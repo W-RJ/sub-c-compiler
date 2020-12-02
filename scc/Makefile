@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -O2 -std=c++11 -Wall
 
-objects = build/main.o build/lexer.o build/parser.o
+objects = build/main.o build/lexer.o build/parser.o build/config.o
 
 build/scc: $(objects)
 	$(CXX) $(CXXFLAGS) $(objects)
@@ -14,6 +14,9 @@ build/lexer.o: src/lexer.cpp src/lexer.h
 
 build/parser.o: src/parser.cpp src/parser.h
 	$(CXX) $(CXXFLAGS) -c src/parser.cpp -o build/parser.o
+
+build/config.o: src/config.cpp src/config.h
+	$(CXX) $(CXXFLAGS) -c src/config.cpp -o build/config.o
 
 clean:
 	-rm $(objects)
