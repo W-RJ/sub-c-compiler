@@ -32,4 +32,4 @@
 *.app
 
 # Build
-scc/build/*
+scc/build/
