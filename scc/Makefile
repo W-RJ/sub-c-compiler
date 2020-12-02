@@ -4,9 +4,9 @@ CXXFLAGS = -O2 -std=c++11 -Wall
 objects = build/main.o build/lexer.o build/parser.o build/config.o
 
 build/scc: $(objects)
-	$(CXX) $(CXXFLAGS) $(objects)
+	$(CXX) $(CXXFLAGS) $(objects) -o build/scc
 
-build/main.o: src/main.cpp
+build/main.o: src/main.cpp src/lexer.h src/parser.h src/config.h
 	$(CXX) $(CXXFLAGS) -c src/main.cpp -o build/main.o
 
 build/lexer.o: src/lexer.cpp src/lexer.h
