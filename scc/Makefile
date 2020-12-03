@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -O2 -std=c++11 -Wall
 
-precmd = build/.dir
+precmd = build/sc.lang
 objects = build/main.o build/lexer.o build/parser.o build/config.o
 
 build/scc: $(objects) Makefile $(precmd)
@@ -19,10 +19,10 @@ build/parser.o: src/parser.cpp src/parser.h Makefile $(precmd)
 build/config.o: src/config.cpp src/config.h Makefile $(precmd)
 	$(CXX) $(CXXFLAGS) -c src/config.cpp -o build/config.o
 
-$(precmd): Makefile
+$(precmd): src/sc.lang Makefile
 	mkdir -p build
-	touch build/.dir
+	cp src/sc.lang build/sc.lang
 
 .PHONY : clean
 clean:
-	-rm $(objects) build/scc
+	-rm $(objects) build/sc.lang build/scc
