@@ -14,13 +14,13 @@ namespace scc
 
     struct Word
     {
-        WordType type;
-        const char *val;
+        WordType type = WordType::NONE;
+        const char *val = NULL;
     };
 
     class Lexer
     {
-    private:
+    protected:
 
         // File Pointer
         FILE *fp;
