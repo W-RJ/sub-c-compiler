@@ -1,7 +1,7 @@
 #include "config.h"
 
 // class Config
-Config::Config(int argc, char **argv) :
+Config::Config() :
 
 #ifdef CG
         inputFileName("testfile.txt"),
@@ -36,6 +36,10 @@ Config::Config(int argc, char **argv) :
 #endif
 
         optimize(true)
+{
+}
+
+void Config::set(int argc, char **argv)
 {
 #ifndef CG
     for (int i = 1; i < argc; i++)

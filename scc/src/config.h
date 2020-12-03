@@ -5,6 +5,9 @@
 
 #define CG 1
 
+/**
+ * Config manager
+ */
 class Config
 {
 public:
@@ -20,7 +23,17 @@ public:
 
     bool optimize;
 
-    Config(int argc, char **argv);
+    Config();
+
+    /**
+     * Set options according to arguments
+     * 
+     * @param argc: count of arguments
+     * @param argv: values of arguments
+     * 
+     * @exception throw InvalidArgumentError if fail
+     */
+    void set(int argc, char **argv);
 };
 
 #endif // _SCC_CONFIG_H_
