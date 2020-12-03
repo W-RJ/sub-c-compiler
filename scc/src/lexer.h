@@ -18,6 +18,9 @@ namespace scc
         const char *val = NULL;
     };
 
+    /**
+     * Abstract base class of lexers used for lexical analysis
+     */
     class Lexer
     {
     protected:
@@ -52,6 +55,15 @@ namespace scc
          */
         virtual Word nextWord() = 0; // NOTE
 
+    };
+
+    /**
+     * Lexical analyzer with DFA
+     */
+    class DFALexer : public Lexer
+    {
+    public:
+        virtual Word nextWord();
     };
 }
 

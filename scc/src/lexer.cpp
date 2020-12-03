@@ -31,4 +31,15 @@ namespace scc
             fp = nullptr;
         }
     }
+
+    // class DFALexer
+    Word DFALexer::nextWord()
+    {
+        Word word;
+        if (fp != nullptr)
+        {
+            // TODO: DFA
+        }
+        return word;
+    }
 }
