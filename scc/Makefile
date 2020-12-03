@@ -7,10 +7,10 @@ objects = build/main.o build/lexer.o build/parser.o build/config.o
 build/scc: $(objects) Makefile $(precmd)
 	$(CXX) $(CXXFLAGS) $(objects) -o build/scc
 
-build/main.o: src/main.cpp src/lexer.h src/parser.h src/config.h Makefile $(precmd)
+build/main.o: src/main.cpp src/lexer.h src/parser.h src/config.h src/sc.lang Makefile $(precmd)
 	$(CXX) $(CXXFLAGS) -c src/main.cpp -o build/main.o
 
-build/lexer.o: src/lexer.cpp src/lexer.h Makefile $(precmd)
+build/lexer.o: src/lexer.cpp src/lexer.h src/sc.lang Makefile $(precmd)
 	$(CXX) $(CXXFLAGS) -c src/lexer.cpp -o build/lexer.o
 
 build/parser.o: src/parser.cpp src/parser.h Makefile $(precmd)
