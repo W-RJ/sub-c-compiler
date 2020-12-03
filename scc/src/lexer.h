@@ -39,9 +39,9 @@ namespace scc
          * 
          * @param filename: name of source file
          * 
-         * @return true if succeed, false otherwise
+         * @exception throw NoSuchFileError if fail
          */
-        bool open(const char *fileName);
+        void open(const char *fileName);
 
         /**
          * Close source file
@@ -63,7 +63,7 @@ namespace scc
     class DFALexer : public Lexer
     {
     public:
-        virtual Word nextWord();
+        virtual Word nextWord() override;
     };
 }
 

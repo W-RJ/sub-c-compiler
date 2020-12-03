@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include "lexer.h"
+#include "exception.h"
 
 namespace scc
 {
@@ -17,10 +18,13 @@ namespace scc
         }
     }
 
-    bool Lexer::open(const char *fileName)
+    void Lexer::open(const char *fileName)
     {
         fp = fopen(fileName, "r, ccs=utf-8");
-        return fp != nullptr;
+        if (fp == nullptr)
+        {
+            throw NoSuchFileError(L"Cannot open input file");
+        }
     }
 
     void Lexer::close()
