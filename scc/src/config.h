@@ -3,6 +3,8 @@
 #ifndef _SCC_CONFIG_H_
 #define _SCC_CONFIG_H_
 
+#define CMD_NAME L"scc"
+#define ERROR_PREFIX CMD_NAME L": error: "
 #define CG 1
 
 /**

@@ -10,3 +10,8 @@ const wchar_t* WRuntimeError::wwhat() const noexcept
 {
     return msg;
 }
+
+const char* WRuntimeError::what() const noexcept
+{
+    return nullptr;
+}

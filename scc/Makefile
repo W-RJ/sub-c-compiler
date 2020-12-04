@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -O2 -std=c++11 -Wall
+CXXFLAGS = -O2 -std=c++11 -Wall -Wno-unused-result
 
 precmd = build/sc.lang
 objects = build/main.o build/lexer.o build/parser.o build/config.o build/exception.o

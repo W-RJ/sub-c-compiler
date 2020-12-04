@@ -15,7 +15,17 @@ public:
 
     explicit WRuntimeError(const wchar_t *what_arg);
 
+    /**
+     * @return error message
+     */
     virtual const wchar_t* wwhat() const noexcept;
+
+    /**
+     * @return nullptr
+     *
+     * @deprecated use wwhat instead
+     */
+    virtual const char* what() const noexcept override;
 };
 
 class NoSuchFileError : public WRuntimeError

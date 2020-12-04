@@ -15,7 +15,7 @@ namespace scc
     struct Word
     {
         WordType type = WordType::NONE;
-        const char *val = NULL;
+        const char *val = nullptr;
     };
 
     /**

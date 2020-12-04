@@ -23,7 +23,7 @@ namespace scc
         fp = fopen(fileName, "r, ccs=utf-8");
         if (fp == nullptr)
         {
-            throw NoSuchFileError(L"Cannot open input file");
+            throw NoSuchFileError(L"Unable to open input file");
         }
     }
 
