@@ -7,7 +7,7 @@
 
 namespace scc
 {
-    enum WordType
+    enum class WordType
     {
         #include "sc.lang"
     };
@@ -51,7 +51,7 @@ namespace scc
         /**
          * Get next word
          * 
-         * @return next word. type == NONE if fail
+         * @return next word. type == WordType::NONE if fail
          */
         virtual Word nextWord() = 0; // NOTE
 
