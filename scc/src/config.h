@@ -14,6 +14,8 @@ class Config
 {
 public:
 
+    const char *langFileName;
+
     const char *inputFileName;
 
     bool lexOnly;

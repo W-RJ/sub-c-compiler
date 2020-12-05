@@ -3,6 +3,8 @@
 // class Config
 Config::Config() :
 
+        langFileName("sc.lang"),
+
 #ifdef CG
         inputFileName("testfile.txt"),
 #else

@@ -11,6 +11,11 @@
 
 void lexerOnly(const Config& config)
 {
+    scc::LangReader reader;
+    reader.open(config.langFileName);
+    reader.read(false);
+    reader.close();
+
     scc::DFALexer lexer;
     lexer.open(config.inputFileName);
 
@@ -39,11 +44,12 @@ void lexerOnly(const Config& config)
         scc::Word word;
         while ((word = lexer.nextWord()).type != scc::WordType::NONE)
         {
-            // TODO: fwprintf
+            fwprintf(fp, L"%ls %ls\n", scc::typeName[int(word.type)], word.val);
         }
 
-        lexer.close();
+        fclose(fp);
     }
+    lexer.close();
 }
 
 int main(int argc, char **argv)

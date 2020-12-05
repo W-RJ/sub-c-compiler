@@ -5,6 +5,8 @@
 
 #include <cstdio>
 
+#include "regexp.h"
+
 namespace scc
 {
     enum class WordType
@@ -12,10 +14,35 @@ namespace scc
         #include "sc.lang"
     };
 
+    extern wchar_t typeName[int(WordType::END)][TYPE_NAME_MAX];
+
     struct Word
     {
         WordType type = WordType::NONE;
         const wchar_t *val = nullptr;
+    };
+
+    class LangReader : public RegExp
+    {
+    private:
+
+        FILE* fp;
+
+    protected:
+
+        virtual wchar_t nextChar() override;
+
+    public:
+
+        LangReader();
+
+        virtual ~LangReader() override;
+
+        void open(const char* fileName);
+
+        void close();
+
+        void read(bool buildTrie); // TODO: build type name?
     };
 
     /**
