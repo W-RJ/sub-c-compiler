@@ -10,7 +10,11 @@ precmd = $(build)/sc.lang
 # *.o
 objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/config.o $(build)/exception.o
 # scc[.exe]
-target = $(build)/scc$(if $(OS)==Windows_NT,.exe)
+ifeq ($(OS),Windows_NT)
+target = $(build)/scc.exe
+else
+target = $(build)/scc
+endif
 
 # compile *.cpp -> *.o
 compile = $(CXX) $(CXXFLAGS) -c $(src)/$(1).cpp -o $(build)/$(1).o
