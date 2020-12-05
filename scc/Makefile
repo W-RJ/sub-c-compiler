@@ -8,7 +8,7 @@ build = build
 precmd = $(build)/sc.lang
 
 # *.o
-objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/config.o $(build)/exception.o
+objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/regexp.o $(build)/config.o $(build)/exception.o
 # scc[.exe]
 ifeq ($(OS),Windows_NT)
 target = $(build)/scc.exe
@@ -29,11 +29,14 @@ $(target): $(objects) Makefile $(precmd)
 $(build)/main.o: $(src)/main.cpp $(src)/lexer.h $(src)/parser.h $(src)/config.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,main)
 
-$(build)/lexer.o: $(src)/lexer.cpp $(src)/lexer.h $(src)/sc.lang Makefile $(precmd)
+$(build)/lexer.o: $(src)/lexer.cpp $(src)/lexer.h $(src)/sc.lang $(src)/exception.h Makefile $(precmd)
 	$(call compile,lexer)
 
 $(build)/parser.o: $(src)/parser.cpp $(src)/parser.h Makefile $(precmd)
 	$(call compile,parser)
+
+$(build)/regexp.o: $(src)/regexp.cpp $(src)/regexp.h Makefile $(precmd)
+	$(call compile,regexp)
 
 $(build)/config.o: $(src)/config.cpp $(src)/config.h Makefile $(precmd)
 	$(call compile,config)
