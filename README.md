@@ -19,7 +19,7 @@ make
 
 ### Windows
 
-首先确保您已安装 MinGW ，并已将 MinGW 的 bin 文件夹的路径添加至环境变量Path中，然后在 Git Bash （或其它bash环境中）输入如下命令：
+首先确保您已安装 MinGW ，并已将 MinGW 的 bin 文件夹路径添加至环境变量Path中，然后在 Git Bash （或其它 Linux Shell 中）输入如下命令：
 
 ``` bash
 cd scc

@@ -26,10 +26,10 @@ $(target): $(objects) Makefile $(precmd)
 	$(CXX) $(CXXFLAGS) $(objects) -o $(target)
 
 # make *.o
-$(build)/main.o: $(src)/main.cpp $(src)/lexer.h $(src)/parser.h $(src)/config.h $(src)/sc.lang Makefile $(precmd)
+$(build)/main.o: $(src)/main.cpp $(src)/lexer.h $(src)/parser.h $(src)/config.h $(src)/exception.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,main)
 
-$(build)/lexer.o: $(src)/lexer.cpp $(src)/lexer.h $(src)/sc.lang $(src)/exception.h Makefile $(precmd)
+$(build)/lexer.o: $(src)/lexer.cpp $(src)/lexer.h $(src)/regexp.h $(src)/exception.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,lexer)
 
 $(build)/parser.o: $(src)/parser.cpp $(src)/parser.h Makefile $(precmd)
