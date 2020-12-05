@@ -1,31 +1,56 @@
 CXX = g++
 CXXFLAGS = -O2 -std=c++11 -Wall -Wno-unused-result
 
-precmd = build/sc.lang
-objects = build/main.o build/lexer.o build/parser.o build/config.o build/exception.o
+# src & build dirs
+src = src
+build = build
 
-build/scc: $(objects) Makefile $(precmd)
-	$(CXX) $(CXXFLAGS) $(objects) -o build/scc
+precmd = $(build)/sc.lang
 
-build/main.o: src/main.cpp src/lexer.h src/parser.h src/config.h src/sc.lang Makefile $(precmd)
-	$(CXX) $(CXXFLAGS) -c src/main.cpp -o build/main.o
+# *.o
+objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/config.o $(build)/exception.o
+# scc[.exe]
+target = $(build)/scc$(if $(OS)==Windows_NT,.exe)
 
-build/lexer.o: src/lexer.cpp src/lexer.h src/sc.lang Makefile $(precmd)
-	$(CXX) $(CXXFLAGS) -c src/lexer.cpp -o build/lexer.o
+# compile *.cpp -> *.o
+compile = $(CXX) $(CXXFLAGS) -c $(src)/$(1).cpp -o $(build)/$(1).o
 
-build/parser.o: src/parser.cpp src/parser.h Makefile $(precmd)
-	$(CXX) $(CXXFLAGS) -c src/parser.cpp -o build/parser.o
+## targets
 
-build/config.o: src/config.cpp src/config.h Makefile $(precmd)
-	$(CXX) $(CXXFLAGS) -c src/config.cpp -o build/config.o
+# make scc[.exe]
+$(target): $(objects) Makefile $(precmd)
+	$(CXX) $(CXXFLAGS) $(objects) -o $(target)
 
-build/exception.o: src/exception.cpp src/exception.h Makefile $(precmd)
-	$(CXX) $(CXXFLAGS) -c src/exception.cpp -o build/exception.o
+# make *.o
+$(build)/main.o: $(src)/main.cpp $(src)/lexer.h $(src)/parser.h $(src)/config.h $(src)/sc.lang Makefile $(precmd)
+	$(call compile,main)
 
-$(precmd): src/sc.lang Makefile
+$(build)/lexer.o: $(src)/lexer.cpp $(src)/lexer.h $(src)/sc.lang Makefile $(precmd)
+	$(call compile,lexer)
+
+$(build)/parser.o: $(src)/parser.cpp $(src)/parser.h Makefile $(precmd)
+	$(call compile,parser)
+
+$(build)/config.o: $(src)/config.cpp $(src)/config.h Makefile $(precmd)
+	$(call compile,config)
+
+$(build)/exception.o: $(src)/exception.cpp $(src)/exception.h Makefile $(precmd)
+	$(call compile,exception)
+
+# mkdir & sc.lang
+$(precmd): $(src)/sc.lang Makefile
 	mkdir -p build
-	cp src/sc.lang build/sc.lang
+	cp $(src)/sc.lang $(build)/sc.lang
 
-.PHONY : clean
+## phony targets
+
+.PHONY : test all clean
+
+test: $(target)
+	# TODO
+
+# clean & rebuild
+all: clean $(target)
+
 clean:
-	-rm $(objects) build/sc.lang build/scc
+	-rm $(objects) $(target) $(build)/sc.lang
