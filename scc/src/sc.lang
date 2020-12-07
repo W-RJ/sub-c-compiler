@@ -1,6 +1,6 @@
 NONE,
 INTCON,//0|[1-9][0-9]*
-CHARCON,//'[+*_a-zA-Z0-9]'
+CHARCON,//'[+\-*/_a-zA-Z0-9]'
 STRCON,//"[ !#-~]*"
 CONSTTK,//const
 INTTK,//int
