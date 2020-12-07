@@ -5,7 +5,7 @@
 
 #include <cstdio>
 
-#include "regexp.h"
+#include "regexp"
 
 namespace scc
 {
@@ -14,7 +14,9 @@ namespace scc
         #include "sc.lang"
     };
 
-    extern wchar_t typeName[int(WordType::END)][TYPE_NAME_MAX];
+    extern wchar_t typeName[unsigned(WordType::END)][TYPE_NAME_MAX];
+
+    extern Trie<WordType> lexTrie;
 
     struct Word
     {
@@ -22,28 +24,7 @@ namespace scc
         const wchar_t *val = nullptr;
     };
 
-    class LangReader : public RegExp
-    {
-    private:
-
-        FILE* fp;
-
-    protected:
-
-        virtual wchar_t nextChar() override;
-
-    public:
-
-        LangReader();
-
-        virtual ~LangReader() override;
-
-        void open(const char* fileName);
-
-        void close();
-
-        void read(bool buildTrie); // TODO: build type name?
-    };
+    void readLang(const char* fileName, bool buildTrie);
 
     /**
      * Abstract base class of lexers used for lexical analysis

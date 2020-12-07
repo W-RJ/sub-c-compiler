@@ -2,72 +2,55 @@
 #include <cwchar>
 
 #include "lexer.h"
+#include "regexp"
+#include "trie"
 #include "exception.h"
 
 namespace scc
 {
-    wchar_t typeName[int(WordType::END)][TYPE_NAME_MAX] = {{'\0'}};
+    wchar_t typeName[unsigned(WordType::END)][TYPE_NAME_MAX] = {{'\0'}};
 
-    // class LangReader
+    Trie<WordType> lexTrie;
 
-    LangReader::LangReader() : fp(nullptr)
+    void readLang(const char* fileName, bool buildTrie)
     {
-    }
-
-    LangReader::~LangReader()
-    {
-        if (fp != nullptr)
-        {
-            fclose(fp);
-        }
-    }
-
-    void LangReader::open(const char* fileName)
-    {
-        fp = fopen(fileName, "r");
+        FILE* fp = fopen(fileName, "r");
         if (fp == nullptr)
         {
-            throw NoSuchFileError(L"Unable to open input file");
+            throw NoSuchFileError(fileName, L"lang");
         }
-    }
-
-    void LangReader::close()
-    {
-        if (fp != nullptr)
-        {
-            fclose(fp);
-            fp = nullptr;
-        }
-    }
-
-    wchar_t LangReader::nextChar()
-    {
-        if (fp == nullptr)
-        {
-            return wchar_t(EOF);
-        }
-        else
-        {
-            return fgetwc(fp);
-        }
-    }
-
-    void LangReader::read(bool buildTrie)
-    {
+        RegExp<WordType> regExp(lexTrie);
+        const int BUFFER_MAX = 256;
+        wchar_t buffer[BUFFER_MAX];
         int n = int(WordType::END);
-        wchar_t buffer[INT16_MAX];
         for (int i = 0; i < n; i++)
         {
             fwscanf(fp, L"%l[^,],", typeName[i]);
-            if (buildTrie)
+            if (buildTrie) // TODO: none & //
             {
-                // TODO
+                if (fgetwc(fp) == '/')
+                {
+                    fgetwc(fp);
+                    fgetws(buffer, BUFFER_MAX, fp);
+                    try
+                    {
+                        regExp.analyze(buffer, WordType(i));
+                    }
+                    catch(RegExpError& e)
+                    {
+                        e.setTypeName(typeName[i]);
+                        e.print(stderr);
+                    }
+
+                    // TODO
+                }
             }
             else
             {
-                fgetws(buffer, INT16_MAX, fp); // TODO
+                while (fgetwc(fp) != L'\n'); // TODO
             }
         }
+        fclose(fp);
     }
 
     // class Lexer
@@ -89,7 +72,7 @@ namespace scc
         fp = fopen(fileName, "r");
         if (fp == nullptr)
         {
-            throw NoSuchFileError(L"Unable to open input file");
+            throw NoSuchFileError(fileName, L"input");
         }
     }
 

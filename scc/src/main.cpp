@@ -11,10 +11,15 @@
 
 void lexerOnly(const Config& config)
 {
-    scc::LangReader reader;
-    reader.open(config.langFileName);
-    reader.read(false);
-    reader.close();
+    try
+    {
+        scc::readLang(config.langFileName, true);
+    }
+    catch(const NoSuchFileError& e)
+    {
+        e.print(stderr);
+        exit(1);
+    }
 
     scc::DFALexer lexer;
     lexer.open(config.inputFileName);
@@ -37,14 +42,14 @@ void lexerOnly(const Config& config)
         }
         if (fp == nullptr)
         {
-            throw NoSuchFileError(L"Unable to open lexical analysis result file");
+            throw NoSuchFileError(config.lexFileName, L"lexical analysis result");
         }
 
         // Analyze
         scc::Word word;
         while ((word = lexer.nextWord()).type != scc::WordType::NONE)
         {
-            fwprintf(fp, L"%ls %ls\n", scc::typeName[int(word.type)], word.val);
+            fwprintf(fp, L"%ls %ls\n", scc::typeName[unsigned(word.type)], word.val);
         }
 
         fclose(fp);
@@ -62,7 +67,7 @@ int main(int argc, char **argv)
     }
     catch (const InvalidArgumentError& e)
     {
-        fwprintf(stderr, ERROR_PREFIX L"invalid argument: %ls\n", e.wwhat());
+        e.print(stderr);
         exit(1); // TODO
     }
 
@@ -74,7 +79,7 @@ int main(int argc, char **argv)
         }
         catch(const NoSuchFileError& e)
         {
-            fwprintf(stderr, ERROR_PREFIX L"No such file error: %ls\n", e.wwhat());
+            e.print(stderr);
             exit(1); // TODO
         }
     }
