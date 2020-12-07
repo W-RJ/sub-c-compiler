@@ -4,6 +4,7 @@
 #define _SCC_LEXER_H_
 
 #include <cstdio>
+#include <string>
 
 #include "regexp"
 
@@ -36,6 +37,10 @@ namespace scc
         // File Pointer
         FILE *fp;
 
+        wchar_t ch;
+
+        std::wstring buffer;
+
     public:
 
         Lexer();
@@ -63,6 +68,15 @@ namespace scc
          */
         virtual Word nextWord() = 0; // NOTE
 
+    };
+
+    /**
+     * Lexical analyzer with Trie
+     */
+    class TrieLexer : public Lexer
+    {
+    public:
+        virtual Word nextWord() override;
     };
 
     /**

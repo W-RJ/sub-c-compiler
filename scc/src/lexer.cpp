@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cwchar>
+#include <cwctype>
 
 #include "lexer.h"
 #include "regexp"
@@ -74,6 +75,7 @@ namespace scc
         {
             throw NoSuchFileError(fileName, L"input");
         }
+        ch = fgetwc(fp);
     }
 
     void Lexer::close()
@@ -83,6 +85,68 @@ namespace scc
             fclose(fp);
             fp = nullptr;
         }
+    }
+
+    // class TrieLexer
+
+    Word TrieLexer::nextWord()
+    {
+        Word word;
+        buffer.clear();
+        int p = 0;
+        if (fp != nullptr)
+        {
+            while (ch != wchar_t(EOF) && (ch <= ' ' || isspace(ch)))
+            {
+                ch = fgetwc(fp);
+            }
+            if (ch == wchar_t(EOF))
+            {
+                return word;
+            }
+            while (true)
+            {
+                if (ch < lexTrie.KEY_L || ch == wchar_t(EOF)) // TODO: merge
+                {
+                    word.type = lexTrie.nodes[p].data;
+                    if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
+                    {
+                        buffer.pop_back();
+                        word.val = buffer.c_str() + 1;
+                    }
+                    else
+                    {
+                        word.val = buffer.c_str();
+                    }
+                    return word; // TODO: ERROR
+                }
+                else if (ch > lexTrie.KEY_R)
+                {
+                    return word; // TODO: ERROR
+                }
+                else if (lexTrie.nodes[p].son[ch - lexTrie.KEY_L] == 0)
+                {
+                    word.type = lexTrie.nodes[p].data;
+                    if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
+                    {
+                        buffer.pop_back();
+                        word.val = buffer.c_str() + 1;
+                    }
+                    else
+                    {
+                        word.val = buffer.c_str();
+                    }
+                    return word; // TODO: ERROR
+                }
+                else
+                {
+                    p = lexTrie.nodes[p].son[ch - lexTrie.KEY_L];
+                }
+                buffer.push_back(ch);
+                ch = fgetwc(fp);
+            }
+        }
+        return word;
     }
 
     // class DFALexer
