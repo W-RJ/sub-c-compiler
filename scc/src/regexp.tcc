@@ -3,6 +3,8 @@
 #ifndef _SCC_REGEXP_TCC_
 #define _SCC_REGEXP_TCC_
 
+#include <cstring>
+
 #include "regexp"
 #include "trie"
 
@@ -149,7 +151,8 @@ namespace scc
             else
             {
                 std::vector<int>* newHeads = new std::vector<int>(*heads);
-                bool vis[trie.nodes.size() + 1] = {false};
+                bool *vis = new bool[trie.nodes.size() + 1];
+                memset(vis, 0, (trie.nodes.size() + 1) * sizeof(bool));
                 while (!heads->empty())
                 {
                     std::vector<int>* curHeads = new std::vector<int>;
@@ -181,6 +184,7 @@ namespace scc
                     delete heads;
                     heads = curHeads;
                 }
+                delete[] vis;
                 delete heads;
                 heads = newHeads;
             }
