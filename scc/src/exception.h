@@ -77,9 +77,11 @@ private:
 
     const wchar_t* typeName;
 
+    wchar_t ch;
+
 public:
 
-    using WRuntimeError::WRuntimeError;
+    RegExpError(const wchar_t *what_arg, wchar_t ch);
 
     void setTypeName(const wchar_t* typeName)
     {

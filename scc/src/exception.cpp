@@ -53,7 +53,12 @@ void InvalidArgumentError::print(FILE* fp) const noexcept
 
 // class RegExpError
 
+
+RegExpError::RegExpError(const wchar_t *what_arg, wchar_t ch) : WRuntimeError(what_arg), ch(ch)
+{
+}
+
 void RegExpError::print(FILE* fp) const noexcept
 {
-    fwprintf(fp, L"%ls%ls In the definition of '%ls': %ls\n", CMD_NAME, ERROR_PREFIX, typeName, msg);
+    fwprintf(fp, L"%ls%ls In the definition of '%ls': %ls (near %lc)\n", CMD_NAME, ERROR_PREFIX, typeName, msg, ch);
 }
