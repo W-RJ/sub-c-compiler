@@ -5,7 +5,12 @@
 #include "lexer.h"
 #include "regexp"
 #include "trie"
+#include "config.h"
 #include "exception.h"
+
+#ifdef CG
+#include "cg.h"
+#endif
 
 namespace scc
 {
@@ -15,7 +20,13 @@ namespace scc
 
     void readLang(const char* fileName, bool buildTrie)
     {
-        FILE* fp = fopen(fileName, "r");
+        FILE* fp;
+#ifdef CG
+        fp = fopen(fileName, "w");
+        fwprintf(fp, L"%ls", lang);
+        fclose(fp);
+#endif
+        fp = fopen(fileName, "r");
         if (fp == nullptr)
         {
             throw NoSuchFileError(fileName, L"lang");
