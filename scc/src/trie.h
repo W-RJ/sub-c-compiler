@@ -3,6 +3,8 @@
 #ifndef _SCC_TRIE_H_
 #define _SCC_TRIE_H_
 
+#include <cstdio>
+
 #include <vector>
 
 namespace scc
@@ -27,6 +29,8 @@ namespace scc
         Trie();
 
         virtual ~Trie();
+
+        void print(FILE* fp);
 
         // TODO
     };
