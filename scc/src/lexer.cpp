@@ -29,7 +29,7 @@ namespace scc
         fp = fopen(fileName, "r");
         if (fp == nullptr)
         {
-            throw NoSuchFileError(fileName, L"lang");
+            throw FileError(fileName, L"lang");
         }
         RegExp<WordType> regExp(lexTrie);
         const int BUFFER_MAX = 256;
@@ -84,7 +84,7 @@ namespace scc
         fp = fopen(fileName, "r");
         if (fp == nullptr)
         {
-            throw NoSuchFileError(fileName, L"input");
+            throw FileError(fileName, L"input");
         }
         ch = fgetwc(fp);
     }

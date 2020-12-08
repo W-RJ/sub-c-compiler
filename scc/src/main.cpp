@@ -15,7 +15,7 @@ void lexerOnly(const Config& config)
     {
         scc::readLang(config.langFileName, true);
     }
-    catch(const NoSuchFileError& e)
+    catch(const FileError& e)
     {
         e.print(stderr);
         exit(1);
@@ -42,7 +42,7 @@ void lexerOnly(const Config& config)
         }
         if (fp == nullptr)
         {
-            throw NoSuchFileError(config.lexFileName, L"lexical analysis result");
+            throw FileError(config.lexFileName, L"lexical analysis result");
         }
 
         // Analyze
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
         {
             lexerOnly(config);
         }
-        catch(const NoSuchFileError& e)
+        catch(const FileError& e)
         {
             e.print(stderr);
             exit(1); // TODO

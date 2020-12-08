@@ -59,7 +59,7 @@ $(build)/cg.o: $(src)/cg.cpp $(src)/cg.h Makefile $(precmd)
 	$(call compile,cg)
 
 ifeq ($(t2wcs),$(wildcard $(t2wcs)))
-$(src)/cg.cpp: $(src)/sc.lang $(src)/cg.tl Makefile
+$(src)/cg.cpp: $(t2wcs) $(src)/sc.lang $(src)/cg.tl Makefile
 	cp $(src)/cg.tl $(src)/cg.cpp
 	$(t2wcs) < $(src)/sc.lang >> $(src)/cg.cpp
 	echo "\";\n}" >> $(src)/cg.cpp

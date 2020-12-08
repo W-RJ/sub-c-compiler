@@ -39,7 +39,7 @@ public:
     virtual void print(FILE* fp) const noexcept;
 };
 
-class NoSuchFileError : public WRuntimeError
+class FileError : public WRuntimeError
 {
 private:
 
@@ -47,11 +47,11 @@ private:
 
     const wchar_t* fileType;
 
-    static const wchar_t* MSG;
+    const int errnum;
 
 public:
     
-    NoSuchFileError(const char* fileName, const wchar_t* fileType);
+    FileError(const char* fileName, const wchar_t* fileType);
 
     /**
      * print error message

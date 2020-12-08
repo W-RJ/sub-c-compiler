@@ -1,4 +1,6 @@
 #include <stdexcept>
+#include <cstring>
+#include <cerrno>
 
 #include "exception.h"
 
@@ -29,18 +31,16 @@ void WRuntimeError::print(FILE* fp) const noexcept
     fwprintf(fp, L"%ls%ls%ls\n", CMD_NAME, ERROR_PREFIX, msg);
 }
 
-// class NoSuchFileError
+// class FileError
 
-const wchar_t* NoSuchFileError::MSG = L"No such file";
-
-NoSuchFileError::NoSuchFileError(const char* fileName, const wchar_t* fileType) :
-        WRuntimeError(fileType), fileName(fileName), fileType(fileType)
+FileError::FileError(const char* fileName, const wchar_t* fileType) :
+        WRuntimeError(fileType), fileName(fileName), fileType(fileType), errnum(errno)
 {
 }
 
-void NoSuchFileError::print(FILE* fp) const noexcept
+void FileError::print(FILE* fp) const noexcept
 {
-    fwprintf(fp, L"%ls%ls%s: %ls\n", CMD_NAME, ERROR_PREFIX, fileName, MSG);
+    fwprintf(fp, L"%ls%ls%s: %s\n", CMD_NAME, ERROR_PREFIX, fileName, strerror(errnum));
     fwprintf(fp, L"%ls%lsUnable to open %ls files\n", CMD_NAME, FATAL_ERROR_PREFIX, fileType);
 }
 

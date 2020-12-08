@@ -52,7 +52,7 @@ namespace scc
          * 
          * @param filename: name of source file
          * 
-         * @exception throw NoSuchFileError if fail
+         * @exception throw FileError if fail
          */
         void open(const char *fileName);
 
