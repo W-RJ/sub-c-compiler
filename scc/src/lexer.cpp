@@ -104,9 +104,9 @@ namespace scc
     {
         Word word;
         buffer.clear();
-        int p = 0;
         if (fp != nullptr)
         {
+            int p = 0;
             while (ch != wchar_t(EOF) && (ch <= ' ' || isspace(ch)))
             {
                 ch = fgetwc(fp);

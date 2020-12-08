@@ -50,7 +50,7 @@ namespace scc
 
     public:
 
-        RegExp(Trie<T>& trie);
+        explicit RegExp(Trie<T>& trie);
 
         virtual ~RegExp();
 
