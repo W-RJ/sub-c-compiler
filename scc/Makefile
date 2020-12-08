@@ -3,11 +3,18 @@ CXXFLAGS = -O2 -std=c++11 -Wall -Wno-unused-result
 
 CG = true
 
-# src & build dirs
+# root & src & build dirs
+root = ..
 src = src
 build = build
 
 precmd = $(build)/sc.lang
+
+ifeq ($(OS),Windows_NT)
+    t2wcs = $(root)/tools/$(build)/t2wcs.exe
+else
+    t2wcs = $(root)/tools/$(build)/t2wcs
+endif
 
 # *.o
 objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/config.o $(build)/exception.o
@@ -51,9 +58,16 @@ $(build)/exception.o: $(src)/exception.cpp $(src)/exception.h Makefile $(precmd)
 $(build)/cg.o: $(src)/cg.cpp $(src)/cg.h Makefile $(precmd)
 	$(call compile,cg)
 
+ifeq ($(t2wcs),$(wildcard $(t2wcs)))
+$(src)/cg.cpp: $(src)/sc.lang $(src)/cg.tl Makefile
+	cp $(src)/cg.tl $(src)/cg.cpp
+	$(t2wcs) < $(src)/sc.lang >> $(src)/cg.cpp
+	echo "\";\n}" >> $(src)/cg.cpp
+endif
+
 # mkdir & sc.lang
 $(precmd): $(src)/sc.lang Makefile
-	mkdir -p build
+	mkdir -p $(build)
 	cp $(src)/sc.lang $(build)/sc.lang
 
 ## phony targets

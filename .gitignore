@@ -33,6 +33,7 @@
 
 # Build
 scc/build/
+tools/build/
 
 # vscode
 .vscode
