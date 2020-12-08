@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "lexer.h"
 #include "parser.h"
 #include "exception.h"
@@ -22,5 +24,14 @@ namespace scc
             throw NullPointerError(L"setLexer: lexer is null");
         }
         this->lexer = lexer;
+    }
+
+    // class RecursiveParser
+
+    void RecursiveParser::parse()
+    {
+        assert(lexer != nullptr);
+
+        // TODO
     }
 }

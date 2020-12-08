@@ -1,5 +1,6 @@
 CXX = g++
 CXXFLAGS = -O2 -std=c++11 -Wall -Wno-unused-result
+# CXXFLAGS += -D NDEBUG
 
 CG = true
 

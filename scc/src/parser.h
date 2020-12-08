@@ -9,9 +9,11 @@ namespace scc
 {
     class Parser
     {
-    private:
+    protected:
 
         Lexer* lexer;
+
+        Word word;
 
     public:
 
@@ -22,6 +24,12 @@ namespace scc
         void setLexer(Lexer* lexer);
 
         virtual void parse() = 0;
+    };
+
+    class RecursiveParser : public Parser
+    {
+    public:
+        virtual void parse() override;
     };
 }
 
