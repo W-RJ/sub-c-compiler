@@ -46,7 +46,7 @@ $(build)/lexer.o: $(src)/lexer.cpp $(src)/lexer.h $(src)/regexp $(src)/regexp.h 
         $(src)/trie.tcc $(src)/config.h $(src)/exception.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,lexer)
 
-$(build)/parser.o: $(src)/parser.cpp $(src)/parser.h Makefile $(precmd)
+$(build)/parser.o: $(src)/parser.cpp $(src)/parser.h $(src)/lexer.h $(src)/exception.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,parser)
 
 $(build)/config.o: $(src)/config.cpp $(src)/config.h Makefile $(precmd)
