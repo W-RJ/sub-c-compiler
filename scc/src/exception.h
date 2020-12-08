@@ -94,4 +94,9 @@ public:
     virtual void print(FILE* fp) const noexcept;
 };
 
+class NullPointerError : public WRuntimeError
+{
+    using WRuntimeError::WRuntimeError;
+};
+
 #endif // _SCC_EXCEPTION_H_

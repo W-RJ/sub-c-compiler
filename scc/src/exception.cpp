@@ -53,7 +53,6 @@ void InvalidArgumentError::print(FILE* fp) const noexcept
 
 // class RegExpError
 
-
 RegExpError::RegExpError(const wchar_t *what_arg, wchar_t ch) : WRuntimeError(what_arg), ch(ch)
 {
 }
