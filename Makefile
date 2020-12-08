@@ -1,6 +1,10 @@
+build = build
+
 main:
 	$(MAKE) -C tools
 	$(MAKE) -C scc
+	mkdir -p $(build)
+	cp scc/$(build)/scc $(build)
 
 ## phony targets
 
@@ -17,3 +21,4 @@ all: clean main
 clean:
 	$(MAKE) clean -C tools
 	$(MAKE) clean -C scc
+	-rm $(build)/scc

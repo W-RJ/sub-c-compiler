@@ -32,8 +32,9 @@
 *.app
 
 # Build
-scc/build/
-tools/build/
+/build/
+/scc/build/
+/tools/build/
 
 # vscode
-.vscode
+/.vscode/
