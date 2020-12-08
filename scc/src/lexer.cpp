@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cwchar>
 #include <cwctype>
+#include <cassert>
 
 #include "lexer.h"
 #include "regexp"
@@ -102,60 +103,58 @@ namespace scc
 
     Word TrieLexer::nextWord()
     {
+        assert(fp != nullptr);
+        int p = 0;
         Word word;
         buffer.clear();
-        if (fp != nullptr)
+        while (ch != wchar_t(EOF) && (ch <= ' ' || isspace(ch)))
         {
-            int p = 0;
-            while (ch != wchar_t(EOF) && (ch <= ' ' || isspace(ch)))
+            ch = fgetwc(fp);
+        }
+        if (ch == wchar_t(EOF))
+        {
+            return word;
+        }
+        while (true)
+        {
+            if (ch < lexTrie.KEY_L || ch == wchar_t(EOF)) // TODO: merge
             {
-                ch = fgetwc(fp);
-            }
-            if (ch == wchar_t(EOF))
-            {
-                return word;
-            }
-            while (true)
-            {
-                if (ch < lexTrie.KEY_L || ch == wchar_t(EOF)) // TODO: merge
+                word.type = lexTrie.nodes[p].data;
+                if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
                 {
-                    word.type = lexTrie.nodes[p].data;
-                    if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
-                    {
-                        buffer.pop_back();
-                        word.val = buffer.c_str() + 1;
-                    }
-                    else
-                    {
-                        word.val = buffer.c_str();
-                    }
-                    return word; // TODO: ERROR
-                }
-                else if (ch > lexTrie.KEY_R)
-                {
-                    return word; // TODO: ERROR
-                }
-                else if (lexTrie.nodes[p].son[ch - lexTrie.KEY_L] == 0)
-                {
-                    word.type = lexTrie.nodes[p].data;
-                    if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
-                    {
-                        buffer.pop_back();
-                        word.val = buffer.c_str() + 1;
-                    }
-                    else
-                    {
-                        word.val = buffer.c_str();
-                    }
-                    return word; // TODO: ERROR
+                    buffer.pop_back();
+                    word.val = buffer.c_str() + 1;
                 }
                 else
                 {
-                    p = lexTrie.nodes[p].son[ch - lexTrie.KEY_L];
+                    word.val = buffer.c_str();
                 }
-                buffer.push_back(ch);
-                ch = fgetwc(fp);
+                return word; // TODO: ERROR
             }
+            else if (ch > lexTrie.KEY_R)
+            {
+                return word; // TODO: ERROR
+            }
+            else if (lexTrie.nodes[p].son[ch - lexTrie.KEY_L] == 0)
+            {
+                word.type = lexTrie.nodes[p].data;
+                if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
+                {
+                    buffer.pop_back();
+                    word.val = buffer.c_str() + 1;
+                }
+                else
+                {
+                    word.val = buffer.c_str();
+                }
+                return word; // TODO: ERROR
+            }
+            else
+            {
+                p = lexTrie.nodes[p].son[ch - lexTrie.KEY_L];
+            }
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
         }
         return word;
     }
