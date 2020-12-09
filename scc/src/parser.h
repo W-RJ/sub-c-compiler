@@ -3,6 +3,8 @@
 #ifndef _SCC_PARSER_H_
 #define _SCC_PARSER_H_
 
+#include <cstdio>
+
 #include "lexer.h"
 
 namespace scc
@@ -15,6 +17,8 @@ namespace scc
 
         Word word;
 
+        FILE *lexFp, *parserFp;
+
     public:
 
         Parser();
@@ -22,6 +26,10 @@ namespace scc
         virtual ~Parser();
 
         void setLexer(Lexer* lexer);
+
+        void open(const char* lexFileName, const char* parserFileName);
+
+        void close();
 
         virtual void parse() = 0;
     };

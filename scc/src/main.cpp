@@ -47,6 +47,24 @@ void lexerOnly(const Config& config)
     lexer.close();
 }
 
+void compile(const Config& config)
+{
+    scc::Lexer* lexer = new scc::TrieLexer;
+    lexer->open(config.inputFileName);
+
+    scc::Parser* parser = new scc::RecursiveParser;
+    parser->setLexer(lexer);
+
+    parser->open(config.lexFileName, config.parserFileName);
+
+    parser->parse();
+
+    parser->close();
+    delete parser;
+    lexer->close();
+    delete lexer;
+}
+
 int main(int argc, char **argv)
 {
     // Set options according to arguments
@@ -85,6 +103,15 @@ int main(int argc, char **argv)
     }
     else
     {
+        try
+        {
+            compile(config);
+        }
+        catch (const FileError& e)
+        {
+            e.print(stderr);
+            exit(1); // TODO
+        }
         // TODO
     }
     return 0;
