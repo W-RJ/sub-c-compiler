@@ -4,7 +4,9 @@ Compiler for the Sub C Programing Language defined by DUT in 2020.
 
 针对大连理工大学在2020年定义的 Sub C 程序设计语言的编译器。
 
-## Build 构建方法
+-----------
+
+## Build | 构建方法
 
 ### Linux / macOS
 
@@ -33,3 +35,48 @@ mingw32-make
 > 修改方法可参考：
 > 
 > https://code.visualstudio.com/docs/editor/integrated-terminal#_windows
+
+-----------
+
+## Language Definition | 语言定义
+
+### Lexical Definition | 词法定义
+
+| 类型码 | 正则表达式 |
+| ------ | ---------- |
+|INTCON|0\|[1-9][0-9]*|
+|CHARCON|'[+\-*/_a-zA-Z0-9]'|
+|STRCON|"[ !#-~]*"|
+|CONSTTK|const|
+|INTTK|int|
+|CHARTK|char|
+|VOIDTK|void|
+|MAINTK|main|
+|IFTK|if|
+|ELSETK|else|
+|DOTK|do|
+|WHILETK|while|
+|FORTK|for|
+|SCANFTK|scanf|
+|PRINTFTK|printf|
+|RETURNTK|return|
+|PLUS|+|
+|MINU|-|
+|MULT|\*|
+|DIV|/|
+|LSS|<|
+|LEQ|<=|
+|GRE|>|
+|GEQ|>=|
+|EQL|==|
+|NEQ|!=|
+|ASSIGN|=|
+|SEMICN|;|
+|COMMA|,|
+|LPARENT|(|
+|RPARENT|)|
+|LBRACK|\[|
+|RBRACK|\]|
+|LBRACE|{|
+|RBRACE|}|
+|IDENFR|[_a-zA-Z][_a-zA-Z0-9]*|
