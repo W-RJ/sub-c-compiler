@@ -1,14 +1,18 @@
 build = build
 
+## phony targets
+
+.PHONY : main zip test all clean
+
 main:
 	$(MAKE) -C tools
 	$(MAKE) -C scc
 	mkdir -p $(build)
 	cp scc/$(build)/scc $(build)
 
-## phony targets
-
-.PHONY : test all clean
+zip: main
+	-rm scc.zip
+	zip -r scc.zip scc
 
 test: main
 	$(MAKE) test -C tools

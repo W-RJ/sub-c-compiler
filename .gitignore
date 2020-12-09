@@ -35,6 +35,7 @@
 /build/
 /scc/build/
 /tools/build/
+/*.zip
 
 # vscode
 /.vscode/
