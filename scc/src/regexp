@@ -1,0 +1,12 @@
+// <regexp> -*- C++ -*-
+
+#pragma once
+
+#ifndef _SCC_REGEXP_
+#define _SCC_REGEXP_
+
+#include "regexp.h"
+
+#include "regexp.tcc"
+
+#endif // _SCC_REGEXP_

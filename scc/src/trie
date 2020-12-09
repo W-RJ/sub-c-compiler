@@ -1,0 +1,12 @@
+// <trie> -*- C++ -*-
+
+#pragma once
+
+#ifndef _SCC_TRIE_
+#define _SCC_TRIE_
+
+#include "trie.h"
+
+#include "trie.tcc"
+
+#endif // _SCC_TRIE_

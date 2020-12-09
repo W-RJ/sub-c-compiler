@@ -11,12 +11,7 @@
 
 void lexerOnly(const Config& config)
 {
-    scc::LangReader reader;
-    reader.open(config.langFileName);
-    reader.read(false);
-    reader.close();
-
-    scc::DFALexer lexer;
+    scc::TrieLexer lexer;
     lexer.open(config.inputFileName);
 
     if (config.lexFileName == nullptr)
@@ -37,19 +32,37 @@ void lexerOnly(const Config& config)
         }
         if (fp == nullptr)
         {
-            throw NoSuchFileError(L"Unable to open lexical analysis result file");
+            throw FileError(config.lexFileName, L"lexical analysis result");
         }
 
         // Analyze
         scc::Word word;
         while ((word = lexer.nextWord()).type != scc::WordType::NONE)
         {
-            fwprintf(fp, L"%ls %ls\n", scc::typeName[int(word.type)], word.val);
+            fwprintf(fp, L"%ls %ls\n", scc::typeName[unsigned(word.type)], word.val);
         }
 
         fclose(fp);
     }
     lexer.close();
+}
+
+void compile(const Config& config)
+{
+    scc::Lexer* lexer = new scc::TrieLexer;
+    lexer->open(config.inputFileName);
+
+    scc::Parser* parser = new scc::RecursiveParser;
+    parser->setLexer(lexer);
+
+    parser->open(config.lexFileName, config.parserFileName);
+
+    parser->parse();
+
+    parser->close();
+    delete parser;
+    lexer->close();
+    delete lexer;
 }
 
 int main(int argc, char **argv)
@@ -62,8 +75,18 @@ int main(int argc, char **argv)
     }
     catch (const InvalidArgumentError& e)
     {
-        fwprintf(stderr, ERROR_PREFIX L"invalid argument: %ls\n", e.wwhat());
+        e.print(stderr);
         exit(1); // TODO
+    }
+
+    try
+    {
+        scc::readLang(config.langFileName, true);
+    }
+    catch (const FileError& e)
+    {
+        e.print(stderr);
+        exit(1);
     }
 
     if (config.lexOnly)
@@ -72,14 +95,23 @@ int main(int argc, char **argv)
         {
             lexerOnly(config);
         }
-        catch(const NoSuchFileError& e)
+        catch (const FileError& e)
         {
-            fwprintf(stderr, ERROR_PREFIX L"No such file error: %ls\n", e.wwhat());
+            e.print(stderr);
             exit(1); // TODO
         }
     }
     else
     {
+        try
+        {
+            compile(config);
+        }
+        catch (const FileError& e)
+        {
+            e.print(stderr);
+            exit(1); // TODO
+        }
         // TODO
     }
     return 0;

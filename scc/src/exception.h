@@ -11,6 +11,12 @@ protected:
 
     const wchar_t *msg;
 
+    static const wchar_t* CMD_NAME;
+
+    static const wchar_t* ERROR_PREFIX;
+
+    static const wchar_t* FATAL_ERROR_PREFIX;
+
 public:
 
     explicit WRuntimeError(const wchar_t *what_arg);
@@ -26,14 +32,69 @@ public:
      * @deprecated use wwhat instead
      */
     virtual const char* what() const noexcept override;
+
+    /**
+     * print error message
+     */
+    virtual void print(FILE* fp) const noexcept;
 };
 
-class NoSuchFileError : public WRuntimeError
+class FileError : public WRuntimeError
 {
-    using WRuntimeError::WRuntimeError;
+private:
+
+    const char* fileName;
+
+    const wchar_t* fileType;
+
+    const int errnum;
+
+public:
+    
+    FileError(const char* fileName, const wchar_t* fileType);
+
+    /**
+     * print error message
+     */
+    virtual void print(FILE* fp) const noexcept;
 };
 
 class InvalidArgumentError : public WRuntimeError
+{
+public:
+
+    using WRuntimeError::WRuntimeError;
+
+    /**
+     * print error message
+     */
+    virtual void print(FILE* fp) const noexcept;
+};
+
+class RegExpError : public WRuntimeError
+{
+private:
+
+    const wchar_t* typeName;
+
+    wchar_t ch;
+
+public:
+
+    RegExpError(const wchar_t *what_arg, wchar_t ch);
+
+    void setTypeName(const wchar_t* typeName)
+    {
+        this->typeName = typeName;
+    }
+
+    /**
+     * print error message
+     */
+    virtual void print(FILE* fp) const noexcept;
+};
+
+class NullPointerError : public WRuntimeError
 {
     using WRuntimeError::WRuntimeError;
 };

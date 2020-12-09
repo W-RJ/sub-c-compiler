@@ -1,7 +1,7 @@
 NONE,
-INTCON,//[0-9]+
-CHARCON,//'[+*_a-zA-Z0-9]'
-STRCON,//""|"[ !#-~]+"
+INTCON,//0|[1-9][0-9]*
+CHARCON,//'[+\-*/_a-zA-Z0-9]'
+STRCON,//"[ !#-~]*"
 CONSTTK,//const
 INTTK,//int
 CHARTK,//char
@@ -17,7 +17,7 @@ PRINTFTK,//printf
 RETURNTK,//return
 PLUS,//+
 MINU,//-
-MULT,//*
+MULT,//\*
 DIV,///
 LSS,//<
 LEQ,//<=
@@ -30,10 +30,10 @@ SEMICN,//;
 COMMA,//,
 LPARENT,//(
 RPARENT,//)
-LBRACK,//[
-RBRACK,//]
+LBRACK,//\[
+RBRACK,//\]
 LBRACE,//{
 RBRACE,//}
-IDENFR,//[_a-zA-Z][_a-zA-Z0-9]+
+IDENFR,//[_a-zA-Z][_a-zA-Z0-9]*
 END,
 #define TYPE_NAME_MAX 10

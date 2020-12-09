@@ -13,14 +13,18 @@ Config::Config() :
 
 #if defined(CG) && CG == 1
         lexOnly(true),
-        lexFileName("output.txt"),
 #else
         lexOnly(false),
+#endif
+
+#if defined(CG) && (CG == 1 || CG == 2)
+        lexFileName("output.txt"),
+#else
         lexFileName(nullptr),
 #endif
 
 #if defined(CG) && CG == 2
-        parserFileName("output.txt"),
+        parserFileName("&"),
 #else
         parserFileName(nullptr),
 #endif

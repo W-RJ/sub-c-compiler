@@ -4,8 +4,9 @@
 #define _SCC_LEXER_H_
 
 #include <cstdio>
+#include <string>
 
-#include "regexp.h"
+#include "regexp"
 
 namespace scc
 {
@@ -14,7 +15,9 @@ namespace scc
         #include "sc.lang"
     };
 
-    extern wchar_t typeName[int(WordType::END)][TYPE_NAME_MAX];
+    extern wchar_t typeName[unsigned(WordType::END)][TYPE_NAME_MAX];
+
+    extern Trie<WordType> lexTrie;
 
     struct Word
     {
@@ -22,28 +25,7 @@ namespace scc
         const wchar_t *val = nullptr;
     };
 
-    class LangReader : public RegExp
-    {
-    private:
-
-        FILE* fp;
-
-    protected:
-
-        virtual wchar_t nextChar() override;
-
-    public:
-
-        LangReader();
-
-        virtual ~LangReader() override;
-
-        void open(const char* fileName);
-
-        void close();
-
-        void read(bool buildTrie); // TODO: build type name?
-    };
+    void readLang(const char* fileName, bool buildTrie);
 
     /**
      * Abstract base class of lexers used for lexical analysis
@@ -54,6 +36,10 @@ namespace scc
 
         // File Pointer
         FILE *fp;
+
+        wchar_t ch;
+
+        std::wstring buffer;
 
     public:
 
@@ -66,7 +52,7 @@ namespace scc
          * 
          * @param filename: name of source file
          * 
-         * @exception throw NoSuchFileError if fail
+         * @exception throw FileError if fail
          */
         void open(const char *fileName);
 
@@ -82,6 +68,15 @@ namespace scc
          */
         virtual Word nextWord() = 0; // NOTE
 
+    };
+
+    /**
+     * Lexical analyzer with Trie
+     */
+    class TrieLexer : public Lexer
+    {
+    public:
+        virtual Word nextWord() override;
     };
 
     /**
