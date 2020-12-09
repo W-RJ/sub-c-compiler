@@ -36,8 +36,64 @@ namespace scc
 
     class RecursiveParser : public Parser
     {
+    protected:
+
+        void constBlock();
+
+        void constDef();
+
+        void integer();
+
+        void declareHead();
+
+        void varBlock();
+
+        void varDef();
+
+        void funDef();
+
+        void voidFunDef();
+
+        void compoundSt();
+
+        void param();
+
+        void mainFun();
+
+        void expression();
+
+        void item();
+
+        void factor();
+
+        void statement();
+
+        void assignSt();
+
+        void conditionSt();
+
+        void condition();
+
+        void loopSt();
+
+        void funCall();
+
+        void voidFunCall();
+
+        void paramVal();
+
+        void statementBlock();
+
+        void readSt();
+
+        void writeSt();
+
+        void returnSt();
+
     public:
+
         virtual void parse() override;
+
     };
 }
 

@@ -90,6 +90,110 @@ namespace scc
 
     // class RecursiveParser
 
+    void RecursiveParser::constBlock()
+    {
+    }
+
+    void RecursiveParser::constDef()
+    {
+    }
+
+    void RecursiveParser::integer()
+    {
+    }
+
+    void RecursiveParser::declareHead()
+    {
+    }
+
+    void RecursiveParser::varBlock()
+    {
+    }
+
+    void RecursiveParser::varDef()
+    {
+    }
+
+    void RecursiveParser::funDef()
+    {
+    }
+
+    void RecursiveParser::voidFunDef()
+    {
+    }
+
+    void RecursiveParser::compoundSt()
+    {
+    }
+
+    void RecursiveParser::param()
+    {
+    }
+
+    void RecursiveParser::mainFun()
+    {
+    }
+
+    void RecursiveParser::expression()
+    {
+    }
+
+    void RecursiveParser::item()
+    {
+    }
+
+    void RecursiveParser::factor()
+    {
+    }
+
+    void RecursiveParser::statement()
+    {
+    }
+
+    void RecursiveParser::assignSt()
+    {
+    }
+
+    void RecursiveParser::conditionSt()
+    {
+    }
+
+    void RecursiveParser::condition()
+    {
+    }
+
+    void RecursiveParser::loopSt()
+    {
+    }
+
+    void RecursiveParser::funCall()
+    {
+    }
+
+    void RecursiveParser::voidFunCall()
+    {
+    }
+
+    void RecursiveParser::paramVal()
+    {
+    }
+
+    void RecursiveParser::statementBlock()
+    {
+    }
+
+    void RecursiveParser::readSt()
+    {
+    }
+
+    void RecursiveParser::writeSt()
+    {
+    }
+
+    void RecursiveParser::returnSt()
+    {
+    }
+
     void RecursiveParser::parse()
     {
         assert(lexer != nullptr);
