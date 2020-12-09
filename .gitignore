@@ -35,4 +35,9 @@
 scc/build/
 
 # vscode
-.vscode
+/.vscode/
+
+# dev-cpp
+*.dev
+*.layout
+Makefile.win
