@@ -11,8 +11,6 @@
 #include "trie"
 #include "config.h"
 #include "exception.h"
-using std::wstring;
-using std::unordered_map;
 
 #ifdef CG
 #include "cg.h"
@@ -71,26 +69,8 @@ namespace scc
         fclose(fp);
     }
 
-    //judge letter 
-    bool IsLetter(const wchar_t x)
-    {
-        return (x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z') || x == '_';
-    }
-
-    //judge number
-    bool IsNumber(const wchar_t x)
-    {
-        return x >= '0' && x <= '9';
-    }
-
-    // judge singSign
-    bool IsSingSign(const wchar_t ch)
-    {
-        return ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')' || ch == '{' || ch == '}' || ch == ';' || ch == ',' || ch == '[' || ch == ']';
-    }
-
     // struct unordered_map
-    void set_key(unordered_map<wstring,WordType> & key)
+    void set_key(std::unordered_map<std::wstring,WordType> & key)
     {
         key[L"const"] = WordType::CONSTTK;
         key[L"int"] = WordType::INTTK;
@@ -105,25 +85,6 @@ namespace scc
         key[L"scanf"] = WordType::SCANFTK;
         key[L"printf"] = WordType::PRINTFTK;
         key[L"return"] = WordType::RETURNTK;
-        key[L"+"] = WordType::PLUS;
-        key[L"-"] = WordType::MINU;
-        key[L"*"] = WordType::MULT;
-        key[L"/"] = WordType::DIV;
-        key[L"<"] = WordType::LSS;
-        key[L"<="] = WordType::LEQ;
-        key[L">"] = WordType::GRE;
-        key[L">="] = WordType::GEQ;
-        key[L"=="] = WordType::EQL;
-        key[L"!="] = WordType::NEQ;
-        key[L"="] = WordType::ASSIGN;
-        key[L";"] = WordType::SEMICN;
-        key[L","] = WordType::COMMA;
-        key[L"("] = WordType::LPARENT;
-        key[L")"] = WordType::RPARENT;
-        key[L"["] = WordType::LBRACK;
-        key[L"]"] = WordType::RBRACK;
-        key[L"{"] = WordType::LBRACE;
-        key[L"}"] = WordType::RBRACE;
     }
 
     // class Lexer
@@ -228,187 +189,243 @@ namespace scc
 
     // class DFALexer
 
+    bool DFALexer::isAlpha(wchar_t ch)
+    {
+        return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
+    }
+
+    bool DFALexer::isDigit(wchar_t ch)
+    {
+        return ch >= '0' && ch <= '9';
+    }
+
     Word DFALexer::nextWord()
     {
+        assert(fp != nullptr);
         Word word;
-        int i=0; //control stemp lengthg
-        wchar_t ctemp;
-        wchar_t stemp[256];
-        unordered_map<wstring,WordType> key;
-        set_key(key);
-        //wstring strtemp;
-        if (fp != nullptr)
+        buffer.clear();
+
+        while (ch != wchar_t(EOF) && (ch <= ' ' || isspace(ch)))
         {
-            // TODO: DFA
-            // fgetc -> fgetwc
-            // char -> wchar_t
-            /* yet to ignore Code annotation */
-            /* yet to wirte error tips */
-            while ((ctemp = fgetwc(fp)) != EOF)
-            {
-                while (iswspace(ctemp))
-                    ctemp = fgetwc(fp);
-                /* char con */
-                if (ctemp == '\'') {
-                    i = 0;
-                    ctemp = fgetwc(fp);
-                    if (!IsLetter(ctemp) && !IsNumber(ctemp)
-                            && ctemp != L'+' && ctemp != L'-' && ctemp != '*' && ctemp != '/')
-                    {
-                        word.type = WordType::NONE;
-                        return word;
-                    }
-                    else
-                    {
-                        stemp[i++] = ctemp;
-                    }
-                    ctemp = fgetwc(fp);
-                    if(ctemp == '\'') // read '\''
-                    {
-                        stemp[i] = '\0';
-                        word.type = WordType::CHARCON;
-                        word.val = stemp;
-                        return word;
-                    }
-                    else
-                    {
-                        word.type = WordType::NONE;
-                        return word;
-                    }
-                }
-                /* str con */
-                else if(ctemp == '\"')
-                {
-                    i = 0;
-                    
-                    while ((ctemp = fgetwc(fp)) != EOF)
-                    {
-                        if (ctemp != '\"' && ctemp >= 32 && ctemp < 127)
-                        {
-                            stemp[i++] = ctemp;
-                        }
-                        else if (ctemp == '\"')
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            word.type = WordType::NONE;
-                            return word;
-                        }
-                    }
-                    if(ctemp == '\"')
-                    {
-                        stemp[i] = '\0';
-                        word.type = WordType::STRCON;
-                        word.val = stemp;
-                        return word; 
-                    }
-                    else
-                    {
-                        word.type = WordType::NONE; 
-                        return word;
-                    }
-                }
-                /* keyType & ID */
-                else if (IsLetter(ctemp))
-                {
-                    i = 0;
-                    do
-                    {
-                        stemp[i++] = ctemp;
-                        ctemp = fgetwc(fp);
-                    } while (IsLetter(ctemp) || IsNumber(ctemp));
-                    ungetwc(ctemp, fp);
-                    stemp[i] = '\0';
-                    wstring strtemp = stemp;
-                    
-                    if (key.find(strtemp) != key.end())
-                    {
-                        word.type = key[strtemp];
-                        word.val = stemp;
-                    }
-                    else
-                    {
-                        word.val = stemp;
-                        word.type = WordType::IDENFR;
-                    } 
-                    return word;
-                }
-                /* INT Number */
-                else if (IsNumber(ctemp))
-                {
-                    i = 0;
-                    if (ctemp != '0')
-                    {
-                        do
-                        {
-                            stemp[i++] = ctemp;
-                        } while ((ctemp = fgetwc(fp)) != EOF && IsNumber(ctemp));
-                        ungetwc(ctemp, fp);
-                        stemp[i] = '\0';
-                        word.val = stemp;
-                        word.type = WordType::INTCON;
-                        return word;
-                    }
-                    else
-                    {
-                        if (IsNumber(ctemp = fgetwc(fp)))
-                        {
-                            ungetc(ctemp, fp);
-                            word.type = WordType::NONE;
-                            return word;
-                        }
-                        else
-                        {
-                            ungetc(ctemp, fp);
-                            word.type = WordType::INTCON;
-                            stemp[0] = '0';
-                            stemp[1] = '\0';
-                            word.val = stemp;
-                            return word;
-                        }
-                    }
-                }
-                /* sign operator */
-                else
-                {   
-                    if (IsSingSign(ctemp))
-                    {
-                        stemp[0] = ctemp;
-                        stemp[1] = '\0';
-                        word.val = stemp;
-                        word.type = key[stemp];
-                    }
-                    else if (ctemp == '>' || ctemp =='<' || ctemp == '='|| ctemp =='!') //strcpy(word.type,signType[k-1]);
-                    {
-                        i = 0;
-                        stemp[i++] = ctemp;
-                        ctemp = fgetwc(fp);
-                        if (ctemp == '=')
-                        {
-                            stemp[i++] = ctemp;
-                        }
-                        else
-                        {
-                            ungetwc(ctemp, fp); //if no '='  then back                          
-                        }
-                        stemp[i] = '\0';  
-                        wstring strtemp = stemp;
-                        if (key.find(strtemp) != key.end())   
-                        {
-                            word.val = stemp;
-                            word.type = key[strtemp];  
-                        }
-                        else
-                        {
-                            word.type = WordType::NONE;
-                        } 
-                    }
-                    return word;
-                }
-            }
+            ch = fgetwc(fp);
         }
+        if (ch == wchar_t(EOF))
+        {
+            return word;
+        }
+
+        switch (ch)
+        {
+        case '\'':
+            ch = fgetwc(fp);
+            if (!(ch == L'+' || ch == L'-' || ch == L'*' || ch == L'/' || isAlpha(ch) || isDigit(ch)))
+            {
+                return word; // TODO: ERROR
+            }
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            if (ch != L'\'')
+            {
+                return word; // TODO: ERROR
+            }
+            ch = fgetwc(fp);
+            word.type = WordType::CHARCON;
+            word.val = buffer.c_str();
+            break;
+        
+        case '"':
+            while ((ch = fgetwc(fp)) != L'"')
+            {
+                if (ch < L' ' || ch > wchar_t(126) || ch == wchar_t(EOF))
+                {
+                    return word; // TODO: ERROR
+                }
+                buffer.push_back(ch);
+            }
+            ch = fgetwc(fp);
+            word.type = WordType::STRCON;
+            word.val = buffer.c_str();
+            break;
+        
+        case '+':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::PLUS;
+            word.val = buffer.c_str();
+            break;
+        
+        case '-':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::MINU;
+            word.val = buffer.c_str();
+            break;
+        
+        case '*':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::MULT;
+            word.val = buffer.c_str();
+            break;
+        
+        case '/':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::DIV;
+            word.val = buffer.c_str();
+            break;
+        
+        case '<':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            if (ch == L'=')
+            {
+                buffer.push_back(ch);
+                ch = fgetwc(fp);
+                word.type = WordType::LEQ;
+                word.val = buffer.c_str();
+            }
+            else
+            {
+                word.type = WordType::LSS;
+                word.val = buffer.c_str();
+            }
+            break;
+        
+        case '>':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            if (ch == L'=')
+            {
+                buffer.push_back(ch);
+                ch = fgetwc(fp);
+                word.type = WordType::GEQ;
+                word.val = buffer.c_str();
+            }
+            else
+            {
+                word.type = WordType::GRE;
+                word.val = buffer.c_str();
+            }
+            break;
+        
+        case '=':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            if (ch == L'=')
+            {
+                buffer.push_back(ch);
+                ch = fgetwc(fp);
+                word.type = WordType::EQL;
+                word.val = buffer.c_str();
+            }
+            else
+            {
+                word.type = WordType::ASSIGN;
+                word.val = buffer.c_str();
+            }
+            break;
+        
+        case '!':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            if (ch != L'=')
+            {
+                return word;
+            }
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::NEQ;
+            word.val = buffer.c_str();
+            break;
+        
+        case ';':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::SEMICN;
+            word.val = buffer.c_str();
+            break;
+        
+        case ',':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::COMMA;
+            word.val = buffer.c_str();
+            break;
+        
+        case '(':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::LPARENT;
+            word.val = buffer.c_str();
+            break;
+        
+        case ')':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::RPARENT;
+            word.val = buffer.c_str();
+            break;
+        
+        case '[':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::LBRACK;
+            word.val = buffer.c_str();
+            break;
+        
+        case ']':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::RBRACK;
+            word.val = buffer.c_str();
+            break;
+        
+        case '{':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::LBRACE;
+            word.val = buffer.c_str();
+            break;
+        
+        case '}':
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::RBRACE;
+            word.val = buffer.c_str();
+            break;
+        
+        case '0': // TODO: ERROR
+            buffer.push_back(ch);
+            ch = fgetwc(fp);
+            word.type = WordType::INTCON;
+            word.val = buffer.c_str();
+            break;
+
+        default:
+            if (isDigit(ch))
+            {
+                do
+                {
+                    buffer.push_back(ch);
+                    ch = fgetwc(fp);
+                } while (isDigit(ch));
+                word.type = WordType::INTCON;
+                word.val = buffer.c_str();
+            }
+            else if (isAlpha(ch))
+            {
+                do
+                {
+                    buffer.push_back(ch);
+                    ch = fgetwc(fp);
+                } while (isAlpha(ch) || isDigit(ch));
+                word.val = buffer.c_str();
+                word.type = lexTrie.find(word.val);
+            }
+            break;
+        }
+
         return word;
     }
 }

@@ -3,7 +3,7 @@
 #ifndef _SCC_CONFIG_H_
 #define _SCC_CONFIG_H_
 
-#define CG 2
+#define CG 1
 
 /**
  * Config manager

@@ -30,6 +30,10 @@ namespace scc
 
         virtual ~Trie();
 
+        T find(const wchar_t* key);
+
+        T findSafe(const wchar_t* key);
+
         void print(FILE* fp);
 
         // TODO

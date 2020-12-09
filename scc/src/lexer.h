@@ -84,8 +84,16 @@ namespace scc
      */
     class DFALexer : public Lexer
     {
+    private:
+
+        bool isAlpha(wchar_t ch);
+
+        bool isDigit(wchar_t ch);
+
     public:
+
         virtual Word nextWord() override;
+
     };
 }
 

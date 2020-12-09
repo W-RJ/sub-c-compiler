@@ -11,7 +11,7 @@
 
 void lexerOnly(const Config& config)
 {
-    scc::TrieLexer lexer;
+    scc::DFALexer lexer;
     lexer.open(config.inputFileName);
 
     if (config.lexFileName == nullptr)

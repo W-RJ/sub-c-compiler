@@ -25,6 +25,34 @@ namespace scc
     }
 
     template<class T, T DEFAULT_VAL, wchar_t KEY_L, wchar_t KEY_R>
+    T Trie<T, DEFAULT_VAL, KEY_L, KEY_R>::find(const wchar_t* key)
+    {
+        int p = 0;
+        while (*key != L'\0')
+        {
+            p = nodes[p].son[*key - KEY_L];
+            key++;
+        }
+        return nodes[p].data;
+    }
+
+    template<class T, T DEFAULT_VAL, wchar_t KEY_L, wchar_t KEY_R>
+    T Trie<T, DEFAULT_VAL, KEY_L, KEY_R>::findSafe(const wchar_t* key)
+    {
+        int p = 0;
+        while (*key != L'\0')
+        {
+            if (*key < KEY_L || *key > KEY_R)
+            {
+                return DEFAULT_VAL;
+            }
+            p = nodes[p].son[*key - KEY_L];
+            key++;
+        }
+        return nodes[p].data;
+    }
+
+    template<class T, T DEFAULT_VAL, wchar_t KEY_L, wchar_t KEY_R>
     void Trie<T, DEFAULT_VAL, KEY_L, KEY_R>::print(FILE* fp)
     {
         int n = nodes.size();
