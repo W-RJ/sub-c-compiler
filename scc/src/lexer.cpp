@@ -1,8 +1,6 @@
 #include <cstdio>
-#include <unordered_map>
-#include <cwchar>
 #include <cstring>
-#include <string>
+#include <cwchar>
 #include <cwctype>
 #include <cassert>
 
@@ -69,24 +67,6 @@ namespace scc
         fclose(fp);
     }
 
-    // struct unordered_map
-    void set_key(std::unordered_map<std::wstring,WordType> & key)
-    {
-        key[L"const"] = WordType::CONSTTK;
-        key[L"int"] = WordType::INTTK;
-        key[L"char"] = WordType::CHARTK;
-        key[L"void"] = WordType::VOIDTK;
-        key[L"main"] = WordType::MAINTK;
-        key[L"if"] = WordType::IFTK;
-        key[L"else"] = WordType::ELSETK;
-        key[L"do"] = WordType::DOTK;
-        key[L"while"] = WordType::WHILETK;
-        key[L"for"] = WordType::FORTK;
-        key[L"scanf"] = WordType::SCANFTK;
-        key[L"printf"] = WordType::PRINTFTK;
-        key[L"return"] = WordType::RETURNTK;
-    }
-
     // class Lexer
 
     Lexer::Lexer() : fp(nullptr)
@@ -135,6 +115,7 @@ namespace scc
         int p = 0;
         Word word;
         buffer.clear();
+
         while (ch != wchar_t(EOF) && (ch <= ' ' || isspace(ch)))
         {
             ch = fgetwc(fp);
@@ -143,21 +124,12 @@ namespace scc
         {
             return word;
         }
+
         while (true)
         {
             if (ch < lexTrie.KEY_L || ch == wchar_t(EOF)) // TODO: merge
             {
-                word.type = lexTrie.nodes[p].data;
-                if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
-                {
-                    buffer.pop_back();
-                    word.val = buffer.c_str() + 1;
-                }
-                else
-                {
-                    word.val = buffer.c_str();
-                }
-                return word; // TODO: ERROR
+                break;
             }
             else if (ch > lexTrie.KEY_R)
             {
@@ -165,17 +137,7 @@ namespace scc
             }
             else if (lexTrie.nodes[p].son[ch - lexTrie.KEY_L] == 0)
             {
-                word.type = lexTrie.nodes[p].data;
-                if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
-                {
-                    buffer.pop_back();
-                    word.val = buffer.c_str() + 1;
-                }
-                else
-                {
-                    word.val = buffer.c_str();
-                }
-                return word; // TODO: ERROR
+                break;
             }
             else
             {
@@ -183,6 +145,17 @@ namespace scc
             }
             buffer.push_back(ch);
             ch = fgetwc(fp);
+        }
+
+        word.type = lexTrie.nodes[p].data;
+        if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
+        {
+            buffer.pop_back();
+            word.val = buffer.c_str() + 1;
+        }
+        else
+        {
+            word.val = buffer.c_str();
         }
         return word;
     }
@@ -422,6 +395,10 @@ namespace scc
                 } while (isAlpha(ch) || isDigit(ch));
                 word.val = buffer.c_str();
                 word.type = lexTrie.find(word.val);
+            }
+            else
+            {
+                // TODO: ERROR
             }
             break;
         }
