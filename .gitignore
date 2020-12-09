@@ -30,3 +30,17 @@
 *.exe
 *.out
 *.app
+
+# Build
+/build/
+/scc/build/
+/tools/build/
+/*.zip
+
+# vscode
+/.vscode/
+
+# dev-cpp
+*.dev
+*.layout
+Makefile.win
