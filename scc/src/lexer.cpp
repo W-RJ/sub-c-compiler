@@ -82,7 +82,14 @@ namespace scc
 
     void Lexer::open(const char *fileName)
     {
-        fp = fopen(fileName, "r");
+        if (strcmp(fileName, "-") == 0)
+        {
+            fp = stdin;
+        }
+        else
+        {
+            fp = fopen(fileName, "r");
+        }
         if (fp == nullptr)
         {
             throw FileError(fileName, L"input");

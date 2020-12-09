@@ -11,16 +11,6 @@
 
 void lexerOnly(const Config& config)
 {
-    try
-    {
-        scc::readLang(config.langFileName, true);
-    }
-    catch(const FileError& e)
-    {
-        e.print(stderr);
-        exit(1);
-    }
-
     scc::TrieLexer lexer;
     lexer.open(config.inputFileName);
 
@@ -71,13 +61,23 @@ int main(int argc, char **argv)
         exit(1); // TODO
     }
 
+    try
+    {
+        scc::readLang(config.langFileName, true);
+    }
+    catch (const FileError& e)
+    {
+        e.print(stderr);
+        exit(1);
+    }
+
     if (config.lexOnly)
     {
         try
         {
             lexerOnly(config);
         }
-        catch(const FileError& e)
+        catch (const FileError& e)
         {
             e.print(stderr);
             exit(1); // TODO
