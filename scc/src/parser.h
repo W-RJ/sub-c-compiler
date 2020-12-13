@@ -38,9 +38,13 @@ namespace scc
     {
     protected:
 
+        void str();
+
         void constBlock();
 
         void constDef();
+
+        void uinteger();
 
         void integer();
 
@@ -75,6 +79,8 @@ namespace scc
         void condition();
 
         void loopSt();
+
+        void step();
 
         void funCall();
 

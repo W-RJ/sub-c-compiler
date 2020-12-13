@@ -90,11 +90,19 @@ namespace scc
 
     // class RecursiveParser
 
+    void RecursiveParser::str()
+    {
+    }
+
     void RecursiveParser::constBlock()
     {
     }
 
     void RecursiveParser::constDef()
+    {
+    }
+
+    void RecursiveParser::uinteger()
     {
     }
 
@@ -163,6 +171,10 @@ namespace scc
     }
 
     void RecursiveParser::loopSt()
+    {
+    }
+
+    void RecursiveParser::step()
     {
     }
 

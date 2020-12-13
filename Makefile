@@ -26,3 +26,4 @@ clean:
 	$(MAKE) clean -C tools
 	$(MAKE) clean -C scc
 	-rm $(build)/scc
+	-rm scc.zip
