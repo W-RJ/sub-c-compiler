@@ -1,4 +1,6 @@
 #include "config.h"
+#include "exception.h"
+#include "define.h"
 
 // class Config
 Config::Config() :

@@ -7,7 +7,7 @@
 #include "lexer.h"
 #include "regexp"
 #include "trie"
-#include "config.h"
+#include "define.h"
 #include "exception.h"
 
 #ifdef CG

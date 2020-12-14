@@ -2,6 +2,7 @@
 #include <cstring>
 #include <cerrno>
 
+#include "config.h"
 #include "exception.h"
 
 // class WRuntimeError
