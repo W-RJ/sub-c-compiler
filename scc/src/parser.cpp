@@ -59,7 +59,7 @@ namespace scc
             {
                 parserFp = stdout;
             }
-            else if (strcmp(parserFileName, "&") == 0)
+            else if (strcmp(parserFileName, "@") == 0)
             {
                 parserFp = lexFp;
             }
