@@ -12,7 +12,15 @@
 void lexerOnly(const Config& config)
 {
     scc::TrieLexer lexer;
-    lexer.open(config.inputFileName);
+    try
+    {
+        lexer.open(config.inputFileName);
+    }
+    catch(const FileError& e)
+    {
+        e.print(stderr);
+        exit(1);
+    }
 
     if (config.lexFileName == nullptr)
     {

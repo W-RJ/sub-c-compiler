@@ -8,7 +8,7 @@ main:
 	$(MAKE) -C tools
 	$(MAKE) -C scc
 	mkdir -p $(build)
-	cp scc/$(build)/scc $(build)
+	cp scc/$(build)/scc scc/$(build)/sc.lang $(build)
 
 zip: main
 	-rm scc.zip
@@ -25,5 +25,5 @@ all: clean main
 clean:
 	$(MAKE) clean -C tools
 	$(MAKE) clean -C scc
-	-rm $(build)/scc
+	-rm $(build)/scc $(build)/sc.lang
 	-rm scc.zip
