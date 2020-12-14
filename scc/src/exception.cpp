@@ -7,11 +7,9 @@
 
 // class WRuntimeError
 
-const wchar_t* WRuntimeError::CMD_NAME = L"scc: ";
+const wchar_t* WRuntimeError::ERROR_PREFIX = L": error: ";
 
-const wchar_t* WRuntimeError::ERROR_PREFIX = L"error: ";
-
-const wchar_t* WRuntimeError::FATAL_ERROR_PREFIX = L"fatal error: ";
+const wchar_t* WRuntimeError::FATAL_ERROR_PREFIX = L": fatal error: ";
 
 WRuntimeError::WRuntimeError(const wchar_t *what_arg) : runtime_error(""), msg(what_arg)
 {
@@ -29,7 +27,7 @@ const char* WRuntimeError::what() const noexcept
 
 void WRuntimeError::print(FILE* fp) const noexcept
 {
-    fwprintf(fp, L"%ls%ls%ls\n", CMD_NAME, ERROR_PREFIX, msg);
+    fwprintf(fp, L"%s%ls%ls\n", Config::cmdName, ERROR_PREFIX, msg);
 }
 
 // class FileError
@@ -41,15 +39,26 @@ FileError::FileError(const char* fileName, const wchar_t* fileType) :
 
 void FileError::print(FILE* fp) const noexcept
 {
-    fwprintf(fp, L"%ls%ls%s: %s\n", CMD_NAME, ERROR_PREFIX, fileName, strerror(errnum));
-    fwprintf(fp, L"%ls%lsUnable to open %ls files\n", CMD_NAME, FATAL_ERROR_PREFIX, fileType);
+    fwprintf(fp, L"%s%ls%s: %s\n", Config::cmdName, ERROR_PREFIX, fileName, strerror(errnum));
+    fwprintf(fp, L"%s%lsUnable to open %ls files\n", Config::cmdName, FATAL_ERROR_PREFIX, fileType);
 }
 
 // class InvalidArgumentError
 
+InvalidArgumentError::InvalidArgumentError(const wchar_t* what_arg, const char* arg) : WRuntimeError(what_arg), arg(arg)
+{
+}
+
 void InvalidArgumentError::print(FILE* fp) const noexcept
 {
-    fwprintf(fp, L"%ls%ls%ls\n", CMD_NAME, FATAL_ERROR_PREFIX, msg); // TODO
+    if (arg != nullptr)
+    {
+        fwprintf(fp, L"%s%ls%ls '%s'\n", Config::cmdName, FATAL_ERROR_PREFIX, msg, arg); // TODO
+    }
+    else
+    {
+        fwprintf(fp, L"%s%ls%ls\n", Config::cmdName, FATAL_ERROR_PREFIX, msg); // TODO
+    }
 }
 
 // class RegExpError
@@ -60,5 +69,5 @@ RegExpError::RegExpError(const wchar_t *what_arg, wchar_t ch) : WRuntimeError(wh
 
 void RegExpError::print(FILE* fp) const noexcept
 {
-    fwprintf(fp, L"%ls%ls In the definition of '%ls': %ls (near %lc)\n", CMD_NAME, ERROR_PREFIX, typeName, msg, ch);
+    fwprintf(fp, L"%s%ls In the definition of '%ls': %ls (near %lc)\n", Config::cmdName, ERROR_PREFIX, typeName, msg, ch);
 }

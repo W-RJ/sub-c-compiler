@@ -3,6 +3,9 @@
 #include "define.h"
 
 // class Config
+
+const char* Config::cmdName = "scc";
+
 Config::Config() :
 
         langFileName("sc.lang"),
@@ -49,10 +52,13 @@ Config::Config() :
 
 void Config::set(int argc, char **argv)
 {
+    cmdName = argv[0];
+
 #ifndef CG
     for (int i = 1; i < argc; i++)
     {
         // TODO
     }
 #endif
+
 }

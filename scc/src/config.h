@@ -10,6 +10,8 @@ class Config
 {
 public:
 
+    static const char* cmdName;
+
     const char *langFileName;
 
     const char *inputFileName;

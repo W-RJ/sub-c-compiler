@@ -11,8 +11,6 @@ protected:
 
     const wchar_t *msg;
 
-    static const wchar_t* CMD_NAME;
-
     static const wchar_t* ERROR_PREFIX;
 
     static const wchar_t* FATAL_ERROR_PREFIX;
@@ -61,9 +59,13 @@ public:
 
 class InvalidArgumentError : public WRuntimeError
 {
+private:
+
+    const char* arg;
+
 public:
 
-    using WRuntimeError::WRuntimeError;
+    InvalidArgumentError(const wchar_t* what_arg, const char* arg);
 
     /**
      * print error message
