@@ -8,9 +8,15 @@
  */
 class Config
 {
+private:
+
+    static const wchar_t* const HELP;
+
 public:
 
     static const char* cmdName;
+
+    static const wchar_t* const VERSION;
 
     const char *langFileName;
 

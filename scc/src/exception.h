@@ -63,9 +63,11 @@ private:
 
     const char* arg;
 
+    const wchar_t* help;
+
 public:
 
-    InvalidArgumentError(const wchar_t* what_arg, const char* arg);
+    InvalidArgumentError(const wchar_t* what_arg, const char* arg, const wchar_t* help = nullptr);
 
     /**
      * print error message

@@ -45,7 +45,7 @@ void FileError::print(FILE* fp) const noexcept
 
 // class InvalidArgumentError
 
-InvalidArgumentError::InvalidArgumentError(const wchar_t* what_arg, const char* arg) : WRuntimeError(what_arg), arg(arg)
+InvalidArgumentError::InvalidArgumentError(const wchar_t* what_arg, const char* arg, const wchar_t* help) : WRuntimeError(what_arg), arg(arg), help(help)
 {
 }
 
@@ -58,6 +58,10 @@ void InvalidArgumentError::print(FILE* fp) const noexcept
     else
     {
         fwprintf(fp, L"%s%ls%ls\n", Config::cmdName, FATAL_ERROR_PREFIX, msg); // TODO
+    }
+    if (help != nullptr)
+    {
+        fwprintf(fp, L"%ls", help);
     }
 }
 
