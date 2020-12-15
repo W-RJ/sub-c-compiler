@@ -11,6 +11,7 @@ precmd = $(build)/sc.lang
 option = $(build)/option
 
 ifeq ($(OS),Windows_NT)
+    CXXFLAGS += -D WINDOWS
     t2wcs = $(root)/tools/$(build)/t2wcs.exe
 else
     t2wcs = $(root)/tools/$(build)/t2wcs

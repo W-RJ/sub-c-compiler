@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <cstring>
 
 #include "config.h"
@@ -32,6 +33,32 @@ const wchar_t* const Config::HELP =
         L"  scc testfile.txt -E -\n"
         L"  Lexical analysis only and place result into stdin.\n"
         L"\n";
+
+char* Config::splitPath(char* path)
+{
+    char* p = strrchr(path, '/');
+    if (p != nullptr)
+    {
+        return p;
+    }
+    else
+    {
+        return strrchr(path, '\\');
+    }
+}
+
+const char* Config::splitPath(const char* path)
+{
+    const char* p = strrchr(path, '/');
+    if (p != nullptr)
+    {
+        return p;
+    }
+    else
+    {
+        return strrchr(path, '\\');
+    }
+}
 
 Config::Config() :
 
@@ -80,6 +107,42 @@ Config::Config() :
 void Config::set(int argc, char **argv)
 {
     cmdName = argv[0];
+
+    char* buffer = new char[FILENAME_MAX];
+    buffer[0] = '\0';
+    int PREFIX_MAX = FILENAME_MAX - strlen(langFileName);
+
+    char* p = splitPath(argv[0]);
+    if (p != nullptr)
+    {
+        strcpy(buffer, cmdName);
+        p += buffer - cmdName;
+    }
+    else
+    {
+        FILE* fp = popen("which scc", "r");
+        if (fp != nullptr)
+        {
+            fgets(buffer, PREFIX_MAX, fp);
+            pclose(fp);
+        }
+        p = splitPath(buffer);
+        if (p == nullptr)
+        {
+            fp = popen("where scc", "r");
+            if (fp != nullptr)
+            {
+                fgets(buffer, PREFIX_MAX, fp);
+                pclose(fp);
+            }
+            p = splitPath(buffer);
+        }
+    }
+    if (p != nullptr)
+    {
+        strcpy(p + 1, langFileName);
+        langFileName = buffer;
+    }
 
 #ifndef CG
 

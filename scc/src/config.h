@@ -12,6 +12,10 @@ private:
 
     static const wchar_t* const HELP;
 
+    static char* splitPath(char* path);
+
+    static const char* splitPath(const char* path);
+
 public:
 
     static const char* cmdName;

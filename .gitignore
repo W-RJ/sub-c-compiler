@@ -38,7 +38,7 @@
 /*.zip
 
 # vscode
-/.vscode/
+.vscode
 
 # dev-cpp
 *.dev
