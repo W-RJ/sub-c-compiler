@@ -45,7 +45,7 @@ compile = $(CXX) $(CXXFLAGS) -c $(src)/$(1).cpp -o $(build)/$(1).o
 
 ## targets
 
-.PHONY : main options test all clean
+.PHONY : main options test unit_test module_test all clean
 
 main: $(precmd) options $(target)
 
@@ -108,8 +108,21 @@ endif
 
 ## phony targets
 
-test: main
+test: unit_test module_test
+
+unit_test:
 	# TODO
+
+module_test: main
+ifdef CG
+	export SCC=$$PWD/$(target); \
+	pytest test/cg$(CG)
+	# TODO
+else
+	export SCC=$$PWD/$(target); \
+	pytest test/ncg
+	# TODO
+endif
 
 # clean & rebuild
 all: clean main
