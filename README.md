@@ -26,8 +26,7 @@ mingw32-make
 
 将在`build`目录中生成可执行文件`scc.exe`。
 
-> 如果您在使用 Windows 系统并使用 Visual Studio Code ，强烈建议您将它的默认 Shell 改为 Git Bash 。
-> 
+> 如果您在使用 Windows 系统并使用 Visual Studio Code ，强烈建议您将它的默认 Shell 改为 Git Bash 。  
 > 修改方法可参考：https://code.visualstudio.com/docs/editor/integrated-terminal#_windows
 
 ## Project Structure | 项目结构
@@ -119,12 +118,13 @@ mingw32-make
 
 ## Grammar definition | 语法定义
 
-Sub C 程序设计语言的语法定义如下：
+Sub C 程序设计语言的EBNF语法定义如下：
 
 ```
            <str> -> STRCON
+       <program> -> [<constBlock>] [<varBlock>] {<funDef> | <voidFunDef>} <mainFun>
     <constBlock> -> CONSTTK <constDef> SEMICN {CONSTTK <constDef> SEMICN}
-      <constDef> -> INTTK IDENFR ASSIGN INTCON {COMMA IDENFR ASSIGN INTCON} | CHARTK IDENFR  ASSIGN INTCON {COMMA IDENFR ASSIGN INTCON}
+      <constDef> -> INTTK IDENFR ASSIGN INTCON {COMMA IDENFR ASSIGN INTCON} | CHARTK IDENFR ASSIGN INTCON {COMMA IDENFR ASSIGN INTCON}
       <uinteger> -> INTCON
        <integer> -> [PLUS | MINU] <uinteger>
    <declareHead> -> INTTK IDENFR | CHARTK IDENFR

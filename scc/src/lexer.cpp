@@ -205,7 +205,7 @@ namespace scc
             word.type = WordType::CHARCON;
             word.val = buffer.c_str();
             break;
-        
+
         case '"':
             while ((ch = fgetwc(fp)) != L'"')
             {
@@ -219,35 +219,35 @@ namespace scc
             word.type = WordType::STRCON;
             word.val = buffer.c_str();
             break;
-        
+
         case '+':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::PLUS;
             word.val = buffer.c_str();
             break;
-        
+
         case '-':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::MINU;
             word.val = buffer.c_str();
             break;
-        
+
         case '*':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::MULT;
             word.val = buffer.c_str();
             break;
-        
+
         case '/':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::DIV;
             word.val = buffer.c_str();
             break;
-        
+
         case '<':
             buffer.push_back(ch);
             ch = fgetwc(fp);
@@ -264,7 +264,7 @@ namespace scc
                 word.val = buffer.c_str();
             }
             break;
-        
+
         case '>':
             buffer.push_back(ch);
             ch = fgetwc(fp);
@@ -281,7 +281,7 @@ namespace scc
                 word.val = buffer.c_str();
             }
             break;
-        
+
         case '=':
             buffer.push_back(ch);
             ch = fgetwc(fp);
@@ -298,7 +298,7 @@ namespace scc
                 word.val = buffer.c_str();
             }
             break;
-        
+
         case '!':
             buffer.push_back(ch);
             ch = fgetwc(fp);
@@ -311,63 +311,63 @@ namespace scc
             word.type = WordType::NEQ;
             word.val = buffer.c_str();
             break;
-        
+
         case ';':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::SEMICN;
             word.val = buffer.c_str();
             break;
-        
+
         case ',':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::COMMA;
             word.val = buffer.c_str();
             break;
-        
+
         case '(':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::LPARENT;
             word.val = buffer.c_str();
             break;
-        
+
         case ')':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::RPARENT;
             word.val = buffer.c_str();
             break;
-        
+
         case '[':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::LBRACK;
             word.val = buffer.c_str();
             break;
-        
+
         case ']':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::RBRACK;
             word.val = buffer.c_str();
             break;
-        
+
         case '{':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::LBRACE;
             word.val = buffer.c_str();
             break;
-        
+
         case '}':
             buffer.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::RBRACE;
             word.val = buffer.c_str();
             break;
-        
+
         case '0': // TODO: ERROR
             buffer.push_back(ch);
             ch = fgetwc(fp);
