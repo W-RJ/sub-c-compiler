@@ -119,36 +119,36 @@ mingw32-make
 
 ## Grammar definition | 语法定义
 
-Sub C 程序设计语言的EBNF语法定义如下：
+Sub C 程序设计语言的语法定义如下：
 
-| 非终结符 | 定义 |
-| -----: | :----- |
-| `<str> ` | ` STRCON` |
-| `<constBlock> ` | ` CONSTTK <constDef> SEMICN {CONSTTK <constDef> SEMICN}` |
-| `<constDef> ` | ` INTTK IDENFR ASSIGN INTCON {COMMA IDENFR ASSIGN INTCON} | CHARTK IDENFR ASSIGN INTCON {COMMA IDENFR ASSIGN INTCON}` |
-| `<uinteger> ` | ` INTCON` |
-| `<integer> ` | ` [PLUS | MINU] <uinteger>` |
-| `<declareHead> ` | ` INTTK IDENFR | CHARTK IDENFR` |
-| `<varBlock> ` | ` <varDef> SEMICN {<varDef> SEMICN}` |
-| `<varDef> ` | ` (INTTK | CHARTK) (IDENFR | IDENFR LBRACK <uinteger> RBRACK) {COMMA (IDENFR | IDENFR LBRACK <uinteger> RBRACK)}` |
-| `<funDef> ` | ` <declareHead> LPARENT <param> RPARENT LBRACE <compoundSt> RBRACE` |
-| `<voidFunDef> ` | ` VOIDTK IDENFR LPARENT <param> RPARENT LBRACE <compoundSt> RBRACE` |
-| `<compoundSt> ` | ` [<constBlock>] [<varBlock>] <statementBlock>` |
-| `<param> ` | ` (INTTK | CHARTK) IDENFR {COMMA (INTTK | CHARTK) IDENFR} | ɛ` |
-| `<mainFun> ` | ` VOIDTK MAINTK LPARENT RPARENT LBRACE <compoundSt> RBRACE` |
-| `<expression> ` | ` [PLUS | MINU] <item> {(PLUS | MINU) <item>}` |
-| `<item> ` | ` <factor> {(MULT | DIV) <factor>}` |
-| `<factor> ` | ` IDENFR | IDENFR LBRACK <expression> RBRACK | LPARENT <expression> RPARENT | <integer> | CHARCON | <funCall>` |
-| `<statement> ` | ` <conditionSt> | <loopSt> | LBRACE <statementBlock> RBRACE | <funCall> SEMICN | <voidFunCall> SEMICN | <assignSt> SEMICN | <readSt> SEMICN | <writeSt> SEMICN | SEMICN | <returnSt> SEMICN` |
-| `<assignSt> ` | ` IDENFR ASSIGN <expression> | IDENFR LBRACK <expression> RBRACK ASSIGN <expression>` |
-| `<conditionSt> ` | ` IFTK LPARENT <condition> RPARENT <statement> [ELSETK <statement>]` |
-| `<condition> ` | ` <expression> (LSS | LEQ | GRE | GEQ | EQL | NEQ) <expression> | <expression>` |
-| `<loopSt> ` | ` WHILETK LPARENT <condition> RPARENT <statement> | DOTK <statement> WHILETK LPARENT <condition> RPARENT | for LPARENT IDENFY ASSIGN <expression> SEMICN <condition> SEMICN IDENFY ASSIGN IDENFY (PLUS | MINU) <step> RPARENT <statement>` |
-| `<step> ` | ` <uinteger>` |
-| `<funCall> ` | ` IDENFR LPARENT <paramVal> RPARENT` |
-| `<voidFunCall> ` | ` IDENFR LPARENT <paramVal> RPARENT` |
-| `<paramVal> ` | ` <expression> {COMMA <expression>} | ɛ` |
-| `<statementBlock> ` | ` {<statement>}` |
-| `<readSt> ` | ` SCANFTK LPARENT IDENFR {COMMA IDENFR} RPARENT` |
-| `<writeSt> ` | ` PRINTFTK LPARENT <str> COMMA <expression> RPARENT | PRINTFTK LPARENT <str> RPARENT | PRINTFTK LPARENT <expression> RPARENT` |
-| `<returnSt> ` | ` RETURNTK [LPARENT <expression> RPARENT]` |
+```
+           <str> -> STRCON
+    <constBlock> -> CONSTTK <constDef> SEMICN {CONSTTK <constDef> SEMICN}
+      <constDef> -> INTTK IDENFR ASSIGN INTCON {COMMA IDENFR ASSIGN INTCON} | CHARTK IDENFR  ASSIGN INTCON {COMMA IDENFR ASSIGN INTCON}
+      <uinteger> -> INTCON
+       <integer> -> [PLUS | MINU] <uinteger>
+   <declareHead> -> INTTK IDENFR | CHARTK IDENFR
+      <varBlock> -> <varDef> SEMICN {<varDef> SEMICN}
+        <varDef> -> (INTTK | CHARTK) (IDENFR | IDENFR LBRACK <uinteger> RBRACK) {COMMA (IDENFR | IDENFR LBRACK <uinteger> RBRACK)}
+        <funDef> -> <declareHead> LPARENT <param> RPARENT LBRACE <compoundSt> RBRACE
+    <voidFunDef> -> VOIDTK IDENFR LPARENT <param> RPARENT LBRACE <compoundSt> RBRACE
+    <compoundSt> -> [<constBlock>] [<varBlock>] <statementBlock>
+         <param> -> (INTTK | CHARTK) IDENFR {COMMA (INTTK | CHARTK) IDENFR} | ɛ
+       <mainFun> -> VOIDTK MAINTK LPARENT RPARENT LBRACE <compoundSt> RBRACE
+    <expression> -> [PLUS | MINU] <item> {(PLUS | MINU) <item>}
+          <item> -> <factor> {(MULT | DIV) <factor>}
+        <factor> -> IDENFR | IDENFR LBRACK <expression> RBRACK | LPARENT <expression> RPARENT | <integer> | CHARCON | <funCall>
+     <statement> -> <conditionSt> | <loopSt> | LBRACE <statementBlock> RBRACE | <funCall> SEMICN | <voidFunCall> SEMICN | <assignSt> SEMICN | <readSt> SEMICN | <writeSt> SEMICN | SEMICN | <returnSt> SEMICN
+      <assignSt> -> IDENFR ASSIGN <expression> | IDENFR LBRACK <expression> RBRACK ASSIGN <expression>
+   <conditionSt> -> IFTK LPARENT <condition> RPARENT <statement> [ELSETK <statement>]
+     <condition> -> <expression> (LSS | LEQ | GRE | GEQ | EQL | NEQ) <expression> | <expression>
+        <loopSt> -> WHILETK LPARENT <condition> RPARENT <statement> | DOTK <statement> WHILETK LPARENT <condition> RPARENT | for LPARENT IDENFY ASSIGN <expression> SEMICN <condition> SEMICN IDENFY ASSIGN IDENFY (PLUS | MINU) <step> RPARENT <statement>
+          <step> -> <uinteger>
+       <funCall> -> IDENFR LPARENT <paramVal> RPARENT
+   <voidFunCall> -> IDENFR LPARENT <paramVal> RPARENT
+      <paramVal> -> <expression> {COMMA <expression>} | ɛ
+<statementBlock> -> {<statement>}
+        <readSt> -> SCANFTK LPARENT IDENFR {COMMA IDENFR} RPARENT
+       <writeSt> -> PRINTFTK LPARENT <str> COMMA <expression> RPARENT | PRINTFTK LPARENT <str> RPARENT | PRINTFTK LPARENT <expression> RPARENT
+      <returnSt> -> RETURNTK [LPARENT <expression> RPARENT]
+```
