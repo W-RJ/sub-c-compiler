@@ -22,9 +22,16 @@ void lexerOnly(const Config& config)
         exit(1);
     }
 
+    scc::Word word;
     if (config.lexFileName == nullptr)
     {
-        while (lexer.nextWord().type != scc::WordType::NONE);
+        do
+        {
+            word.type = scc::WordType::NONE;
+            word.val.clear();
+            lexer.nextWord(word);
+        }
+        while (word.type != scc::WordType::NONE);
     }
     else
     {
@@ -44,10 +51,13 @@ void lexerOnly(const Config& config)
         }
 
         // Analyze
-        scc::Word word;
-        while ((word = lexer.nextWord()).type != scc::WordType::NONE)
+        lexer.nextWord(word);
+        while (word.type != scc::WordType::NONE)
         {
-            fwprintf(fp, L"%ls %ls\n", scc::typeName[unsigned(word.type)], word.val);
+            fwprintf(fp, L"%ls %ls\n", scc::typeName[unsigned(word.type)], word.val.c_str());
+            word.type = scc::WordType::NONE;
+            word.val.clear();
+            lexer.nextWord(word);
         }
 
         fclose(fp);
