@@ -1,6 +1,8 @@
 const int a = 1;
+const char cc='/';
 
 int b;
+char c;
 
 void main()
 {

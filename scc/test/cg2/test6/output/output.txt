@@ -7,9 +7,20 @@ INTCON 1
 <整数>
 <常量定义>
 SEMICN ;
+CONSTTK const
+CHARTK char
+IDENFR cc
+ASSIGN =
+CHARCON /
+<常量定义>
+SEMICN ;
 <常量说明>
 INTTK int
 IDENFR b
+<变量定义>
+SEMICN ;
+CHARTK char
+IDENFR c
 <变量定义>
 SEMICN ;
 <变量说明>

@@ -14,7 +14,7 @@ main:
 
 zip: main
 	-rm scc.zip
-	zip -r scc.zip scc
+	zip -r scc.zip scc -x \*.pyc
 
 test: module_test main
 	# TODO
