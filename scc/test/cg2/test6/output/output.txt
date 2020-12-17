@@ -23,6 +23,14 @@ CHARTK char
 IDENFR c
 <变量定义>
 SEMICN ;
+INTTK int
+IDENFR d
+LBRACK [
+INTCON 100
+<无符号整数>
+RBRACK ]
+<变量定义>
+SEMICN ;
 <变量说明>
 INTTK int
 IDENFR ifun
@@ -63,6 +71,62 @@ MAINTK main
 LPARENT (
 RPARENT )
 LBRACE {
+IDENFR b
+ASSIGN =
+IDENFR a
+<因子>
+<项>
+PLUS +
+IDENFR c
+<因子>
+<项>
+<表达式>
+<赋值语句>
+SEMICN ;
+<语句>
+IDENFR b
+ASSIGN =
+IDENFR a
+<因子>
+MULT *
+IDENFR c
+<因子>
+<项>
+PLUS +
+IDENFR b
+<因子>
+MULT *
+IDENFR c
+<因子>
+MULT *
+LPARENT (
+IDENFR b
+<因子>
+<项>
+MINU -
+IDENFR c
+<因子>
+<项>
+<表达式>
+RPARENT )
+<因子>
+<项>
+PLUS +
+IDENFR d
+LBRACK [
+INTCON 99
+<无符号整数>
+<整数>
+<因子>
+<项>
+<表达式>
+RBRACK ]
+<因子>
+<项>
+<表达式>
+<赋值语句>
+SEMICN ;
+<语句>
 <语句列>
 <复合语句>
 RBRACE }

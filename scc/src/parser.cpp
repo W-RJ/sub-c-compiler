@@ -546,12 +546,10 @@ namespace scc
     void RecursiveParser::item()
     {
         factor();
-        nextWord();
         while (buffer[h].type == WordType::MULT || buffer[h].type == WordType::DIV)
         {
             nextWord();
             factor();
-            nextWord();
         }
 
         print(L"<项>\n");
@@ -615,10 +613,119 @@ namespace scc
 
     void RecursiveParser::statement()
     {
+        switch (buffer[h].type)
+        {
+        case WordType::IFTK:
+            conditionSt();
+            break;
+
+        case WordType::WHILETK:
+        case WordType::DOTK:
+        case WordType::FORTK:
+            loopSt();
+            break;
+
+        case WordType::LBRACE:
+            nextWord();
+            statementBlock();
+            if (buffer[h].type != WordType::RBRACE)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            break;
+
+        case WordType::IDENFR:
+            nextWord(false);
+            if (buffer[h].type == WordType::ASSIGN || buffer[h].type == WordType::LBRACK)
+            {
+                rollback(1);
+                assignSt();
+            }
+            else
+            {
+                rollback(1);
+                funCall(); // TODO: FIXME
+            }
+            if (buffer[h].type != WordType::SEMICN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            break;
+
+        case WordType::SCANFTK:
+            readSt();
+            if (buffer[h].type != WordType::SEMICN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            break;
+
+        case WordType::PRINTFTK:
+            writeSt();
+            if (buffer[h].type != WordType::SEMICN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            break;
+
+        case WordType::SEMICN:
+            nextWord();
+            break;
+
+        case WordType::RETURNTK:
+            returnSt();
+            if (buffer[h].type != WordType::SEMICN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            break;
+
+        default:
+            break;
+        }
+
+        print(L"<语句>\n");
     }
 
     void RecursiveParser::assignSt()
     {
+        if (buffer[h].type != WordType::IDENFR)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type == WordType::ASSIGN)
+        {
+            nextWord();
+            expression();
+        }
+        else if (buffer[h].type == WordType::LBRACK)
+        {
+            nextWord();
+            expression();
+            if (buffer[h].type != WordType::RBRACK)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            if (buffer[h].type != WordType::ASSIGN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            expression();
+        }
+        else
+        {
+            // TODO: ERROR
+        }
+
+        print(L"<赋值语句>\n");
     }
 
     void RecursiveParser::conditionSt()
@@ -653,7 +760,7 @@ namespace scc
     {
         while (STATEMENT_SELECT[unsigned(buffer[h].type)])
         {
-            expression();
+            statement();
         }
 
         print(L"<语句列>\n");

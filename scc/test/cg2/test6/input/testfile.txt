@@ -4,6 +4,8 @@ const char cc='/';
 int b;
 char c;
 
+int d[100];
+
 int ifun(char par)
 {
 }
@@ -18,5 +20,6 @@ void vfun()
 
 void main()
 {
-
+    b=a+c;
+    b=a*c+b*c*(b-c)+d[99];
 }
