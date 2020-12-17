@@ -124,7 +124,7 @@ Sub C 程序设计语言的EBNF语法定义如下：
            <str> -> STRCON
        <program> -> [<constBlock>] [<varBlock>] {<funDef> | <voidFunDef>} <mainFun>
     <constBlock> -> CONSTTK <constDef> SEMICN {CONSTTK <constDef> SEMICN}
-      <constDef> -> INTTK IDENFR ASSIGN INTCON {COMMA IDENFR ASSIGN INTCON} | CHARTK IDENFR ASSIGN INTCON {COMMA IDENFR ASSIGN INTCON}
+      <constDef> -> INTTK IDENFR ASSIGN <integer> {COMMA IDENFR ASSIGN <integer>} | CHARTK IDENFR ASSIGN CHARCON {COMMA IDENFR ASSIGN CHARCON}
       <uinteger> -> INTCON
        <integer> -> [PLUS | MINU] <uinteger>
    <declareHead> -> INTTK IDENFR | CHARTK IDENFR
@@ -142,7 +142,7 @@ Sub C 程序设计语言的EBNF语法定义如下：
       <assignSt> -> IDENFR ASSIGN <expression> | IDENFR LBRACK <expression> RBRACK ASSIGN <expression>
    <conditionSt> -> IFTK LPARENT <condition> RPARENT <statement> [ELSETK <statement>]
      <condition> -> <expression> (LSS | LEQ | GRE | GEQ | EQL | NEQ) <expression> | <expression>
-        <loopSt> -> WHILETK LPARENT <condition> RPARENT <statement> | DOTK <statement> WHILETK LPARENT <condition> RPARENT | for LPARENT IDENFY ASSIGN <expression> SEMICN <condition> SEMICN IDENFY ASSIGN IDENFY (PLUS | MINU) <step> RPARENT <statement>
+        <loopSt> -> WHILETK LPARENT <condition> RPARENT <statement> | DOTK <statement> WHILETK LPARENT <condition> RPARENT | FORTK LPARENT IDENFY ASSIGN <expression> SEMICN <condition> SEMICN IDENFY ASSIGN IDENFY (PLUS | MINU) <step> RPARENT <statement>
           <step> -> <uinteger>
        <funCall> -> IDENFR LPARENT <paramVal> RPARENT
    <voidFunCall> -> IDENFR LPARENT <paramVal> RPARENT
