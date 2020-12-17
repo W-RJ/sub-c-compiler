@@ -158,6 +158,13 @@ namespace scc
 
     void RecursiveParser::str()
     {
+        if (buffer[h].type != WordType::STRCON)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+
+        print(L"<字符串>\n");
     }
 
     void RecursiveParser::constBlock()
@@ -507,14 +514,103 @@ namespace scc
 
     void RecursiveParser::expression()
     {
+        if (buffer[h].type == WordType::PLUS)
+        {
+            nextWord();
+        }
+        else if (buffer[h].type == WordType::MINU)
+        {
+            nextWord();
+        }
+        item();
+        while (EXPRESSION_SELECT[unsigned(buffer[h].type)])
+        {
+            if (buffer[h].type == WordType::PLUS)
+            {
+                nextWord();
+            }
+            else if (buffer[h].type == WordType::MINU)
+            {
+                nextWord();
+            }
+            else
+            {
+                // TODO: ERROR
+            }
+            item();
+        }
+
+        print(L"<表达式>\n");
     }
 
     void RecursiveParser::item()
     {
+        factor();
+        nextWord();
+        while (buffer[h].type == WordType::MULT || buffer[h].type == WordType::DIV)
+        {
+            nextWord();
+            factor();
+            nextWord();
+        }
+
+        print(L"<项>\n");
     }
 
     void RecursiveParser::factor()
     {
+        switch (buffer[h].type)
+        {
+        case WordType::IDENFR:
+            nextWord(false);
+            if (buffer[h].type == WordType::LPARENT)
+            {
+                rollback(1);
+                funCall();
+            }
+            else
+            {
+                rollback(1);
+                nextWord();
+                if (buffer[h].type == WordType::LBRACK)
+                {
+                    nextWord();
+                    expression();
+                    if (buffer[h].type != WordType::RBRACK)
+                    {
+                        // TODO: ERROR
+                    }
+                    nextWord();
+                }
+            }
+            break;
+
+        case WordType::LPARENT:
+            nextWord();
+            expression();
+            if (buffer[h].type != WordType::RPARENT)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            break;
+
+        case WordType::PLUS:
+        case WordType::MINU:
+        case WordType::INTCON:
+            integer();
+            break;
+
+        case WordType::CHARCON:
+            nextWord();
+            break;
+
+        default:
+            // TODO: ERROR
+            break;
+        }
+
+        print(L"<因子>\n");
     }
 
     void RecursiveParser::statement()
