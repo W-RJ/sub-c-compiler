@@ -274,10 +274,63 @@ namespace scc
 
     void RecursiveParser::varBlock()
     {
+        while (true)
+        {
+            varDef();
+            if (buffer[h].type != WordType::SEMICN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            if (buffer[h].type != WordType::INTTK && buffer[h].type != WordType::CHARTK)
+            {
+                break;
+            }
+            nextWord(false);
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                rollback(1);
+                break;
+            }
+            nextWord(false);
+            if (buffer[h].type != WordType::LBRACK && buffer[h].type != WordType::COMMA && buffer[h].type != WordType::SEMICN)
+            {
+                rollback(2);
+                break;
+            }
+            rollback(2);
+        }
+
+        print(L"<变量说明>\n");
     }
 
     void RecursiveParser::varDef()
     {
+        if (buffer[h].type != WordType::INTTK && buffer[h].type != WordType::CHARTK)
+        {
+            // TODO: ERROR
+        }
+        do
+        {
+            nextWord();
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            if (buffer[h].type == WordType::LBRACK)
+            {
+                nextWord();
+                uinteger();
+                if (buffer[h].type != WordType::RBRACK)
+                {
+                    // TODO: ERROR
+                }
+                nextWord();
+            }
+        } while (buffer[h].type == WordType::COMMA);
+
+        print(L"<变量定义>\n");
     }
 
     void RecursiveParser::funDef()
@@ -423,6 +476,28 @@ namespace scc
         if (buffer[h].type == WordType::CONSTTK)
         {
             constBlock();
+        }
+
+        if (buffer[h].type == WordType::INTTK || buffer[h].type == WordType::CHARTK)
+        {
+            nextWord(false);
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                rollback(1);
+            }
+            else
+            {
+                nextWord(false);
+                if (buffer[h].type != WordType::LBRACK && buffer[h].type != WordType::COMMA && buffer[h].type != WordType::SEMICN)
+                {
+                    rollback(2);
+                }
+                else
+                {
+                    rollback(2);
+                    varBlock();
+                }
+            }
         }
 
         // TODO

@@ -8,6 +8,11 @@ INTCON 1
 <常量定义>
 SEMICN ;
 <常量说明>
+INTTK int
+IDENFR b
+<变量定义>
+SEMICN ;
+<变量说明>
 VOIDTK void
 MAINTK main
 LPARENT (
