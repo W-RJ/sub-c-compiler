@@ -10,8 +10,39 @@ namespace scc
 {
     // class Parser
 
+    bool Parser::EXPRESSION_SELECT[unsigned(WordType::END)] = {false};
+    bool Parser::STATEMENT_SELECT[unsigned(WordType::END)] = {false};
+
+    bool Parser::hasInited = false;
+
+    void Parser::init()
+    {
+        EXPRESSION_SELECT[unsigned(WordType::PLUS)] = true;
+        EXPRESSION_SELECT[unsigned(WordType::MINU)] = true;
+        EXPRESSION_SELECT[unsigned(WordType::IDENFR)] = true;
+        EXPRESSION_SELECT[unsigned(WordType::LPARENT)] = true;
+        EXPRESSION_SELECT[unsigned(WordType::INTCON)] = true;
+        EXPRESSION_SELECT[unsigned(WordType::CHARCON)] = true;
+
+        STATEMENT_SELECT[unsigned(WordType::IFTK)] = true;
+        STATEMENT_SELECT[unsigned(WordType::WHILETK)] = true;
+        STATEMENT_SELECT[unsigned(WordType::DOTK)] = true;
+        STATEMENT_SELECT[unsigned(WordType::FORTK)] = true;
+        STATEMENT_SELECT[unsigned(WordType::LBRACE)] = true;
+        STATEMENT_SELECT[unsigned(WordType::IDENFR)] = true;
+        STATEMENT_SELECT[unsigned(WordType::SCANFTK)] = true;
+        STATEMENT_SELECT[unsigned(WordType::PRINTFTK)] = true;
+        STATEMENT_SELECT[unsigned(WordType::SEMICN)] = true;
+        STATEMENT_SELECT[unsigned(WordType::RETURNTK)] = true;
+    }
+
     Parser::Parser() : lexer(nullptr), h(0), size(0), lexFp(nullptr), parserFp(nullptr)
     {
+        if (!hasInited)
+        {
+            hasInited = true;
+            init();
+        }
     }
 
     Parser::~Parser()

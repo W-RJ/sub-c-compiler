@@ -23,6 +23,14 @@ namespace scc
 
         FILE *lexFp, *parserFp;
 
+        static bool EXPRESSION_SELECT[unsigned(WordType::END)];
+
+        static bool STATEMENT_SELECT[unsigned(WordType::END)];
+
+        static bool hasInited;
+
+        static void init();
+
         void nextWord(bool accept = true);
 
         void rollback(unsigned n);
