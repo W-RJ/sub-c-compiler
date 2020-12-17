@@ -1,3 +1,13 @@
+CONSTTK const
+INTTK int
+IDENFR a
+ASSIGN =
+INTCON 1
+<无符号整数>
+<整数>
+<常量定义>
+SEMICN ;
+<常量说明>
 VOIDTK void
 MAINTK main
 LPARENT (

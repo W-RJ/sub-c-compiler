@@ -162,18 +162,110 @@ namespace scc
 
     void RecursiveParser::constBlock()
     {
+        if (buffer[h].type != WordType::CONSTTK)
+        {
+            // TODO: ERROR
+        }
+        do
+        {
+            nextWord();
+            constDef();
+            if (buffer[h].type != WordType::SEMICN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+
+        } while (buffer[h].type == WordType::CONSTTK);
+
+        print(L"<常量说明>\n");
     }
 
     void RecursiveParser::constDef()
     {
+        if (buffer[h].type == WordType::INTTK)
+        {
+            do
+            {
+                nextWord();
+                if (buffer[h].type != WordType::IDENFR)
+                {
+                    // TODO: ERROR
+                }
+                nextWord();
+                if (buffer[h].type != WordType::ASSIGN)
+                {
+                    // TODO: ERROR
+                }
+                nextWord();
+                integer();
+
+            } while (buffer[h].type == WordType::COMMA);
+        }
+        else if (buffer[h].type == WordType::CHARTK)
+        {
+            do
+            {
+                nextWord();
+                if (buffer[h].type != WordType::IDENFR)
+                {
+                    // TODO: ERROR
+                }
+                nextWord();
+                if (buffer[h].type != WordType::ASSIGN)
+                {
+                    // TODO: ERROR
+                }
+                nextWord();
+                if (buffer[h].type != WordType::CHARCON)
+                {
+                    // TODO: ERROR
+                }
+                nextWord();
+
+            } while (buffer[h].type == WordType::COMMA);
+        }
+        else
+        {
+            // TODO: ERROR
+        }
+
+        print(L"<常量定义>\n");
     }
 
     void RecursiveParser::uinteger()
     {
+        if (buffer[h].type != WordType::INTCON)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+
+        print(L"<无符号整数>\n");
     }
 
     void RecursiveParser::integer()
     {
+        if (buffer[h].type == WordType::PLUS)
+        {
+            nextWord();
+            uinteger();
+        }
+        else if (buffer[h].type == WordType::MINU)
+        {
+            nextWord();
+            uinteger();
+        }
+        else if (buffer[h].type == WordType::INTCON)
+        {
+            uinteger();
+        }
+        else
+        {
+            // TODO: ERROR
+        }
+
+        print(L"<整数>\n");
     }
 
     void RecursiveParser::declareHead()
@@ -327,6 +419,11 @@ namespace scc
         assert(lexer != nullptr);
 
         nextWord(false);
+
+        if (buffer[h].type == WordType::CONSTTK)
+        {
+            constBlock();
+        }
 
         // TODO
 
