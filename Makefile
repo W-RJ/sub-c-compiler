@@ -1,6 +1,6 @@
 build = build
 
-range = 1
+range = 2
 
 ## phony targets
 

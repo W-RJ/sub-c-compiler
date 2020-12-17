@@ -1,0 +1,10 @@
+VOIDTK void
+MAINTK main
+LPARENT (
+RPARENT )
+LBRACE {
+<语句列>
+<复合语句>
+RBRACE }
+<主函数>
+<程序>
