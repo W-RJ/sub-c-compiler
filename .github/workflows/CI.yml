@@ -31,6 +31,8 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip
         python3 -m pip install -r requirements.txt
+    - name: Install language packs
+      run: |
         sudo apt install language-pack-zh-hans language-pack-zh-hans-base
     - name: make test
       run: |
