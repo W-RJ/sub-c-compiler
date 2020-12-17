@@ -730,18 +730,191 @@ namespace scc
 
     void RecursiveParser::conditionSt()
     {
+        if (buffer[h].type != WordType::IFTK)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::LPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        condition();
+        if (buffer[h].type != WordType::RPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        statement();
+        if (buffer[h].type == WordType::ELSETK)
+        {
+            nextWord();
+            statement();
+        }
+
+        print(L"<条件语句>\n");
     }
 
     void RecursiveParser::condition()
     {
+        expression();
+        switch (buffer[h].type)
+        {
+        case WordType::LSS:
+            nextWord();
+            expression();
+            break;
+
+        case WordType::LEQ:
+            nextWord();
+            expression();
+            break;
+
+        case WordType::GRE:
+            nextWord();
+            expression();
+            break;
+
+        case WordType::GEQ:
+            nextWord();
+            expression();
+            break;
+
+        case WordType::EQL:
+            nextWord();
+            expression();
+            break;
+
+        case WordType::NEQ:
+            nextWord();
+            expression();
+            break;
+
+        default:
+            break;
+        }
+
+        print(L"<条件>\n");
     }
 
     void RecursiveParser::loopSt()
     {
+        if (buffer[h].type == WordType::WHILETK)
+        {
+            nextWord();
+            if (buffer[h].type != WordType::LPARENT)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            condition();
+            if (buffer[h].type != WordType::RPARENT)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            statement();
+        }
+        else if (buffer[h].type == WordType::DOTK)
+        {
+            nextWord();
+            statement();
+            if (buffer[h].type != WordType::WHILETK)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            if (buffer[h].type != WordType::LPARENT)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            condition();
+            if (buffer[h].type != WordType::RPARENT)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+        }
+        else if (buffer[h].type == WordType::FORTK)
+        {
+            nextWord();
+            if (buffer[h].type != WordType::LPARENT)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            if (buffer[h].type != WordType::ASSIGN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            expression();
+            if (buffer[h].type != WordType::SEMICN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            condition();
+            if (buffer[h].type != WordType::SEMICN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            if (buffer[h].type != WordType::ASSIGN)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            if (buffer[h].type == WordType::PLUS)
+            {
+                nextWord();
+            }
+            else if (buffer[h].type == WordType::MINU)
+            {
+                nextWord();
+            }
+            else
+            {
+                // TODO: ERROR
+            }
+            step();
+            if (buffer[h].type != WordType::RPARENT)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            statement();
+        }
+        else
+        {
+            // TODO: ERROR
+        }
+
+        print(L"<循环语句>\n");
     }
 
     void RecursiveParser::step()
     {
+        uinteger();
+
+        print(L"<步长>\n");
     }
 
     void RecursiveParser::funCall()
