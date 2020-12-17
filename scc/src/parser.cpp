@@ -919,14 +919,61 @@ namespace scc
 
     void RecursiveParser::funCall()
     {
+        if (buffer[h].type != WordType::IDENFR)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::LPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        paramVal();
+        if (buffer[h].type != WordType::RPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+
+        print(L"<有返回值函数调用语句>\n");
     }
 
     void RecursiveParser::voidFunCall()
     {
+        if (buffer[h].type != WordType::IDENFR)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::LPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        paramVal();
+        if (buffer[h].type != WordType::RPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+
+        print(L"<无返回值函数调用语句>\n");
     }
 
     void RecursiveParser::paramVal()
     {
+        if (EXPRESSION_SELECT[unsigned(buffer[h].type)])
+        {
+            expression();
+            while (buffer[h].type == WordType::COMMA)
+            {
+                nextWord();
+                expression();
+            }
+        }
+
+        print(L"<值参数表>\n");
     }
 
     void RecursiveParser::statementBlock()
@@ -941,14 +988,87 @@ namespace scc
 
     void RecursiveParser::readSt()
     {
+        if (buffer[h].type != WordType::SCANFTK)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::LPARENT)
+        {
+            // TODO: ERROR
+        }
+        do
+        {
+            nextWord();
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+        } while (buffer[h].type == WordType::COMMA);
+
+        if (buffer[h].type != WordType::RPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+
+        print(L"<读语句>\n");
     }
 
     void RecursiveParser::writeSt()
     {
+        if (buffer[h].type != WordType::PRINTFTK)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::LPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type == WordType::STRCON)
+        {
+            str();
+            if (buffer[h].type == WordType::COMMA)
+            {
+                nextWord();
+                expression();
+            }
+        }
+        else if (EXPRESSION_SELECT[unsigned(buffer[h].type)])
+        {
+            expression();
+        }
+        if (buffer[h].type != WordType::RPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+
+        print(L"<写语句>\n");
     }
 
     void RecursiveParser::returnSt()
     {
+        if (buffer[h].type != WordType::RETURNTK)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type == WordType::LPARENT)
+        {
+            nextWord();
+            expression();
+            if (buffer[h].type != WordType::RPARENT)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+        }
+
+        print(L"<返回语句>\n");
     }
 
     void RecursiveParser::parse()
