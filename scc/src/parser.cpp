@@ -1,3 +1,5 @@
+#include <cstdio>
+#include <cwchar>
 #include <cassert>
 
 #include "lexer.h"
@@ -8,7 +10,7 @@ namespace scc
 {
     // class Parser
 
-    Parser::Parser() : lexer(nullptr), lexFp(nullptr), parserFp(nullptr)
+    Parser::Parser() : lexer(nullptr), h(0), size(0), lexFp(nullptr), parserFp(nullptr)
     {
     }
 
@@ -86,6 +88,39 @@ namespace scc
         }
         lexFp = nullptr;
         parserFp = nullptr;
+    }
+
+    void Parser::nextWord(bool accept)
+    {
+        if (accept && lexFp != nullptr)
+        {
+            fwprintf(lexFp, L"%ls %ls\n", scc::typeName[unsigned(buffer[h].type)], buffer[h].val.c_str());
+        }
+        ++h %= CACHE_MAX;
+        if (size > 0)
+        {
+            --size;
+        }
+        else
+        {
+            buffer[h].type = WordType::NONE;
+            buffer[h].val.clear();
+            lexer->nextWord(buffer[h]);
+        }
+    }
+
+    void Parser::rollback(unsigned n)
+    {
+        h = (h - n + CACHE_MAX) % CACHE_MAX;
+        size += n;
+    }
+
+    void Parser::print(const wchar_t* name)
+    {
+        if (parserFp != nullptr)
+        {
+            fputws(name, parserFp);
+        }
     }
 
     // class RecursiveParser

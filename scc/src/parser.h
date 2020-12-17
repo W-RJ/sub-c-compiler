@@ -15,9 +15,19 @@ namespace scc
 
         Lexer* lexer;
 
-        Word word;
+        static const int CACHE_MAX = 8;
+
+        Word buffer[CACHE_MAX];
+
+        int h, size;
 
         FILE *lexFp, *parserFp;
+
+        void nextWord(bool accept = true);
+
+        void rollback(unsigned n);
+
+        void print(const wchar_t* name);
 
     public:
 
