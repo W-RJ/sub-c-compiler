@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <clocale>
 
 #include "lexer.h"
 #include "parser.h"
@@ -85,6 +86,8 @@ void compile(const Config& config)
 
 int main(int argc, char **argv)
 {
+    setlocale(LC_ALL, "zh_CN.UTF-8"); // TODO: Windows
+
     // Set options according to arguments
     Config config;
     try
