@@ -198,6 +198,17 @@ namespace scc
 
     void RecursiveParser::compoundSt()
     {
+        if (buffer[h].type == WordType::CONSTTK)
+        {
+            constBlock();
+        }
+        if (buffer[h].type == WordType::INTTK || buffer[h].type == WordType::CHARTK)
+        {
+            varBlock();
+        }
+        statementBlock();
+
+        print(L"<复合语句>\n");
     }
 
     void RecursiveParser::param()
@@ -206,6 +217,39 @@ namespace scc
 
     void RecursiveParser::mainFun()
     {
+        if (buffer[h].type != WordType::VOIDTK)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::MAINTK)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::LPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::RPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::LBRACE)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        compoundSt();
+        if (buffer[h].type != WordType::RBRACE)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+
+        print(L"<主函数>\n");
     }
 
     void RecursiveParser::expression()
@@ -258,6 +302,12 @@ namespace scc
 
     void RecursiveParser::statementBlock()
     {
+        while (STATEMENT_SELECT[unsigned(buffer[h].type)])
+        {
+            expression();
+        }
+
+        print(L"<语句列>\n");
     }
 
     void RecursiveParser::readSt()
@@ -275,6 +325,14 @@ namespace scc
     void RecursiveParser::parse()
     {
         assert(lexer != nullptr);
+
+        nextWord(false);
+
+        // TODO
+
+        mainFun();
+
+        print(L"<程序>\n");
 
         // TODO
     }
