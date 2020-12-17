@@ -270,6 +270,30 @@ namespace scc
 
     void RecursiveParser::declareHead()
     {
+        if (buffer[h].type == WordType::INTTK)
+        {
+            nextWord();
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+        }
+        else if (buffer[h].type == WordType::CHARTK)
+        {
+            nextWord();
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+        }
+        else
+        {
+            // TODO: ERROR
+        }
+
+        print(L"<声明头部>\n");
     }
 
     void RecursiveParser::varBlock()
@@ -335,10 +359,69 @@ namespace scc
 
     void RecursiveParser::funDef()
     {
+        declareHead();
+        if (buffer[h].type != WordType::LPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        param();
+        if (buffer[h].type != WordType::RPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::LBRACE)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        compoundSt();
+        if (buffer[h].type != WordType::RBRACE)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+
+        print(L"<有返回值函数定义>\n");
     }
 
     void RecursiveParser::voidFunDef()
     {
+        if (buffer[h].type != WordType::VOIDTK)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::IDENFR)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::LPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        param();
+        if (buffer[h].type != WordType::RPARENT)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        if (buffer[h].type != WordType::LBRACE)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+        compoundSt();
+        if (buffer[h].type != WordType::RBRACE)
+        {
+            // TODO: ERROR
+        }
+        nextWord();
+
+        print(L"<无返回值函数定义>\n");
     }
 
     void RecursiveParser::compoundSt()
@@ -358,6 +441,31 @@ namespace scc
 
     void RecursiveParser::param()
     {
+        if (buffer[h].type == WordType::INTTK || buffer[h].type == WordType::CHARTK)
+        {
+            nextWord();
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                // TODO: ERROR
+            }
+            nextWord();
+            while (buffer[h].type == WordType::COMMA)
+            {
+                nextWord();
+                if (buffer[h].type != WordType::INTTK && buffer[h].type != WordType::CHARTK)
+                {
+                    // TODO: ERROR
+                }
+                nextWord();
+                if (buffer[h].type != WordType::IDENFR)
+                {
+                    // TODO: ERROR
+                }
+                nextWord();
+            }
+        }
+
+        print(L"<参数表>\n");
     }
 
     void RecursiveParser::mainFun()
@@ -497,6 +605,29 @@ namespace scc
                     rollback(2);
                     varBlock();
                 }
+            }
+        }
+
+        while (true)
+        {
+            if (buffer[h].type == WordType::INTTK || buffer[h].type == WordType::CHARTK)
+            {
+                funDef();
+            }
+            else if (buffer[h].type == WordType::VOIDTK)
+            {
+                nextWord(false);
+                if (buffer[h].type != WordType::IDENFR)
+                {
+                    rollback(1);
+                    break;
+                }
+                rollback(1);
+                voidFunDef();
+            }
+            else
+            {
+                break; // TODO
             }
         }
 

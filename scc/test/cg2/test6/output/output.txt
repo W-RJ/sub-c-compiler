@@ -24,6 +24,40 @@ IDENFR c
 <变量定义>
 SEMICN ;
 <变量说明>
+INTTK int
+IDENFR ifun
+<声明头部>
+LPARENT (
+CHARTK char
+IDENFR par
+<参数表>
+RPARENT )
+LBRACE {
+<语句列>
+<复合语句>
+RBRACE }
+<有返回值函数定义>
+CHARTK char
+IDENFR cfun
+<声明头部>
+LPARENT (
+<参数表>
+RPARENT )
+LBRACE {
+<语句列>
+<复合语句>
+RBRACE }
+<有返回值函数定义>
+VOIDTK void
+IDENFR vfun
+LPARENT (
+<参数表>
+RPARENT )
+LBRACE {
+<语句列>
+<复合语句>
+RBRACE }
+<无返回值函数定义>
 VOIDTK void
 MAINTK main
 LPARENT (

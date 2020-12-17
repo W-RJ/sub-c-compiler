@@ -4,6 +4,18 @@ const char cc='/';
 int b;
 char c;
 
+int ifun(char par)
+{
+}
+
+char cfun()
+{
+}
+
+void vfun()
+{
+}
+
 void main()
 {
 
