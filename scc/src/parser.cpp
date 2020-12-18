@@ -36,7 +36,7 @@ namespace scc
         STATEMENT_SELECT[static_cast<unsigned>(WordType::RETURNTK)] = true;
     }
 
-    Parser::Parser() : lexer(nullptr), h(0), size(0), lexFp(nullptr), parserFp(nullptr)
+    Parser::Parser() : lexer(nullptr), h(0), size(0), lexFp(nullptr), parserFp(nullptr), global(true)
     {
         if (!hasInited)
         {
@@ -144,6 +144,11 @@ namespace scc
     {
         h = (h - n + CACHE_MAX) % CACHE_MAX;
         size += n;
+    }
+
+    Word& Parser::preWord(unsigned n)
+    {
+        return buffer[(h - n + CACHE_MAX) % CACHE_MAX];
     }
 
     void Parser::print(const wchar_t* name)
@@ -1075,6 +1080,8 @@ namespace scc
     {
         assert(lexer != nullptr);
 
+        global = true;
+
         nextWord(false);
 
         if (buffer[h].type == WordType::CONSTTK)
@@ -1103,6 +1110,8 @@ namespace scc
                 }
             }
         }
+
+        global = false;
 
         while (true)
         {

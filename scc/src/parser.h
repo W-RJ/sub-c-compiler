@@ -44,6 +44,8 @@ namespace scc
 
         FILE *lexFp, *parserFp;
 
+        bool global;
+
         Trie<Var, L'0', L'z'> globalTrie;
 
         Trie<Var, L'0', L'z'> localTrie;
@@ -61,6 +63,8 @@ namespace scc
         void nextWord(bool accept = true);
 
         void rollback(unsigned n);
+
+        Word& preWord(unsigned n);
 
         void print(const wchar_t* name);
 
