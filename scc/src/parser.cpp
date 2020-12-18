@@ -351,32 +351,47 @@ namespace scc
         print(L"<整数>\n");
     }
 
-    void RecursiveParser::declareHead()
+    Fun* RecursiveParser::declareHead()
     {
+        Fun* fun = nullptr;
+        VarType type = VarType::NONE;
         if (buffer[h].type == WordType::INTTK)
         {
-            nextWord();
-            if (buffer[h].type != WordType::IDENFR)
-            {
-                // TODO: ERROR
-            }
-            nextWord();
+            type = VarType::INT;
         }
         else if (buffer[h].type == WordType::CHARTK)
         {
-            nextWord();
-            if (buffer[h].type != WordType::IDENFR)
-            {
-                // TODO: ERROR
-            }
-            nextWord();
+            type = VarType::CHAR;
         }
         else
         {
             // TODO: ERROR
         }
+        if (type != VarType::NONE)
+        {
+            nextWord();
+            if (buffer[h].type != WordType::IDENFR)
+            {
+                // TODO: ERROR
+            }
+
+            if (globalTrie.find(buffer[h].val.c_str()).type != VarType::NONE)
+            {
+                // TODO: ERROR
+            }
+            fun = &funTrie.at(buffer[h].val.c_str());
+            if (fun->returnType != VarType::NONE)
+            {
+                // TODO: ERROR
+            }
+            fun->returnType = type;
+
+            nextWord();
+        }
 
         print(L"<声明头部>\n");
+
+        return fun;
     }
 
     void RecursiveParser::varBlock()
@@ -489,7 +504,7 @@ namespace scc
 
     void RecursiveParser::funDef()
     {
-        declareHead();
+        /*Fun* fun =*/ declareHead();
         if (buffer[h].type != WordType::LPARENT)
         {
             // TODO: ERROR
@@ -527,6 +542,18 @@ namespace scc
         {
             // TODO: ERROR
         }
+
+        if (globalTrie.find(buffer[h].val.c_str()).type != VarType::NONE)
+        {
+            // TODO: ERROR
+        }
+        Fun& fun = funTrie.at(buffer[h].val.c_str());
+        if (fun.returnType != VarType::NONE)
+        {
+            // TODO: ERROR
+        }
+        fun.returnType = VarType::VOID;
+
         nextWord();
         if (buffer[h].type != WordType::LPARENT)
         {
@@ -768,7 +795,14 @@ namespace scc
             else
             {
                 rollback(1);
-                funCall(); // TODO: FIXME
+                if (funTrie.find(buffer[h].val.c_str()).returnType == VarType::VOID)
+                {
+                    voidFunCall();
+                }
+                else
+                {
+                    funCall();
+                }
             }
             if (buffer[h].type != WordType::SEMICN)
             {

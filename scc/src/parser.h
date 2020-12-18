@@ -100,7 +100,7 @@ namespace scc
 
         void integer();
 
-        void declareHead();
+        Fun* declareHead();
 
         void varBlock();
 
