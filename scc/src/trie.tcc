@@ -11,21 +11,26 @@ namespace scc
 {
     // class Trie
 
-    template<class T, T DEFAULT_VAL, wchar_t KEY_L, wchar_t KEY_R>
-    Trie<T, DEFAULT_VAL, KEY_L, KEY_R>::Trie()
+    template<class T, wchar_t KEY_L, wchar_t KEY_R>
+    Trie<T, KEY_L, KEY_R>::Node::Node() : son{0}, data()
     {
-        nodes.push_back(Node{});
+    }
+
+    template<class T, wchar_t KEY_L, wchar_t KEY_R>
+    Trie<T, KEY_L, KEY_R>::Trie()
+    {
+        nodes.emplace_back();
         // TODO
     }
 
-    template<class T, T DEFAULT_VAL, wchar_t KEY_L, wchar_t KEY_R>
-    Trie<T, DEFAULT_VAL, KEY_L, KEY_R>::~Trie()
+    template<class T, wchar_t KEY_L, wchar_t KEY_R>
+    Trie<T, KEY_L, KEY_R>::~Trie()
     {
         // TODO
     }
 
-    template<class T, T DEFAULT_VAL, wchar_t KEY_L, wchar_t KEY_R>
-    T Trie<T, DEFAULT_VAL, KEY_L, KEY_R>::find(const wchar_t* key)
+    template<class T, wchar_t KEY_L, wchar_t KEY_R>
+    T Trie<T, KEY_L, KEY_R>::find(const wchar_t* key)
     {
         int p = 0;
         while (*key != L'\0')
@@ -36,8 +41,8 @@ namespace scc
         return nodes[p].data;
     }
 
-    template<class T, T DEFAULT_VAL, wchar_t KEY_L, wchar_t KEY_R>
-    T Trie<T, DEFAULT_VAL, KEY_L, KEY_R>::findSafe(const wchar_t* key)
+    template<class T, wchar_t KEY_L, wchar_t KEY_R>
+    T Trie<T, KEY_L, KEY_R>::findSafe(const wchar_t* key)
     {
         int p = 0;
         while (*key != L'\0')
@@ -52,8 +57,8 @@ namespace scc
         return nodes[p].data;
     }
 
-    template<class T, T DEFAULT_VAL, wchar_t KEY_L, wchar_t KEY_R>
-    void Trie<T, DEFAULT_VAL, KEY_L, KEY_R>::print(FILE* fp)
+    template<class T, wchar_t KEY_L, wchar_t KEY_R>
+    void Trie<T, KEY_L, KEY_R>::print(FILE* fp)
     {
         int n = nodes.size();
         for (int i = 0; i < n; i++)

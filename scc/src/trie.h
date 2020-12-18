@@ -9,20 +9,22 @@
 
 namespace scc
 {
-    template<class T, T _DEFAULT_VAL = T(0), wchar_t _KEY_L = wchar_t(32), wchar_t _KEY_R = wchar_t(126)>
+    template<class T, wchar_t _KEY_L = wchar_t(32), wchar_t _KEY_R = wchar_t(126)>
     class Trie
     {
     public:
 
         struct Node
         {
-            int son[unsigned(_KEY_R - _KEY_L + 1)] = {0};
-            T data = DEFAULT_VAL;
+            int son[unsigned(_KEY_R - _KEY_L + 1)];
+            T data;
+
+            Node();
         };
 
         static const wchar_t KEY_L = _KEY_L;
         static const wchar_t KEY_R = _KEY_R;
-        static const T DEFAULT_VAL = _DEFAULT_VAL;
+        static const T DEFAULT_VAL = T();
 
         std::vector<Node> nodes;
 
