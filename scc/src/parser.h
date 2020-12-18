@@ -20,7 +20,10 @@ namespace scc
 
     struct Var
     {
+        static const int SINGLE = -1;
+
         bool writable = true;
+        int size = SINGLE;
         VarType type = VarType::NONE;
     };
 
