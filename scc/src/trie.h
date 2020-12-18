@@ -24,7 +24,7 @@ namespace scc
 
         static const wchar_t KEY_L = _KEY_L;
         static const wchar_t KEY_R = _KEY_R;
-        static const T DEFAULT_VAL = T();
+        const T DEFAULT_VAL;
 
         std::vector<Node> nodes;
 

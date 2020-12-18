@@ -17,7 +17,7 @@ namespace scc
     }
 
     template<class T, wchar_t KEY_L, wchar_t KEY_R>
-    Trie<T, KEY_L, KEY_R>::Trie()
+    Trie<T, KEY_L, KEY_R>::Trie() : DEFAULT_VAL()
     {
         nodes.emplace_back();
         // TODO
