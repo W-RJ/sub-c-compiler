@@ -18,8 +18,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: make
-      run: make
+    - name: make release
+      run: make release
 
   test:
 
