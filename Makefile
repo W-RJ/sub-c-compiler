@@ -1,6 +1,6 @@
 build = build
 
-range = 2
+range = 1 2
 
 ## phony targets
 
@@ -12,7 +12,13 @@ main:
 	mkdir -p $(build)
 	cp scc/$(build)/scc scc/$(build)/sc.lang $(build)
 
-zip: main
+release:
+	$(MAKE) release=true -C tools
+	$(MAKE) release=true -C scc
+	mkdir -p $(build)
+	cp scc/$(build)/scc scc/$(build)/sc.lang $(build)
+
+zip: release
 	-rm scc.zip
 	zip -r scc.zip scc -x \*.pyc
 
