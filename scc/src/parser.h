@@ -6,9 +6,30 @@
 #include <cstdio>
 
 #include "lexer.h"
+#include "trie"
 
 namespace scc
 {
+    enum class VarType
+    {
+        NONE,
+        VOID,
+        CHAR,
+        INT,
+    };
+
+    struct Var
+    {
+        bool writable = true;
+        VarType type = VarType::NONE;
+    };
+
+    struct Fun
+    {
+        VarType returnType = VarType::NONE;
+        std::vector<VarType> paramTypes;
+    };
+
     class Parser
     {
     protected:
@@ -22,6 +43,12 @@ namespace scc
         int h, size;
 
         FILE *lexFp, *parserFp;
+
+        Trie<Var, L'0', L'z'> globalTrie;
+
+        Trie<Var, L'0', L'z'> localTrie;
+
+        Trie<Fun, L'0', L'z'> funTrie;
 
         static bool EXPRESSION_SELECT[static_cast<unsigned>(WordType::END)];
 
