@@ -32,11 +32,11 @@ namespace scc
 
         virtual ~Trie();
 
-        T find(const wchar_t* key);
+        T& at(const wchar_t* key);
 
-        T findSafe(const wchar_t* key);
+        T& find(const wchar_t* key);
 
-        void print(FILE* fp);
+        void print(FILE* fp) const;
 
         // TODO
     };
