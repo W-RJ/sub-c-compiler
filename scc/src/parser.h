@@ -96,7 +96,7 @@ namespace scc
 
         void constDef();
 
-        void uinteger();
+        int uinteger();
 
         void integer();
 

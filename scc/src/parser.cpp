@@ -1,5 +1,7 @@
 #include <cstdio>
 #include <cwchar>
+#include <string>
+#include <climits>
 #include <cassert>
 
 #include "lexer.h"
@@ -245,7 +247,7 @@ namespace scc
         print(L"<常量定义>\n");
     }
 
-    void RecursiveParser::uinteger()
+    int RecursiveParser::uinteger()
     {
         if (buffer[h].type != WordType::INTCON)
         {
@@ -254,6 +256,15 @@ namespace scc
         nextWord();
 
         print(L"<无符号整数>\n");
+        try
+        {
+            return std::stoi(preWord(1).val);
+        }
+        catch(const std::invalid_argument& e)
+        {
+            // TODO: ERROR
+            return INT_MAX;
+        }
     }
 
     void RecursiveParser::integer()
