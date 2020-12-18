@@ -206,6 +206,7 @@ namespace scc
                 {
                     // TODO: ERROR
                 }
+                int idH = h;
                 nextWord();
                 if (buffer[h].type != WordType::ASSIGN)
                 {
@@ -214,6 +215,35 @@ namespace scc
                 nextWord();
                 integer();
 
+                Var* var;
+                if (global)
+                {
+                    if (funTrie.find(buffer[idH].val.c_str()).returnType != VarType::NONE)
+                    {
+                        // TODO: ERROR
+                        continue;
+                    }
+                    else
+                    {
+                        var = &localTrie.at(buffer[idH].val.c_str()); // TODO
+                    }
+                }
+                else
+                {
+                    var = &localTrie.at(buffer[idH].val.c_str()); // TODO
+                }
+                if (var->type != VarType::NONE)
+                {
+                    // TODO: ERROR
+                    continue;
+                }
+                else
+                {
+                    var->type = VarType::INT;
+                    var->writable = false;
+
+                    // TODO
+                }
             } while (buffer[h].type == WordType::COMMA);
         }
         else if (buffer[h].type == WordType::CHARTK)
@@ -225,6 +255,7 @@ namespace scc
                 {
                     // TODO: ERROR
                 }
+                int idH = h;
                 nextWord();
                 if (buffer[h].type != WordType::ASSIGN)
                 {
@@ -237,6 +268,35 @@ namespace scc
                 }
                 nextWord();
 
+                Var* var;
+                if (global)
+                {
+                    if (funTrie.find(buffer[idH].val.c_str()).returnType != VarType::NONE)
+                    {
+                        // TODO: ERROR
+                        continue;
+                    }
+                    else
+                    {
+                        var = &localTrie.at(buffer[idH].val.c_str()); // TODO
+                    }
+                }
+                else
+                {
+                    var = &localTrie.at(buffer[idH].val.c_str()); // TODO
+                }
+                if (var->type != VarType::NONE)
+                {
+                    // TODO: ERROR
+                    continue;
+                }
+                else
+                {
+                    var->type = VarType::CHAR;
+                    var->writable = false;
+
+                    // TODO
+                }
             } while (buffer[h].type == WordType::COMMA);
         }
         else
