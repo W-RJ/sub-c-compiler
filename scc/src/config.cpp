@@ -179,7 +179,7 @@ void Config::set(int argc, char **argv)
                     break;
 
                 case 'P':
-                    optimize = true;
+                    optimize = false;
                     break;
 
                 case 'G':
