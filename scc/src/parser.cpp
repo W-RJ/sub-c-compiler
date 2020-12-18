@@ -10,30 +10,30 @@ namespace scc
 {
     // class Parser
 
-    bool Parser::EXPRESSION_SELECT[unsigned(WordType::END)] = {false};
-    bool Parser::STATEMENT_SELECT[unsigned(WordType::END)] = {false};
+    bool Parser::EXPRESSION_SELECT[static_cast<unsigned>(WordType::END)] = {false};
+    bool Parser::STATEMENT_SELECT[static_cast<unsigned>(WordType::END)] = {false};
 
     bool Parser::hasInited = false;
 
     void Parser::init()
     {
-        EXPRESSION_SELECT[unsigned(WordType::PLUS)] = true;
-        EXPRESSION_SELECT[unsigned(WordType::MINU)] = true;
-        EXPRESSION_SELECT[unsigned(WordType::IDENFR)] = true;
-        EXPRESSION_SELECT[unsigned(WordType::LPARENT)] = true;
-        EXPRESSION_SELECT[unsigned(WordType::INTCON)] = true;
-        EXPRESSION_SELECT[unsigned(WordType::CHARCON)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(WordType::PLUS)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(WordType::MINU)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(WordType::IDENFR)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(WordType::LPARENT)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(WordType::INTCON)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(WordType::CHARCON)] = true;
 
-        STATEMENT_SELECT[unsigned(WordType::IFTK)] = true;
-        STATEMENT_SELECT[unsigned(WordType::WHILETK)] = true;
-        STATEMENT_SELECT[unsigned(WordType::DOTK)] = true;
-        STATEMENT_SELECT[unsigned(WordType::FORTK)] = true;
-        STATEMENT_SELECT[unsigned(WordType::LBRACE)] = true;
-        STATEMENT_SELECT[unsigned(WordType::IDENFR)] = true;
-        STATEMENT_SELECT[unsigned(WordType::SCANFTK)] = true;
-        STATEMENT_SELECT[unsigned(WordType::PRINTFTK)] = true;
-        STATEMENT_SELECT[unsigned(WordType::SEMICN)] = true;
-        STATEMENT_SELECT[unsigned(WordType::RETURNTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(WordType::IFTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(WordType::WHILETK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(WordType::DOTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(WordType::FORTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(WordType::LBRACE)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(WordType::IDENFR)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(WordType::SCANFTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(WordType::PRINTFTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(WordType::SEMICN)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(WordType::RETURNTK)] = true;
     }
 
     Parser::Parser() : lexer(nullptr), h(0), size(0), lexFp(nullptr), parserFp(nullptr)
@@ -125,7 +125,7 @@ namespace scc
     {
         if (accept && lexFp != nullptr)
         {
-            fwprintf(lexFp, L"%ls %ls\n", scc::typeName[unsigned(buffer[h].type)], buffer[h].val.c_str());
+            fwprintf(lexFp, L"%ls %ls\n", scc::typeName[static_cast<unsigned>(buffer[h].type)], buffer[h].val.c_str());
         }
         ++h %= CACHE_MAX;
         if (size > 0)
@@ -523,7 +523,7 @@ namespace scc
             nextWord();
         }
         item();
-        while (EXPRESSION_SELECT[unsigned(buffer[h].type)])
+        while (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
             if (buffer[h].type == WordType::PLUS)
             {
@@ -963,7 +963,7 @@ namespace scc
 
     void RecursiveParser::paramVal()
     {
-        if (EXPRESSION_SELECT[unsigned(buffer[h].type)])
+        if (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
             expression();
             while (buffer[h].type == WordType::COMMA)
@@ -978,7 +978,7 @@ namespace scc
 
     void RecursiveParser::statementBlock()
     {
-        while (STATEMENT_SELECT[unsigned(buffer[h].type)])
+        while (STATEMENT_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
             statement();
         }
@@ -1037,7 +1037,7 @@ namespace scc
                 expression();
             }
         }
-        else if (EXPRESSION_SELECT[unsigned(buffer[h].type)])
+        else if (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
             expression();
         }

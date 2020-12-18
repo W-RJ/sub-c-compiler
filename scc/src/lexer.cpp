@@ -16,7 +16,7 @@
 
 namespace scc
 {
-    wchar_t typeName[unsigned(WordType::END)][TYPE_NAME_MAX] = {{'\0'}};
+    wchar_t typeName[static_cast<unsigned>(WordType::END)][TYPE_NAME_MAX] = {{'\0'}};
 
     Trie<WordType> lexTrie;
 
@@ -36,7 +36,7 @@ namespace scc
         RegExp<WordType> regExp(lexTrie);
         const int BUFFER_MAX = 256;
         wchar_t buffer[BUFFER_MAX];
-        int n = int(WordType::END);
+        int n = static_cast<int>(WordType::END);
         for (int i = 0; i < n; i++)
         {
             fwscanf(fp, L"%l[^,],", typeName[i]);

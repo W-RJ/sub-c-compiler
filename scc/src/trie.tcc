@@ -67,7 +67,7 @@ namespace scc
         int n = nodes.size();
         for (int i = 0; i < n; i++)
         {
-            fwprintf(fp, L"%d<%d>: ", i, int(nodes[i].data));
+            fwprintf(fp, L"%d<%d>: ", i, static_cast<int>(nodes[i].data));
             for (wchar_t c = KEY_L; c <= KEY_R; c++)
             {
                 if (nodes[i].son[c - KEY_L] != 0)

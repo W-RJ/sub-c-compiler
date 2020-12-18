@@ -16,7 +16,7 @@ namespace scc
 
         struct Node
         {
-            int son[unsigned(_KEY_R - _KEY_L + 1)];
+            int son[static_cast<unsigned>(_KEY_R - _KEY_L + 1)];
             T data;
 
             Node();

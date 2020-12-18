@@ -55,7 +55,7 @@ void lexerOnly(const Config& config)
         lexer.nextWord(word);
         while (word.type != scc::WordType::NONE)
         {
-            fwprintf(fp, L"%ls %ls\n", scc::typeName[unsigned(word.type)], word.val.c_str());
+            fwprintf(fp, L"%ls %ls\n", scc::typeName[static_cast<unsigned>(word.type)], word.val.c_str());
             word.type = scc::WordType::NONE;
             word.val.clear();
             lexer.nextWord(word);

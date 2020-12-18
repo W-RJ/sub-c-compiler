@@ -137,7 +137,7 @@ namespace scc
                                 if (!newNode)
                                 {
                                     newNode = true;
-                                    trie.nodes.push_back(typename Trie<T>::Node{});
+                                    trie.nodes.emplace_back();
                                 }
                                 trie.nodes[*itHeads].son[c - trie.KEY_L] = trie.nodes.size() - 1;
                             }
@@ -168,7 +168,7 @@ namespace scc
                                     if (!newNode)
                                     {
                                         newNode = true;
-                                        trie.nodes.push_back(typename Trie<T>::Node{});
+                                        trie.nodes.emplace_back();
                                     }
                                     trie.nodes[*itHeads].son[c - trie.KEY_L] = trie.nodes.size() - 1;
                                 }
@@ -198,7 +198,7 @@ namespace scc
             {
                 if (trie.nodes[*itHeads].son[c - trie.KEY_L] == 0)
                 {
-                    trie.nodes.push_back(typename Trie<T>::Node{});
+                    trie.nodes.emplace_back();
                     trie.nodes[*itHeads].son[c - trie.KEY_L] = trie.nodes.size() - 1;
                 }
                 *itHeads = trie.nodes[*itHeads].son[c - trie.KEY_L];

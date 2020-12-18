@@ -15,7 +15,7 @@ namespace scc
         #include "sc.lang"
     };
 
-    extern wchar_t typeName[unsigned(WordType::END)][TYPE_NAME_MAX];
+    extern wchar_t typeName[static_cast<unsigned>(WordType::END)][TYPE_NAME_MAX];
 
     extern Trie<WordType> lexTrie;
 
