@@ -62,7 +62,7 @@ namespace scc
     {
         if (lexer == nullptr)
         {
-            throw NullPointerError(L"setLexer: lexer is null");
+            throw NullPointerError(L"Parser::setLexer: lexer is null");
         }
         this->lexer = lexer;
     }

@@ -361,7 +361,7 @@ namespace scc
                     word.val.push_back(ch);
                     ch = fgetwc(fp);
                 } while (isAlpha(ch) || isDigit(ch));
-                word.type = lexTrie.at(word.val.c_str());
+                word.type = lexTrie.get(word.val.c_str());
             }
             else
             {

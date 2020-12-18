@@ -103,4 +103,9 @@ class NullPointerError : public WRuntimeError
     using WRuntimeError::WRuntimeError;
 };
 
+class OutOfRangeError : public WRuntimeError
+{
+    using WRuntimeError::WRuntimeError;
+};
+
 #endif // _SCC_EXCEPTION_H_

@@ -34,7 +34,11 @@ namespace scc
 
         T& at(const wchar_t* key);
 
-        T& find(const wchar_t* key);
+        T& get(const wchar_t* key);
+
+        const T& find(const wchar_t* key);
+
+        void clear();
 
         void print(FILE* fp) const;
 
