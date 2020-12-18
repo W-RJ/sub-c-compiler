@@ -413,7 +413,16 @@ namespace scc
 
     void RecursiveParser::varDef()
     {
-        if (buffer[h].type != WordType::INTTK && buffer[h].type != WordType::CHARTK)
+        VarType type = VarType::NONE;
+        if (buffer[h].type == WordType::INTTK)
+        {
+            type = VarType::INT;
+        }
+        else if (buffer[h].type == WordType::CHARTK)
+        {
+            type = VarType::CHAR;
+        }
+        else
         {
             // TODO: ERROR
         }
@@ -424,17 +433,55 @@ namespace scc
             {
                 // TODO: ERROR
             }
+            int idH = h;
+            int size = Var::SINGLE;
             nextWord();
             if (buffer[h].type == WordType::LBRACK)
             {
                 nextWord();
-                uinteger();
+                size = uinteger();
+                if (size == 0)
+                {
+                    // TODO: ERROR
+                }
                 if (buffer[h].type != WordType::RBRACK)
                 {
                     // TODO: ERROR
                 }
                 nextWord();
             }
+
+            Var* var;
+            if (global)
+            {
+                if (funTrie.find(buffer[idH].val.c_str()).returnType != VarType::NONE)
+                {
+                    // TODO: ERROR
+                    continue;
+                }
+                else
+                {
+                    var = &localTrie.at(buffer[idH].val.c_str()); // TODO
+                }
+            }
+            else
+            {
+                var = &localTrie.at(buffer[idH].val.c_str()); // TODO
+            }
+            if (var->type != VarType::NONE)
+            {
+                // TODO: ERROR
+                continue;
+            }
+            else
+            {
+                var->size = size;
+                var->type = type;
+
+                // TODO
+            }
+
+            // TODO
         } while (buffer[h].type == WordType::COMMA);
 
         print(L"<变量定义>\n");
