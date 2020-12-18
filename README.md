@@ -1,33 +1,106 @@
 # Sub C Compiler (SCC)
 
-Compiler for the Sub C Programing Language defined by DUT in 2020.
+Compiler for the Sub C Programing Language defined by CG.
 
-针对大连理工大学在2020年定义的 Sub C 程序设计语言的编译器。
+针对希冀平台定义的 Sub C 程序设计语言的编译器。
 
-## Build | 构建方法
+## Build & Installation & Test | 构建方法、安装方法与自测方法
 
 ### Linux / macOS
 
-首先确保您已安装 make ，然后在终端中输入如下命令：
+首先确保您已安装`make`，然后在终端中输入如下命令：
 
 ``` bash
-make
+make release
 ```
 
-将在`build`目录中生成可执行文件`scc`。
+将在`release`目录中生成可执行文件`scc`和默认的动态词法定义文件`sc.lang`。运行时请确保上述两个文件被放置在同一个目录下。
+
+若要安装到操作系统的程序目录下，可以输入如下命令：
+
+``` bash
+sudo make install
+```
+
+或
+
+``` bash
+su -c make install
+```
+
+在上述安装命令中，默认安装路径为`/usr/local/bin`，可用环境变量`DESTDIR`指定安装的目标路径，可将`install`替换为`uninstall`来卸载。
+
+若要生成按照希冀平台的要求强制固定输入输出文件名（而不是根据命令行参数）、且不支持读取动态词法定义的可执行程序，可用环境变量`CG`指定希冀平台的题号（范围为1～5）。例如：
+
+``` bash
+make release CG=1
+```
+
+将生成只进行词法分析的、输入输出文件固定的、词法类型名和正则表达式固定的可执行程序。
+
+若要生成能够提交到希冀平台的压缩包，首先确保您已安装`zip`，然后可输入如下命令：
+
+``` bash
+make zip CG=?
+```
+
+其中`?`的范围为1～5。该命令将生成一个能够提交到希冀平台的zip压缩包。
+
+若要执行本程序自带的自我测试脚本，首先确保您已安装`python3`，然后使用如下命令安装`pytest`（如已安装可以跳过）：
+
+``` bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+在某些操作系统中，您可能需要将`python`替换为`python3`。安装`pytest`后，可输入如下命令执行自我测试脚本：
+
+``` bash
+make test
+```
+
+若命令执行成功，则说明测试成功。
+
+上述自测命令仅用于使用自带测试用例自测，若要使用其它测试用例请使用`make release`命令或`make release CG=?`命令构建后测试。
 
 ### Windows
 
 首先确保您已安装 MinGW ，并已将 MinGW 的 bin 目录添加至环境变量Path中，然后在 Git Bash （或其它 Linux Shell 中）输入如下命令：
 
 ``` bash
-mingw32-make
+mingw32-make release
 ```
 
-将在`build`目录中生成可执行文件`scc.exe`。
+将在`release`目录中生成可执行文件`scc.exe`和默认的动态词法定义文件`sc.lang`。运行时请确保上述两个文件被放置在同一个目录下。
+
 
 > 如果您在使用 Windows 系统并使用 Visual Studio Code ，强烈建议您将它的默认 Shell 改为 Git Bash 。  
 > 修改方法可参考：https://code.visualstudio.com/docs/editor/integrated-terminal#_windows
+
+若要生成按照希冀平台的要求强制固定输入输出文件名（而不是根据命令行参数）、且不支持读取动态词法定义的可执行程序，可用环境变量`CG`指定希冀平台的题号（范围为1～5）。例如：
+
+``` bash
+mingw32-make release CG=1
+```
+
+将生成只进行词法分析的、输入输出文件固定的、词法类型名和正则表达式固定的可执行程序。
+
+若要执行本程序自带的自我测试脚本，首先确保您已安装`python3`，然后使用如下命令安装`pytest`（如已安装可以跳过）：
+
+``` bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+安装`pytest`后，可输入如下命令执行自我测试脚本：
+
+``` bash
+mingw32-make test
+```
+
+若命令执行成功，则说明测试成功。
+
+上述自测命令仅用于使用自带测试用例自测，若要使用其它测试用例请使用`make release`命令或`make release CG=?`命令构建后测试。
 
 ## Project Structure | 项目结构
 
