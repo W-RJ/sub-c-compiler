@@ -113,7 +113,13 @@ mingw32-make test
 
 ## Project Structure | 项目结构
 
-目前本项目分为3个子项目，其中在每个子项目中 src 为源码目录， build 为编译生成的目标文件目录，test为自动测试目录， Makefile 为编译脚本。代码的编译由 Makefile 管理。
+目前本项目分为3个子项目，其中在每个子项目中 src 为源码目录， build 为构建生成的目标文件目录， test 为自动测试目录， Makefile 为编译脚本。
+
+另外，在本项目根目录中除了三个子项目目录外还有 release 目录（构建生成的最终发布版本的可执行程序目录）、 build 目录（构建生成的目标文件目录）、 test 目录 （自动测试目录）、 Makefile （编译脚本）。
+
+代码的编译由 Makefile 管理。
+
+各个子项目如下：
 
 ### SCC
 
