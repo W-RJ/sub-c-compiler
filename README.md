@@ -205,7 +205,7 @@ mingw32-make test
 | RBRACE   | }                      |
 | IDENFR   | [_a-zA-Z][_a-zA-Z0-9]* |
 
-## Grammar definition | 语法定义
+### Grammar definition | 语法定义
 
 Sub C 程序设计语言的EBNF语法定义如下：
 
