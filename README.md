@@ -4,7 +4,7 @@ Compiler for the Sub C Programing Language defined by CG.
 
 针对希冀平台定义的 Sub C 程序设计语言的编译器。
 
-## Build & Installation & Test | 构建方法、安装方法与自测方法
+## Build & Installation & Test | 构建、安装、自测方法
 
 ### Linux / macOS
 
@@ -30,13 +30,15 @@ su -c make install
 
 在上述安装命令中，默认安装路径为`/usr/local/bin`，可用环境变量`DESTDIR`指定安装的目标路径，可将`install`替换为`uninstall`来卸载。
 
-若要生成按照希冀平台的要求强制固定输入输出文件名（而不是根据命令行参数）、且不支持读取动态词法定义的可执行程序，可用环境变量`CG`指定希冀平台的题号（范围为1～5）。例如：
+若要生成强制固定输入输出文件名为希冀平台要求的文件名（而不是根据命令行参数）、且不支持读取动态词法定义的可执行程序，可用环境变量`CG`指定希冀平台的题号（范围为1～5）。例如：
 
 ``` bash
 make release CG=1
 ```
 
 将生成只进行词法分析的、输入输出文件固定的、词法类型名和正则表达式固定的可执行程序。
+
+若不指定`CG`变量，则默认生成正常的、功能完整的可执行程序。
 
 若要生成能够提交到希冀平台的压缩包，首先确保您已安装`zip`，然后可输入如下命令：
 
@@ -45,6 +47,9 @@ make zip CG=?
 ```
 
 其中`?`的范围为1～5。该命令将生成一个能够提交到希冀平台的zip压缩包。
+
+> 建议使用上述命令打包，而不要自行打包。  
+> 若一定要自行打包代码提交，请先使用`make release CG=?`命令（`?`的范围为1～5）编译一次，然后再打包，并请注意不要将`*.pyc`文件打包进压缩包。
 
 若要执行本程序自带的自我测试脚本，首先确保您已安装`python3`，然后使用如下命令安装`pytest`（如已安装可以跳过）：
 
@@ -77,13 +82,17 @@ mingw32-make release
 > 如果您在使用 Windows 系统并使用 Visual Studio Code ，强烈建议您将它的默认 Shell 改为 Git Bash 。  
 > 修改方法可参考：https://code.visualstudio.com/docs/editor/integrated-terminal#_windows
 
-若要生成按照希冀平台的要求强制固定输入输出文件名（而不是根据命令行参数）、且不支持读取动态词法定义的可执行程序，可用环境变量`CG`指定希冀平台的题号（范围为1～5）。例如：
+若要生成强制固定输入输出文件名为希冀平台要求的文件名（而不是根据命令行参数）、且不支持读取动态词法定义的可执行程序，可用环境变量`CG`指定希冀平台的题号（范围为1～5）。例如：
 
 ``` bash
 mingw32-make release CG=1
 ```
 
 将生成只进行词法分析的、输入输出文件固定的、词法类型名和正则表达式固定的可执行程序。
+
+若不指定`CG`变量，则默认生成正常的、功能完整的可执行程序。
+
+> 若要打包代码提交，请先使用`mingw32-make release CG=?`命令（`?`的范围为1～5）编译一次，然后再打包，并请注意不要将`*.pyc`文件打包进压缩包。
 
 若要执行本程序自带的自我测试脚本，首先确保您已安装`python3`，然后使用如下命令安装`pytest`（如已安装可以跳过）：
 
@@ -104,7 +113,7 @@ mingw32-make test
 
 ## Project Structure | 项目结构
 
-目前本项目分为3个子项目，其中在每个子项目中 src 为源码目录， build 为编译生成的目标文件目录， Makefile 为编译脚本。代码的编译由 Makefile 管理。
+目前本项目分为3个子项目，其中在每个子项目中 src 为源码目录， build 为编译生成的目标文件目录，test为自动测试目录， Makefile 为编译脚本。代码的编译由 Makefile 管理。
 
 ### SCC
 
@@ -120,6 +129,7 @@ mingw32-make test
 | sc.lang   | 包含各词法类型的类型码和正则表达式，支持 **在运行时动态修改** |
 | exception | 包含各种异常类，支持不同等级的运行时异常 |
 | config    | 包含对各种预定义参数与命令行参数的处理 |
+| define    | 包含各种编译选项的宏定义 |
 | cg        | 包含对希冀系统不支持 Makefile 的问题的处理 |
 
 ### IDE
@@ -150,44 +160,44 @@ mingw32-make test
 
 利用上述正则表达式文法，将 Sub C 程序设计语言的词法定义如下：
 
-| 类型码 | 正则表达式 |
-| ------ | ---------- |
-|INTCON|0\|[1-9][0-9]*|
-|CHARCON|'[+\\-*/_a-zA-Z0-9]'|
-|STRCON|"[ !#-~]*"|
-|CONSTTK|const|
-|INTTK|int|
-|CHARTK|char|
-|VOIDTK|void|
-|MAINTK|main|
-|IFTK|if|
-|ELSETK|else|
-|DOTK|do|
-|WHILETK|while|
-|FORTK|for|
-|SCANFTK|scanf|
-|PRINTFTK|printf|
-|RETURNTK|return|
-|PLUS|+|
-|MINU|-|
-|MULT|\\*|
-|DIV|/|
-|LSS|<|
-|LEQ|<=|
-|GRE|>|
-|GEQ|>=|
-|EQL|==|
-|NEQ|!=|
-|ASSIGN|=|
-|SEMICN|;|
-|COMMA|,|
-|LPARENT|(|
-|RPARENT|)|
-|LBRACK|\\[|
-|RBRACK|\\]|
-|LBRACE|{|
-|RBRACE|}|
-|IDENFR|[_a-zA-Z][_a-zA-Z0-9]*|
+|  类型码  |       正则表达式       |
+| -------- | ---------------------- |
+| INTCON   | 0\|[1-9][0-9]*         |
+| CHARCON  | '[+\\-*/_a-zA-Z0-9]'   |
+| STRCON   | "[ !#-~]*"             |
+| CONSTTK  | const                  |
+| INTTK    | int                    |
+| CHARTK   | char                   |
+| VOIDTK   | void                   |
+| MAINTK   | main                   |
+| IFTK     | if                     |
+| ELSETK   | else                   |
+| DOTK     | do                     |
+| WHILETK  | while                  |
+| FORTK    | for                    |
+| SCANFTK  | scanf                  |
+| PRINTFTK | printf                 |
+| RETURNTK | return                 |
+| PLUS     | +                      |
+| MINU     | -                      |
+| MULT     | \\*                    |
+| DIV      | /                      |
+| LSS      | <                      |
+| LEQ      | <=                     |
+| GRE      | >                      |
+| GEQ      | >=                     |
+| EQL      | ==                     |
+| NEQ      | !=                     |
+| ASSIGN   | =                      |
+| SEMICN   | ;                      |
+| COMMA    | ,                      |
+| LPARENT  | (                      |
+| RPARENT  | )                      |
+| LBRACK   | \\[                    |
+| RBRACK   | \\]                    |
+| LBRACE   | {                      |
+| RBRACE   | }                      |
+| IDENFR   | [_a-zA-Z][_a-zA-Z0-9]* |
 
 ## Grammar definition | 语法定义
 
