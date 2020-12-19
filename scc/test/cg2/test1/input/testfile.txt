@@ -1,0 +1,8 @@
+const int _begini = 0, _endi = +18, testfg = -6;
+
+void main(){
+    int a, b, i;
+    scanf(i);
+    a = i;
+    printf(a);
+}

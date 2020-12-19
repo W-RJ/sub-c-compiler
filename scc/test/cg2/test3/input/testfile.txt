@@ -1,0 +1,80 @@
+int g_list[20];
+
+int abs(int a){
+    g_list[0] = g_list[0] + 1;
+    if(a < 0){
+        return (-a);
+    }
+    return (a);
+}
+
+void init(){
+    int i;
+    i = 0;
+    while(i < 10){
+        g_list[i] = 0;
+        i =i++1;
+    }
+    g_list[1] = g_list[1] + 1;
+}
+
+void show(){
+    int i;
+    g_list[3] = 1;
+    i = 0;
+    while(i < 4){
+        printf(g_list[i]);
+        i =i+1;
+    }
+}
+
+int times(int a, int b){
+    g_list[2] = 1;
+    return (a * b);
+}
+
+int sum4(int a, int b, int c, int d){
+    g_list[3] = 1 + g_list[3];
+    return (a + b+ c+ d);
+}
+
+void main(){
+    int a;
+    int theSum, i;
+    char f;
+    scanf(a);
+    scanf(f);
+    init();
+    if(a < 0){
+        printf(sum4(abs(times(2, -2)), abs(-1), abs(-3), abs(2) ));
+        return;
+    }
+    printf(sum4(abs(times(2, -2)), abs(-1), abs(-3), abs(22) ));
+    theSum= 0;
+    if( a > 10 ){
+        i = 0;
+        do{
+            theSum = theSum + i;
+            i = i + 1;
+        }while(i < a);
+    }
+    else{
+        if(f+0=='+'+0){
+            i = 0;
+            while(i < a+3){
+                theSum = theSum + i;
+                i = i + 3;
+            };
+        }
+        else{
+            i = 0;
+            while(i < a+3){
+                theSum = theSum - i;
+                i = i + 3;
+            };
+        }
+    }
+    printf(theSum);
+    show();
+    return;
+}
