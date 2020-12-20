@@ -1,0 +1,201 @@
+INTTK int
+IDENFR gets1
+<声明头部>
+LPARENT (
+INTTK int
+IDENFR var1
+COMMA ,
+INTTK int
+IDENFR var2
+<参数表>
+RPARENT )
+LBRACE {
+INTTK int
+IDENFR i
+COMMA ,
+IDENFR j
+<变量定义>
+SEMICN ;
+INTTK int
+IDENFR change1
+<变量定义>
+SEMICN ;
+<变量说明>
+IDENFR i
+ASSIGN =
+INTCON 0
+<无符号整数>
+<整数>
+<因子>
+<项>
+<表达式>
+<赋值语句>
+SEMICN ;
+<语句>
+DOTK do
+LBRACE {
+IDENFR i
+ASSIGN =
+IDENFR i
+<因子>
+<项>
+PLUS +
+INTCON 1
+<无符号整数>
+<整数>
+<因子>
+<项>
+<表达式>
+<赋值语句>
+SEMICN ;
+<语句>
+IDENFR var1
+ASSIGN =
+IDENFR var2
+<因子>
+<项>
+PLUS +
+IDENFR var1
+<因子>
+<项>
+<表达式>
+<赋值语句>
+SEMICN ;
+<语句>
+<语句列>
+RBRACE }
+<语句>
+WHILETK while
+LPARENT (
+IDENFR i
+<因子>
+<项>
+<表达式>
+LSS <
+IDENFR var2
+<因子>
+<项>
+<表达式>
+<条件>
+RPARENT )
+<循环语句>
+<语句>
+SEMICN ;
+<语句>
+IDENFR change1
+ASSIGN =
+IDENFR var1
+<因子>
+<项>
+<表达式>
+<赋值语句>
+SEMICN ;
+<语句>
+RETURNTK return
+LPARENT (
+IDENFR change1
+<因子>
+<项>
+<表达式>
+RPARENT )
+<返回语句>
+SEMICN ;
+<语句>
+<语句列>
+<复合语句>
+RBRACE }
+<有返回值函数定义>
+VOIDTK void
+MAINTK main
+LPARENT (
+RPARENT )
+LBRACE {
+CONSTTK const
+INTTK int
+IDENFR const1
+ASSIGN =
+MINU -
+INTCON 21
+<无符号整数>
+<整数>
+COMMA ,
+IDENFR const2
+ASSIGN =
+INTCON 10
+<无符号整数>
+<整数>
+<常量定义>
+SEMICN ;
+<常量说明>
+INTTK int
+IDENFR k
+<变量定义>
+SEMICN ;
+<变量说明>
+SCANFTK scanf
+LPARENT (
+IDENFR k
+RPARENT )
+<读语句>
+SEMICN ;
+<语句>
+IFTK if
+LPARENT (
+IDENFR k
+<因子>
+<项>
+<表达式>
+LSS <
+IDENFR const2
+<因子>
+<项>
+<表达式>
+<条件>
+RPARENT )
+LBRACE {
+PRINTFTK printf
+LPARENT (
+IDENFR gets1
+LPARENT (
+IDENFR const1
+<因子>
+<项>
+<表达式>
+COMMA ,
+IDENFR k
+<因子>
+<项>
+<表达式>
+<值参数表>
+RPARENT )
+<有返回值函数调用语句>
+<因子>
+<项>
+<表达式>
+RPARENT )
+<写语句>
+SEMICN ;
+<语句>
+<语句列>
+RBRACE }
+<语句>
+ELSETK else
+LBRACE {
+PRINTFTK printf
+LPARENT (
+STRCON Hello World
+<字符串>
+RPARENT )
+<写语句>
+SEMICN ;
+<语句>
+<语句列>
+RBRACE }
+<语句>
+<条件语句>
+<语句>
+<语句列>
+<复合语句>
+RBRACE }
+<主函数>
+<程序>

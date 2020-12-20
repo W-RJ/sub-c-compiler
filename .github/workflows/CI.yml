@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: 
+      - master
+      - dev
+  pull_request:
+    branches:
+      - master
+      - dev
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: make release
+      run: make release
+
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install requirements
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r requirements.txt
+    - name: Install language packs
+      run: |
+        sudo apt install -y language-pack-zh-hans language-pack-zh-hans-base
+    - name: make test
+      run: |
+        export PATH=${PATH}:~/.local/bin
+        make test

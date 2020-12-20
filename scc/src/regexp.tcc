@@ -137,7 +137,7 @@ namespace scc
                                 if (!newNode)
                                 {
                                     newNode = true;
-                                    trie.nodes.push_back(typename Trie<T>::Node{});
+                                    trie.nodes.emplace_back();
                                 }
                                 trie.nodes[*itHeads].son[c - trie.KEY_L] = trie.nodes.size() - 1;
                             }
@@ -168,7 +168,7 @@ namespace scc
                                     if (!newNode)
                                     {
                                         newNode = true;
-                                        trie.nodes.push_back(typename Trie<T>::Node{});
+                                        trie.nodes.emplace_back();
                                     }
                                     trie.nodes[*itHeads].son[c - trie.KEY_L] = trie.nodes.size() - 1;
                                 }
@@ -198,7 +198,7 @@ namespace scc
             {
                 if (trie.nodes[*itHeads].son[c - trie.KEY_L] == 0)
                 {
-                    trie.nodes.push_back(typename Trie<T>::Node{});
+                    trie.nodes.emplace_back();
                     trie.nodes[*itHeads].son[c - trie.KEY_L] = trie.nodes.size() - 1;
                 }
                 *itHeads = trie.nodes[*itHeads].son[c - trie.KEY_L];
@@ -259,11 +259,11 @@ namespace scc
             optItem(ranges);
             optTail(ranges);
         }
-        else if (ch == ']')
+        else if (ch == L']')
         {
             return;
         }
-        else if (ch == '-')
+        else if (ch == L'-')
         {
             throw RegExpError(L"'-' is in the wrong place", ch);
         }
@@ -285,7 +285,7 @@ namespace scc
             wchar_t optCh = optChar();
             ranges.emplace_back(optCh, range(optCh));
         }
-        else if (ch == '-')
+        else if (ch == L'-')
         {
             throw RegExpError(L"'-' is in the wrong place", ch);
         }
@@ -302,7 +302,7 @@ namespace scc
     template<class T>
     wchar_t RegExp<T>::range(wchar_t optCh)
     {
-        if (ch == '-')
+        if (ch == L'-')
         {
             ch = nextChar();
             return optChar();
@@ -322,7 +322,7 @@ namespace scc
     wchar_t RegExp<T>::itemChar()
     {
         wchar_t res;
-        if (ch == '\\')
+        if (ch == L'\\')
         {
             res = nextChar();
             ch = nextChar();
@@ -344,7 +344,7 @@ namespace scc
     wchar_t RegExp<T>::optChar()
     {
         wchar_t res;
-        if (ch == '\\')
+        if (ch == L'\\')
         {
             res = nextChar();
             ch = nextChar();

@@ -1,0 +1,69 @@
+CONSTTK const
+INTTK int
+IDENFR _begini
+ASSIGN =
+INTCON 0
+<无符号整数>
+<整数>
+COMMA ,
+IDENFR _endi
+ASSIGN =
+PLUS +
+INTCON 18
+<无符号整数>
+<整数>
+COMMA ,
+IDENFR testfg
+ASSIGN =
+MINU -
+INTCON 6
+<无符号整数>
+<整数>
+<常量定义>
+SEMICN ;
+<常量说明>
+VOIDTK void
+MAINTK main
+LPARENT (
+RPARENT )
+LBRACE {
+INTTK int
+IDENFR a
+COMMA ,
+IDENFR b
+COMMA ,
+IDENFR i
+<变量定义>
+SEMICN ;
+<变量说明>
+SCANFTK scanf
+LPARENT (
+IDENFR i
+RPARENT )
+<读语句>
+SEMICN ;
+<语句>
+IDENFR a
+ASSIGN =
+IDENFR i
+<因子>
+<项>
+<表达式>
+<赋值语句>
+SEMICN ;
+<语句>
+PRINTFTK printf
+LPARENT (
+IDENFR a
+<因子>
+<项>
+<表达式>
+RPARENT )
+<写语句>
+SEMICN ;
+<语句>
+<语句列>
+<复合语句>
+RBRACE }
+<主函数>
+<程序>

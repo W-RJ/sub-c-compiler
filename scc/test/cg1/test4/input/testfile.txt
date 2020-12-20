@@ -1,0 +1,108 @@
+const int _begini = 0, _endi = + 18, testfg = - 6;
+const char lowera ='a', lowerz ='z', capitalZ ='Z', char2 ='2', minusSy ='-';
+int random_name1, random_name2;
+void init(){
+    int i;
+    printf("---- ---- ---- test for (0->17)");
+    for(i = 0;
+    i < _endi;
+    i = i + 1){
+        if(i -(+ i / 3)* 3 == 0)printf("i = ", i);
+    }
+    printf("end i = ", i);
+    printf("---- ---- ---- test for (15->-5)");
+    for(i = 15;
+    i >= - 5;
+    i = i - 1){
+        printf("i = ", i);
+    }
+    printf("end i = ", i);
+    return;
+}
+int fibic(int a){
+    const int return1 = 2;
+    if(a > return1){
+        return(fibic(a - 1)+ fibic(a - 2));
+    }
+    else{
+        return(1);
+    }
+}
+int abs(int kk){
+    if(kk < 0){
+        return(- kk);
+    }
+    return(kk);
+}
+char plus(){
+    char plussy;
+    plussy ='+';
+    return(plussy);
+}
+int sum4(int a, int b, int c, int d){
+    int sum;
+    sum = a + b + c + d;
+    printf("---------------");
+    printf("a = ", a);
+    printf("b = ", b);
+    printf("c = ", c);
+    printf("d = ", d);
+    printf("sum = ", sum);
+    printf("---------------");
+    return(sum);
+}
+void main(){
+    const int maxFibic = 13;
+    const char chartimes ='*';
+    int cal;
+    char outch, underline;
+    int toPrinti;
+    printf("---- ---- ---- test scanf(intput int)");
+    scanf(toPrinti);
+    printf(toPrinti);
+    printf("---- ---- ---- test scanf(intput int char)");
+    scanf(cal, outch);
+    printf("\n");
+    if(cal){
+        printf("input cal != 0, cal = ", cal);
+        cal = abs(cal);
+    }
+    if(cal >= maxFibic + 1){
+        printf("cal value should <= ", maxFibic);
+        cal = maxFibic;
+    }
+    init();
+    printf("---- ---- ---- test call func");
+    printf("fibic val = ", fibic(cal));
+    printf("abs(-7) = ", abs(- 7));
+    printf("---- ---- ---- test while (0 -> 6)");
+    cal = 0;
+    while(cal < 7){
+        printf("cal = ", cal);
+        cal = cal + 1;
+    }
+    printf("---- ---- ---- test do while (-17->3)");
+    cal = - 17;
+    do{
+        printf("cal = ", cal);
+        cal = cal + 1;
+    }
+    while(cal < 4);
+    printf("---- ---- ---- test char val");
+    underline ='_';
+    printf("+-*/_");
+    printf(plus());
+    printf(minusSy);
+    printf(chartimes);
+    printf('/');
+    printf(underline);
+    printf(outch);
+    printf("---- ---- ---- test func call");
+    printf("(expect 91)sum4=", sum4(1, sum4(2, sum4(3, 4, 5, 6), 7, 8), 9, sum4(10, 11, 12, 13)));
+    if(sum4(1, 2, 3, 4)!= 10){
+        printf("1 + 2 + 3 + 4 != 10");
+    }
+    else{
+        printf("1 + 2 + 3 + 4 == 10");
+    }
+}

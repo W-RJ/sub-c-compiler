@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <clocale>
 
 #include "lexer.h"
 #include "parser.h"
@@ -11,12 +12,27 @@
 
 void lexerOnly(const Config& config)
 {
-    scc::DFALexer lexer;
-    lexer.open(config.inputFileName);
+    scc::TrieLexer lexer;
+    try
+    {
+        lexer.open(config.inputFileName);
+    }
+    catch(const FileError& e)
+    {
+        e.print(stderr);
+        exit(1);
+    }
 
+    scc::Word word;
     if (config.lexFileName == nullptr)
     {
-        while (lexer.nextWord().type != scc::WordType::NONE);
+        do
+        {
+            word.type = scc::WordType::NONE;
+            word.val.clear();
+            lexer.nextWord(word);
+        }
+        while (word.type != scc::WordType::NONE);
     }
     else
     {
@@ -36,10 +52,13 @@ void lexerOnly(const Config& config)
         }
 
         // Analyze
-        scc::Word word;
-        while ((word = lexer.nextWord()).type != scc::WordType::NONE)
+        lexer.nextWord(word);
+        while (word.type != scc::WordType::NONE)
         {
-            fwprintf(fp, L"%ls %ls\n", scc::typeName[unsigned(word.type)], word.val);
+            fwprintf(fp, L"%ls %ls\n", scc::typeName[static_cast<unsigned>(word.type)], word.val.c_str());
+            word.type = scc::WordType::NONE;
+            word.val.clear();
+            lexer.nextWord(word);
         }
 
         fclose(fp);
@@ -67,6 +86,8 @@ void compile(const Config& config)
 
 int main(int argc, char **argv)
 {
+    setlocale(LC_ALL, "zh_CN.UTF-8"); // TODO: Windows
+
     // Set options according to arguments
     Config config;
     try

@@ -34,7 +34,7 @@ int t2wcs(int argc, char** argv)
         fwprintf(stderr, FATAL_ERROR_PREFIX L"invalid arguments: 0 or 2 arguments are required\n");
         exit(1);
     }
-    while ((ch = fgetwc(ifp)) != wchar_t(EOF))
+    while ((ch = fgetwc(ifp)) != static_cast<wchar_t>(WEOF))
     {
         switch (ch)
         {

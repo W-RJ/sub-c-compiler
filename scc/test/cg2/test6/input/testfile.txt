@@ -1,0 +1,33 @@
+const int a = 1;
+const char cc='/';
+
+int b;
+char c;
+
+int d[100];
+
+int ifun(char par)
+{
+}
+
+char cfun()
+{
+}
+
+void vfun()
+{
+}
+
+void main()
+{
+    int i;
+
+    b=a+c;
+    b=a*c+b*c*(b-c)+d[99];
+
+    for(i=0;i<100;i=i+1)
+        if (i / 9 == 9)
+            {i = i + 2;}
+
+
+}

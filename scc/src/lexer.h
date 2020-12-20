@@ -15,14 +15,14 @@ namespace scc
         #include "sc.lang"
     };
 
-    extern wchar_t typeName[unsigned(WordType::END)][TYPE_NAME_MAX];
+    extern wchar_t typeName[static_cast<unsigned>(WordType::END)][TYPE_NAME_MAX];
 
     extern Trie<WordType> lexTrie;
 
     struct Word
     {
         WordType type = WordType::NONE;
-        const wchar_t *val = nullptr;
+        std::wstring val;
     };
 
     void readLang(const char* fileName, bool buildTrie);
@@ -38,8 +38,6 @@ namespace scc
         FILE *fp;
 
         wchar_t ch;
-
-        std::wstring buffer;
 
     public:
 
@@ -64,9 +62,9 @@ namespace scc
         /**
          * Get next word
          * 
-         * @return next word. type == WordType::NONE if fail
+         * @param word: next word. type == WordType::NONE if fail
          */
-        virtual Word nextWord() = 0; // NOTE
+        virtual void nextWord(Word& word) = 0; // NOTE
 
     };
 
@@ -76,7 +74,7 @@ namespace scc
     class TrieLexer : public Lexer
     {
     public:
-        virtual Word nextWord() override;
+        virtual void nextWord(Word& word) override;
     };
 
     /**
@@ -92,7 +90,7 @@ namespace scc
 
     public:
 
-        virtual Word nextWord() override;
+        virtual void nextWord(Word& word) override;
 
     };
 }
