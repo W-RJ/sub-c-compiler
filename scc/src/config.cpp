@@ -5,6 +5,15 @@
 #include "exception.h"
 #include "define.h"
 
+FILE* popen(const void*, const void*)
+{
+    return nullptr;
+}
+
+void pclose(const void*)
+{
+}
+
 // class Config
 
 const char* Config::cmdName = "scc";
