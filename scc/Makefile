@@ -80,7 +80,7 @@ ifeq ($(t2wcs),$(wildcard $(t2wcs)))
 $(src)/cg.cpp: $(t2wcs) $(src)/sc.lang $(src)/cg.tl Makefile
 	cp $(src)/cg.tl $(src)/cg.cpp
 	$(t2wcs) < $(src)/sc.lang >> $(src)/cg.cpp
-	echo "\";\n}" >> $(src)/cg.cpp
+	echo -e "\";\n}" >> $(src)/cg.cpp
 endif
 
 # mkdir & sc.lang
