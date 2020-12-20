@@ -12,7 +12,7 @@ const char* Config::cmdName = "scc";
 const wchar_t* const Config::VERSION = L"1.0";
 
 const wchar_t* const Config::HELP =
-        L"Usage: scc [options] <input file>\n"
+        L"Usage: scc <input file> [options]\n"
         L"Options:\n"
         L"  -O        --optimize        Optimize.\n"
         L"  -P        --no-optimize     Do not optimize.\n"
@@ -23,7 +23,8 @@ const wchar_t* const Config::HELP =
         L"  -h        --help            Display this infomation.\n"
         L"  -v        --version         Display compiler version information.\n"
         L"\n"
-        L"   Set <file> to '-' to read from stdin / write to stdout\n"
+        L"   Set <file> to '-' to read from stdin / write to stdout.\n"
+        L"   Set parser file to '@' to write to the same file as lexer.\n"
         L"\n"
         L"Examples:\n"
         L"\n"
@@ -32,6 +33,9 @@ const wchar_t* const Config::HELP =
         L"\n"
         L"  scc testfile.txt -E -\n"
         L"  Lexical analysis only and place result into stdin.\n"
+        L"\n"
+        L"  scc testfile.txt -e output.txt -p @\n"
+        L"  Place lexical analysis result and parsing result into output.txt.\n"
         L"\n";
 
 char* Config::splitPath(char* path)
