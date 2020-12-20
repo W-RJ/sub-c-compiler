@@ -5,47 +5,33 @@
 #include "config.h"
 #include "exception.h"
 
-// class WRuntimeError
+// class RuntimeError
 
-const wchar_t* WRuntimeError::ERROR_PREFIX = L": error: ";
+const char* RuntimeError::ERROR_PREFIX = ": error: ";
 
-const wchar_t* WRuntimeError::FATAL_ERROR_PREFIX = L": fatal error: ";
+const char* RuntimeError::FATAL_ERROR_PREFIX = ": fatal error: ";
 
-WRuntimeError::WRuntimeError(const wchar_t *what_arg) : runtime_error(""), msg(what_arg)
+void RuntimeError::print(FILE* fp) const noexcept
 {
-}
-
-const wchar_t* WRuntimeError::wwhat() const noexcept
-{
-    return msg;
-}
-
-const char* WRuntimeError::what() const noexcept
-{
-    return nullptr;
-}
-
-void WRuntimeError::print(FILE* fp) const noexcept
-{
-    fwprintf(fp, L"%s%ls%ls\n", Config::cmdName, ERROR_PREFIX, msg);
+    fprintf(fp, "%s%s%s\n", Config::cmdName, ERROR_PREFIX, what());
 }
 
 // class FileError
 
-FileError::FileError(const char* fileName, const wchar_t* fileType) :
-        WRuntimeError(fileType), fileName(fileName), fileType(fileType), errnum(errno)
+FileError::FileError(const char* fileName, const char* fileType) :
+        RuntimeError(fileType), fileName(fileName), fileType(fileType), errnum(errno)
 {
 }
 
 void FileError::print(FILE* fp) const noexcept
 {
-    fwprintf(fp, L"%s%ls%s: %s\n", Config::cmdName, ERROR_PREFIX, fileName, strerror(errnum));
-    fwprintf(fp, L"%s%lsUnable to open %ls files\n", Config::cmdName, FATAL_ERROR_PREFIX, fileType);
+    fprintf(fp, "%s%s%s: %s\n", Config::cmdName, ERROR_PREFIX, fileName, strerror(errnum));
+    fprintf(fp, "%s%sUnable to open %s files\n", Config::cmdName, FATAL_ERROR_PREFIX, fileType);
 }
 
 // class InvalidArgumentError
 
-InvalidArgumentError::InvalidArgumentError(const wchar_t* what_arg, const char* arg, const wchar_t* help) : WRuntimeError(what_arg), arg(arg), help(help)
+InvalidArgumentError::InvalidArgumentError(const char* what_arg, const char* arg, const char* help) : RuntimeError(what_arg), arg(arg), help(help)
 {
 }
 
@@ -53,25 +39,25 @@ void InvalidArgumentError::print(FILE* fp) const noexcept
 {
     if (arg != nullptr)
     {
-        fwprintf(fp, L"%s%ls%ls '%s'\n", Config::cmdName, FATAL_ERROR_PREFIX, msg, arg); // TODO
+        fprintf(fp, "%s%s%s '%s'\n", Config::cmdName, FATAL_ERROR_PREFIX, what(), arg); // TODO
     }
     else
     {
-        fwprintf(fp, L"%s%ls%ls\n", Config::cmdName, FATAL_ERROR_PREFIX, msg); // TODO
+        fprintf(fp, "%s%s%s\n", Config::cmdName, FATAL_ERROR_PREFIX, what()); // TODO
     }
     if (help != nullptr)
     {
-        fwprintf(fp, L"%ls", help);
+        fprintf(fp, "%s", help);
     }
 }
 
 // class RegExpError
 
-RegExpError::RegExpError(const wchar_t *what_arg, wchar_t ch) : WRuntimeError(what_arg), typeName(nullptr), ch(ch)
+RegExpError::RegExpError(const char *what_arg, char ch) : RuntimeError(what_arg), typeName(nullptr), ch(ch)
 {
 }
 
 void RegExpError::print(FILE* fp) const noexcept
 {
-    fwprintf(fp, L"%s%ls In the definition of '%ls': %ls (near %lc)\n", Config::cmdName, ERROR_PREFIX, typeName, msg, ch);
+    fprintf(fp, "%s%s In the definition of '%s': %s (near %c)\n", Config::cmdName, ERROR_PREFIX, typeName, what(), ch);
 }

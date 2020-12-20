@@ -6,13 +6,13 @@ root = ..
 src = src
 build = build
 
-# t2wcs[.exe]
+# t2str[.exe]
 ifeq ($(OS),Windows_NT)
-    t2wcs = $(build)/t2wcs.exe
+    t2str = $(build)/t2str.exe
     word2input = $(build)/word2input.exe
     CXXFLAGS += -D WINDOWS
 else
-    t2wcs = $(build)/t2wcs
+    t2str = $(build)/t2str
     word2input = $(build)/word2input
 endif
 
@@ -20,12 +20,12 @@ endif
 
 .PHONY : main test all clean
 
-main: $(t2wcs) $(word2input)
+main: $(t2str) $(word2input)
 
-# make t2wcs[.exe]
-$(t2wcs): $(src)/t2wcs.cpp Makefile
+# make t2str[.exe]
+$(t2str): $(src)/t2str.cpp Makefile
 	mkdir -p $(build)
-	$(CXX) $(CXXFLAGS) -D t2wcs=main $(src)/t2wcs.cpp -o $(t2wcs)
+	$(CXX) $(CXXFLAGS) -D t2str=main $(src)/t2str.cpp -o $(t2str)
 
 # make word2input[.exe]
 $(word2input): $(src)/word2input.cpp Makefile
@@ -34,11 +34,11 @@ $(word2input): $(src)/word2input.cpp Makefile
 
 ## phony targets
 
-test: $(t2wcs) $(word2input)
+test: $(t2str) $(word2input)
 	# TODO
 
 # clean & rebuild
-all: clean $(t2wcs) $(word2input)
+all: clean $(t2str) $(word2input)
 
 clean:
-	-rm $(t2wcs) $(word2input)
+	-rm $(t2str) $(word2input)

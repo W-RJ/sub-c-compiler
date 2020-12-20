@@ -69,7 +69,7 @@ namespace scc
 
         Word& preWord(unsigned n);
 
-        void print(const wchar_t* name);
+        void print(const char* name);
 
     public:
 

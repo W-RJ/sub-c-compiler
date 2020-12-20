@@ -5,7 +5,7 @@
 
 namespace scc
 {
-    extern const wchar_t* lang;
+    extern const char* lang;
 }
 
 #endif // _SCC_CG_H_

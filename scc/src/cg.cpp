@@ -2,7 +2,7 @@
 
 namespace scc
 {
-const wchar_t* lang = L"\
+const char* lang = "\
 NONE,\n\
 INTCON,//0|[1-9][0-9]*\n\
 CHARCON,//'[+\\-*/_a-zA-Z0-9]'\n\
@@ -42,5 +42,5 @@ RBRACE,//}\n\
 IDENFR,//[_a-zA-Z][_a-zA-Z0-9]*\n\
 END,\n\
 #define TYPE_NAME_MAX 10\n\
-";
+-e ";
 }

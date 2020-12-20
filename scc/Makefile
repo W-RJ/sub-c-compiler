@@ -12,9 +12,9 @@ option = $(build)/option
 
 ifeq ($(OS),Windows_NT)
     CXXFLAGS += -D WINDOWS
-    t2wcs = $(root)/tools/$(build)/t2wcs.exe
+    t2str = $(root)/tools/$(build)/t2str.exe
 else
-    t2wcs = $(root)/tools/$(build)/t2wcs
+    t2str = $(root)/tools/$(build)/t2str
 endif
 
 # *.o
@@ -76,10 +76,10 @@ $(build)/exception.o: $(src)/exception.cpp $(src)/exception.h $(src)/config.h Ma
 $(build)/cg.o: $(src)/cg.cpp $(src)/cg.h Makefile $(precmd)
 	$(call compile,cg)
 
-ifeq ($(t2wcs),$(wildcard $(t2wcs)))
-$(src)/cg.cpp: $(t2wcs) $(src)/sc.lang $(src)/cg.tl Makefile
+ifeq ($(t2str),$(wildcard $(t2str)))
+$(src)/cg.cpp: $(t2str) $(src)/sc.lang $(src)/cg.tl Makefile
 	cp $(src)/cg.tl $(src)/cg.cpp
-	$(t2wcs) < $(src)/sc.lang >> $(src)/cg.cpp
+	$(t2str) < $(src)/sc.lang >> $(src)/cg.cpp
 	echo -e "\";\n}" >> $(src)/cg.cpp
 endif
 

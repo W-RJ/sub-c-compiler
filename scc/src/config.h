@@ -10,7 +10,7 @@ class Config
 {
 private:
 
-    static const wchar_t* const HELP;
+    static const char* const HELP;
 
     static char* splitPath(char* path);
 
@@ -20,7 +20,7 @@ public:
 
     static const char* cmdName;
 
-    static const wchar_t* const VERSION;
+    static const char* const VERSION;
 
     const char *langFileName;
 

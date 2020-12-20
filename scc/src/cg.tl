@@ -2,4 +2,4 @@
 
 namespace scc
 {
-const wchar_t* lang = L"\
+const char* lang = "\

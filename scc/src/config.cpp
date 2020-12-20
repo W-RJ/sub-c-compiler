@@ -9,34 +9,34 @@
 
 const char* Config::cmdName = "scc";
 
-const wchar_t* const Config::VERSION = L"1.0";
+const char* const Config::VERSION = "1.0";
 
-const wchar_t* const Config::HELP =
-        L"Usage: scc <input file> [options]\n"
-        L"Options:\n"
-        L"  -O        --optimize        Optimize.\n"
-        L"  -P        --no-optimize     Do not optimize.\n"
-        L"  -G <file> --lang <file>     Use specific lang file.\n"
-        L"  -E <file> --lex-only <file> Lexical analysis only and place result into <file>.\n"
-        L"  -e <file> --lex <file>      Place lexical analysis result into <file>.\n"
-        L"  -p <file> --parser <file>   Place parsing result into <file>.\n"
-        L"  -h        --help            Display this infomation.\n"
-        L"  -v        --version         Display compiler version information.\n"
-        L"\n"
-        L"   Set <file> to '-' to read from stdin / write to stdout.\n"
-        L"   Set parser file to '@' to write to the same file as lexer.\n"
-        L"\n"
-        L"Examples:\n"
-        L"\n"
-        L"  scc testfile.txt -E output.txt\n"
-        L"  Lexical analysis only and place result into output.txt.\n"
-        L"\n"
-        L"  scc testfile.txt -E -\n"
-        L"  Lexical analysis only and place result into stdin.\n"
-        L"\n"
-        L"  scc testfile.txt -e output.txt -p @\n"
-        L"  Place lexical analysis result and parsing result into output.txt.\n"
-        L"\n";
+const char* const Config::HELP =
+        "Usage: scc <input file> [options]\n"
+        "Options:\n"
+        "  -O        --optimize        Optimize.\n"
+        "  -P        --no-optimize     Do not optimize.\n"
+        "  -G <file> --lang <file>     Use specific lang file.\n"
+        "  -E <file> --lex-only <file> Lexical analysis only and place result into <file>.\n"
+        "  -e <file> --lex <file>      Place lexical analysis result into <file>.\n"
+        "  -p <file> --parser <file>   Place parsing result into <file>.\n"
+        "  -h        --help            Display this infomation.\n"
+        "  -v        --version         Display compiler version information.\n"
+        "\n"
+        "   Set <file> to '-' to read from stdin / write to stdout.\n"
+        "   Set parser file to '@' to write to the same file as lexer.\n"
+        "\n"
+        "Examples:\n"
+        "\n"
+        "  scc testfile.txt -E output.txt\n"
+        "  Lexical analysis only and place result into output.txt.\n"
+        "\n"
+        "  scc testfile.txt -E -\n"
+        "  Lexical analysis only and place result into stdin.\n"
+        "\n"
+        "  scc testfile.txt -e output.txt -p @\n"
+        "  Place lexical analysis result and parsing result into output.txt.\n"
+        "\n";
 
 char* Config::splitPath(char* path)
 {
@@ -166,7 +166,7 @@ void Config::set(int argc, char **argv)
             }
             else
             {
-                throw InvalidArgumentError(L"except option before", argv[i]); // TODO
+                throw InvalidArgumentError("except option before", argv[i]); // TODO
             }
         }
         else if (argv[i][1] != '-')
@@ -208,19 +208,19 @@ void Config::set(int argc, char **argv)
                     break;
 
                 case 'h':
-                    wprintf(L"%ls", HELP);
+                    printf("%s", HELP);
                     exit(0);
                     break;
 
                 case 'v':
-                    wprintf(L"scc version %ls\n", VERSION);
+                    printf("scc version %s\n", VERSION);
                     exit(0);
                     break;
 
                 default:
                     argv[i][j - 1] = '-';
                     argv[i][j + 1] = '\0';
-                    throw InvalidArgumentError(L"unrecognized option", argv[i] + j - 1, HELP);
+                    throw InvalidArgumentError("unrecognized option", argv[i] + j - 1, HELP);
                 }
 
                 if (more)
@@ -230,7 +230,7 @@ void Config::set(int argc, char **argv)
                     if (argv[i][2] != '\0')
                     {
                         argv[i][2] = '\0';
-                        throw InvalidArgumentError(L"missing filename after", argv[i]);
+                        throw InvalidArgumentError("missing filename after", argv[i]);
                     }
                     break;
                 }
@@ -265,12 +265,12 @@ void Config::set(int argc, char **argv)
             }
             else if (strcmp(argv[i] + 2, "help") == 0)
             {
-                wprintf(L"%ls", HELP);
+                printf("%s", HELP);
                 exit(0);
             }
             else if (strcmp(argv[i] + 2, "version") == 0)
             {
-                wprintf(L"scc version %ls\n", VERSION);
+                printf("scc version %s\n", VERSION);
                 exit(0);
             }
             else if (argv[i][2] == '\0')
@@ -279,7 +279,7 @@ void Config::set(int argc, char **argv)
             }
             else
             {
-                throw InvalidArgumentError(L"unrecognized option", argv[i], HELP);
+                throw InvalidArgumentError("unrecognized option", argv[i], HELP);
             }
         }
 
@@ -288,7 +288,7 @@ void Config::set(int argc, char **argv)
             i++;
             if (i >= argc)
             {
-                throw InvalidArgumentError(L"missing filename after", argv[i - 1]);
+                throw InvalidArgumentError("missing filename after", argv[i - 1]);
             }
             if (strcmp(argv[i], "--") == 0)
             {
@@ -296,7 +296,7 @@ void Config::set(int argc, char **argv)
             }
             if (i >= argc)
             {
-                throw InvalidArgumentError(L"missing filename after", argv[i - 2]);
+                throw InvalidArgumentError("missing filename after", argv[i - 2]);
             }
             *fileName = argv[i];
         }
@@ -306,7 +306,7 @@ void Config::set(int argc, char **argv)
 
     if (inputFileName == nullptr)
     {
-        throw InvalidArgumentError(L"no input file", nullptr, HELP);
+        throw InvalidArgumentError("no input file", nullptr, HELP);
     }
 
 #endif

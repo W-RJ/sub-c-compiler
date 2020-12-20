@@ -5,31 +5,17 @@
 
 #include <stdexcept>
 
-class WRuntimeError : public std::runtime_error
+class RuntimeError : public std::runtime_error
 {
 protected:
 
-    const wchar_t *msg;
+    static const char* ERROR_PREFIX;
 
-    static const wchar_t* ERROR_PREFIX;
-
-    static const wchar_t* FATAL_ERROR_PREFIX;
+    static const char* FATAL_ERROR_PREFIX;
 
 public:
 
-    explicit WRuntimeError(const wchar_t *what_arg);
-
-    /**
-     * @return error message
-     */
-    virtual const wchar_t* wwhat() const noexcept;
-
-    /**
-     * @return nullptr
-     *
-     * @deprecated use wwhat instead
-     */
-    virtual const char* what() const noexcept override;
+    using std::runtime_error::runtime_error;
 
     /**
      * print error message
@@ -37,19 +23,19 @@ public:
     virtual void print(FILE* fp) const noexcept;
 };
 
-class FileError : public WRuntimeError
+class FileError : public RuntimeError
 {
 private:
 
     const char* fileName;
 
-    const wchar_t* fileType;
+    const char* fileType;
 
     const int errnum;
 
 public:
     
-    FileError(const char* fileName, const wchar_t* fileType);
+    FileError(const char* fileName, const char* fileType);
 
     /**
      * print error message
@@ -57,17 +43,17 @@ public:
     virtual void print(FILE* fp) const noexcept;
 };
 
-class InvalidArgumentError : public WRuntimeError
+class InvalidArgumentError : public RuntimeError
 {
 private:
 
     const char* arg;
 
-    const wchar_t* help;
+    const char* help;
 
 public:
 
-    InvalidArgumentError(const wchar_t* what_arg, const char* arg, const wchar_t* help = nullptr);
+    InvalidArgumentError(const char* what_arg, const char* arg, const char* help = nullptr);
 
     /**
      * print error message
@@ -75,19 +61,19 @@ public:
     virtual void print(FILE* fp) const noexcept;
 };
 
-class RegExpError : public WRuntimeError
+class RegExpError : public RuntimeError
 {
 private:
 
-    const wchar_t* typeName;
+    const char* typeName;
 
-    wchar_t ch;
+    char ch;
 
 public:
 
-    RegExpError(const wchar_t *what_arg, wchar_t ch);
+    RegExpError(const char *what_arg, char ch);
 
-    void setTypeName(const wchar_t* typeName)
+    void setTypeName(const char* typeName)
     {
         this->typeName = typeName;
     }
@@ -98,14 +84,14 @@ public:
     virtual void print(FILE* fp) const noexcept;
 };
 
-class NullPointerError : public WRuntimeError
+class NullPointerError : public RuntimeError
 {
-    using WRuntimeError::WRuntimeError;
+    using RuntimeError::RuntimeError;
 };
 
-class OutOfRangeError : public WRuntimeError
+class OutOfRangeError : public RuntimeError
 {
-    using WRuntimeError::WRuntimeError;
+    using RuntimeError::RuntimeError;
 };
 
 #endif // _SCC_EXCEPTION_H_
