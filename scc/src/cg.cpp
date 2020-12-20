@@ -42,5 +42,5 @@ RBRACE,//}\n\
 IDENFR,//[_a-zA-Z][_a-zA-Z0-9]*\n\
 END,\n\
 #define TYPE_NAME_MAX 10\n\
--e ";
+";
 }
