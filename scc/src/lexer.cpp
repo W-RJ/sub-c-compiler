@@ -16,7 +16,7 @@
 
 namespace scc
 {
-    wchar_t typeName[static_cast<unsigned>(WordType::END)][TYPE_NAME_MAX] = {{'\0'}};
+    wchar_t typeName[static_cast<unsigned>(WordType::END)][TYPE_NAME_MAX] = {{L'\0'}};
 
     Trie<WordType> lexTrie;
 
@@ -42,7 +42,7 @@ namespace scc
             fwscanf(fp, L"%l[^,],", typeName[i]);
             if (buildTrie) // TODO: none & //
             {
-                if (fgetwc(fp) == '/')
+                if (fgetwc(fp) == L'/')
                 {
                     fgetwc(fp);
                     fgetws(buffer, BUFFER_MAX, fp);
@@ -114,18 +114,18 @@ namespace scc
         assert(fp != nullptr);
         int p = 0;
 
-        while (ch != wchar_t(EOF) && (ch <= ' ' || isspace(ch)))
+        while (ch != static_cast<wchar_t>(WEOF) && (ch <= L' ' || isspace(ch)))
         {
             ch = fgetwc(fp);
         }
-        if (ch == wchar_t(EOF))
+        if (ch == static_cast<wchar_t>(WEOF))
         {
             return;
         }
 
         while (true)
         {
-            if (ch < lexTrie.KEY_L || ch == wchar_t(EOF)) // TODO: merge
+            if (ch < lexTrie.KEY_L || ch == static_cast<wchar_t>(WEOF)) // TODO: merge
             {
                 break;
             }
@@ -157,30 +157,30 @@ namespace scc
 
     bool DFALexer::isAlpha(wchar_t ch)
     {
-        return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
+        return (ch >= L'a' && ch <= L'z') || (ch >= L'A' && ch <= L'Z') || ch == L'_';
     }
 
     bool DFALexer::isDigit(wchar_t ch)
     {
-        return ch >= '0' && ch <= '9';
+        return ch >= L'0' && ch <= L'9';
     }
 
     void DFALexer::nextWord(Word& word)
     {
         assert(fp != nullptr);
 
-        while (ch != wchar_t(EOF) && (ch <= ' ' || isspace(ch)))
+        while (ch != static_cast<wchar_t>(WEOF) && (ch <= L' ' || isspace(ch)))
         {
             ch = fgetwc(fp);
         }
-        if (ch == wchar_t(EOF))
+        if (ch == static_cast<wchar_t>(WEOF))
         {
             return;
         }
 
         switch (ch)
         {
-        case '\'':
+        case L'\'':
             ch = fgetwc(fp);
             if (!(ch == L'+' || ch == L'-' || ch == L'*' || ch == L'/' || isAlpha(ch) || isDigit(ch)))
             {
@@ -196,10 +196,10 @@ namespace scc
             word.type = WordType::CHARCON;
             break;
 
-        case '"':
+        case L'"':
             while ((ch = fgetwc(fp)) != L'"')
             {
-                if (ch < L' ' || ch > wchar_t(126) || ch == wchar_t(EOF))
+                if (ch < L' ' || ch > static_cast<wchar_t>(126) || ch == static_cast<wchar_t>(WEOF))
                 {
                     return; // TODO: ERROR
                 }
@@ -209,31 +209,31 @@ namespace scc
             word.type = WordType::STRCON;
             break;
 
-        case '+':
+        case L'+':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::PLUS;
             break;
 
-        case '-':
+        case L'-':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::MINU;
             break;
 
-        case '*':
+        case L'*':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::MULT;
             break;
 
-        case '/':
+        case L'/':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::DIV;
             break;
 
-        case '<':
+        case L'<':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             if (ch == L'=')
@@ -248,7 +248,7 @@ namespace scc
             }
             break;
 
-        case '>':
+        case L'>':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             if (ch == L'=')
@@ -263,7 +263,7 @@ namespace scc
             }
             break;
 
-        case '=':
+        case L'=':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             if (ch == L'=')
@@ -278,7 +278,7 @@ namespace scc
             }
             break;
 
-        case '!':
+        case L'!':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             if (ch != L'=')
@@ -290,55 +290,55 @@ namespace scc
             word.type = WordType::NEQ;
             break;
 
-        case ';':
+        case L';':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::SEMICN;
             break;
 
-        case ',':
+        case L',':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::COMMA;
             break;
 
-        case '(':
+        case L'(':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::LPARENT;
             break;
 
-        case ')':
+        case L')':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::RPARENT;
             break;
 
-        case '[':
+        case L'[':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::LBRACK;
             break;
 
-        case ']':
+        case L']':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::RBRACK;
             break;
 
-        case '{':
+        case L'{':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::LBRACE;
             break;
 
-        case '}':
+        case L'}':
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::RBRACE;
             break;
 
-        case '0': // TODO: ERROR
+        case L'0': // TODO: ERROR
             word.val.push_back(ch);
             ch = fgetwc(fp);
             word.type = WordType::INTCON;

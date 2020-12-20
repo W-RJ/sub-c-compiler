@@ -259,11 +259,11 @@ namespace scc
             optItem(ranges);
             optTail(ranges);
         }
-        else if (ch == ']')
+        else if (ch == L']')
         {
             return;
         }
-        else if (ch == '-')
+        else if (ch == L'-')
         {
             throw RegExpError(L"'-' is in the wrong place", ch);
         }
@@ -285,7 +285,7 @@ namespace scc
             wchar_t optCh = optChar();
             ranges.emplace_back(optCh, range(optCh));
         }
-        else if (ch == '-')
+        else if (ch == L'-')
         {
             throw RegExpError(L"'-' is in the wrong place", ch);
         }
@@ -302,7 +302,7 @@ namespace scc
     template<class T>
     wchar_t RegExp<T>::range(wchar_t optCh)
     {
-        if (ch == '-')
+        if (ch == L'-')
         {
             ch = nextChar();
             return optChar();
@@ -322,7 +322,7 @@ namespace scc
     wchar_t RegExp<T>::itemChar()
     {
         wchar_t res;
-        if (ch == '\\')
+        if (ch == L'\\')
         {
             res = nextChar();
             ch = nextChar();
@@ -344,7 +344,7 @@ namespace scc
     wchar_t RegExp<T>::optChar()
     {
         wchar_t res;
-        if (ch == '\\')
+        if (ch == L'\\')
         {
             res = nextChar();
             ch = nextChar();

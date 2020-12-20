@@ -9,7 +9,7 @@
 
 namespace scc
 {
-    template<class T, wchar_t _KEY_L = wchar_t(32), wchar_t _KEY_R = wchar_t(126)>
+    template<class T, wchar_t _KEY_L = static_cast<wchar_t>(32), wchar_t _KEY_R = static_cast<wchar_t>(126)>
     class Trie
     {
     public:
