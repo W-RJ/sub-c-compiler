@@ -1,5 +1,4 @@
 #include <cstdio>
-#include <cwchar>
 #include <string>
 #include <climits>
 #include <cassert>
@@ -64,7 +63,7 @@ namespace scc
     {
         if (lexer == nullptr)
         {
-            throw NullPointerError(L"Parser::setLexer: lexer is null");
+            throw NullPointerError("Parser::setLexer: lexer is null");
         }
         this->lexer = lexer;
     }
@@ -84,7 +83,7 @@ namespace scc
             }
             if (lexFp == nullptr)
             {
-                throw FileError(lexFileName, L"lexical analysis result");
+                throw FileError(lexFileName, "lexical analysis result");
             }
         }
 
@@ -104,7 +103,7 @@ namespace scc
             }
             if (parserFp == nullptr)
             {
-                throw FileError(parserFileName, L"parsing result");
+                throw FileError(parserFileName, "parsing result");
             }
         }
     }
@@ -127,7 +126,7 @@ namespace scc
     {
         if (accept && lexFp != nullptr)
         {
-            fwprintf(lexFp, L"%ls %ls\n", scc::typeName[static_cast<unsigned>(buffer[h].type)], buffer[h].val.c_str());
+            fprintf(lexFp, "%s %s\n", scc::typeName[static_cast<unsigned>(buffer[h].type)], buffer[h].val.c_str());
         }
         ++h %= CACHE_MAX;
         if (size > 0)
@@ -153,11 +152,11 @@ namespace scc
         return buffer[(h - n + CACHE_MAX) % CACHE_MAX];
     }
 
-    void Parser::print(const wchar_t* name)
+    void Parser::print(const char* name)
     {
         if (parserFp != nullptr)
         {
-            fputws(name, parserFp);
+            fputs(name, parserFp);
         }
     }
 
@@ -171,7 +170,7 @@ namespace scc
         }
         nextWord();
 
-        print(L"<字符串>\n");
+        print("<字符串>\n");
     }
 
     void RecursiveParser::constBlock()
@@ -192,7 +191,7 @@ namespace scc
 
         } while (buffer[h].type == WordType::CONSTTK);
 
-        print(L"<常量说明>\n");
+        print("<常量说明>\n");
     }
 
     void RecursiveParser::constDef()
@@ -304,7 +303,7 @@ namespace scc
             // TODO: ERROR
         }
 
-        print(L"<常量定义>\n");
+        print("<常量定义>\n");
     }
 
     int RecursiveParser::uinteger()
@@ -315,7 +314,7 @@ namespace scc
         }
         nextWord();
 
-        print(L"<无符号整数>\n");
+        print("<无符号整数>\n");
         try
         {
             return std::stoi(preWord(1).val);
@@ -348,7 +347,7 @@ namespace scc
             // TODO: ERROR
         }
 
-        print(L"<整数>\n");
+        print("<整数>\n");
     }
 
     Fun* RecursiveParser::declareHead()
@@ -389,7 +388,7 @@ namespace scc
             nextWord();
         }
 
-        print(L"<声明头部>\n");
+        print("<声明头部>\n");
 
         return fun;
     }
@@ -423,7 +422,7 @@ namespace scc
             rollback(2);
         }
 
-        print(L"<变量说明>\n");
+        print("<变量说明>\n");
     }
 
     void RecursiveParser::varDef()
@@ -499,7 +498,7 @@ namespace scc
             // TODO
         } while (buffer[h].type == WordType::COMMA);
 
-        print(L"<变量定义>\n");
+        print("<变量定义>\n");
     }
 
     void RecursiveParser::funDef()
@@ -528,7 +527,7 @@ namespace scc
         }
         nextWord();
 
-        print(L"<有返回值函数定义>\n");
+        print("<有返回值函数定义>\n");
     }
 
     void RecursiveParser::voidFunDef()
@@ -578,7 +577,7 @@ namespace scc
         }
         nextWord();
 
-        print(L"<无返回值函数定义>\n");
+        print("<无返回值函数定义>\n");
     }
 
     void RecursiveParser::compoundSt()
@@ -593,7 +592,7 @@ namespace scc
         }
         statementBlock();
 
-        print(L"<复合语句>\n");
+        print("<复合语句>\n");
     }
 
     void RecursiveParser::param()
@@ -622,7 +621,7 @@ namespace scc
             }
         }
 
-        print(L"<参数表>\n");
+        print("<参数表>\n");
     }
 
     void RecursiveParser::mainFun()
@@ -659,7 +658,7 @@ namespace scc
         }
         nextWord();
 
-        print(L"<主函数>\n");
+        print("<主函数>\n");
     }
 
     void RecursiveParser::expression()
@@ -690,7 +689,7 @@ namespace scc
             item();
         }
 
-        print(L"<表达式>\n");
+        print("<表达式>\n");
     }
 
     void RecursiveParser::item()
@@ -702,7 +701,7 @@ namespace scc
             factor();
         }
 
-        print(L"<项>\n");
+        print("<项>\n");
     }
 
     void RecursiveParser::factor()
@@ -758,7 +757,7 @@ namespace scc
             break;
         }
 
-        print(L"<因子>\n");
+        print("<因子>\n");
     }
 
     void RecursiveParser::statement()
@@ -846,7 +845,7 @@ namespace scc
             break;
         }
 
-        print(L"<语句>\n");
+        print("<语句>\n");
     }
 
     void RecursiveParser::assignSt()
@@ -882,7 +881,7 @@ namespace scc
             // TODO: ERROR
         }
 
-        print(L"<赋值语句>\n");
+        print("<赋值语句>\n");
     }
 
     void RecursiveParser::conditionSt()
@@ -910,7 +909,7 @@ namespace scc
             statement();
         }
 
-        print(L"<条件语句>\n");
+        print("<条件语句>\n");
     }
 
     void RecursiveParser::condition()
@@ -952,7 +951,7 @@ namespace scc
             break;
         }
 
-        print(L"<条件>\n");
+        print("<条件>\n");
     }
 
     void RecursiveParser::loopSt()
@@ -1064,14 +1063,14 @@ namespace scc
             // TODO: ERROR
         }
 
-        print(L"<循环语句>\n");
+        print("<循环语句>\n");
     }
 
     void RecursiveParser::step()
     {
         uinteger();
 
-        print(L"<步长>\n");
+        print("<步长>\n");
     }
 
     void RecursiveParser::funCall()
@@ -1093,7 +1092,7 @@ namespace scc
         }
         nextWord();
 
-        print(L"<有返回值函数调用语句>\n");
+        print("<有返回值函数调用语句>\n");
     }
 
     void RecursiveParser::voidFunCall()
@@ -1115,7 +1114,7 @@ namespace scc
         }
         nextWord();
 
-        print(L"<无返回值函数调用语句>\n");
+        print("<无返回值函数调用语句>\n");
     }
 
     void RecursiveParser::paramVal()
@@ -1130,7 +1129,7 @@ namespace scc
             }
         }
 
-        print(L"<值参数表>\n");
+        print("<值参数表>\n");
     }
 
     void RecursiveParser::statementBlock()
@@ -1140,7 +1139,7 @@ namespace scc
             statement();
         }
 
-        print(L"<语句列>\n");
+        print("<语句列>\n");
     }
 
     void RecursiveParser::readSt()
@@ -1170,7 +1169,7 @@ namespace scc
         }
         nextWord();
 
-        print(L"<读语句>\n");
+        print("<读语句>\n");
     }
 
     void RecursiveParser::writeSt()
@@ -1204,7 +1203,7 @@ namespace scc
         }
         nextWord();
 
-        print(L"<写语句>\n");
+        print("<写语句>\n");
     }
 
     void RecursiveParser::returnSt()
@@ -1225,7 +1224,7 @@ namespace scc
             nextWord();
         }
 
-        print(L"<返回语句>\n");
+        print("<返回语句>\n");
     }
 
     void RecursiveParser::parse()
@@ -1292,7 +1291,7 @@ namespace scc
 
         mainFun();
 
-        print(L"<程序>\n");
+        print("<程序>\n");
 
         // TODO
     }

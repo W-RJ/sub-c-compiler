@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cwchar>
 #include <clocale>
 
 #include "lexer.h"
@@ -48,14 +47,14 @@ void lexerOnly(const Config& config)
         }
         if (fp == nullptr)
         {
-            throw FileError(config.lexFileName, L"lexical analysis result");
+            throw FileError(config.lexFileName, "lexical analysis result");
         }
 
         // Analyze
         lexer.nextWord(word);
         while (word.type != scc::WordType::NONE)
         {
-            fwprintf(fp, L"%ls %ls\n", scc::typeName[static_cast<unsigned>(word.type)], word.val.c_str());
+            fprintf(fp, "%s %s\n", scc::typeName[static_cast<unsigned>(word.type)], word.val.c_str());
             word.type = scc::WordType::NONE;
             word.val.clear();
             lexer.nextWord(word);

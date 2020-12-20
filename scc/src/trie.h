@@ -9,7 +9,7 @@
 
 namespace scc
 {
-    template<class T, wchar_t _KEY_L = static_cast<wchar_t>(32), wchar_t _KEY_R = static_cast<wchar_t>(126)>
+    template<class T, char _KEY_L = static_cast<char>(32), char _KEY_R = static_cast<char>(126)>
     class Trie
     {
     public:
@@ -22,8 +22,8 @@ namespace scc
             Node();
         };
 
-        static const wchar_t KEY_L = _KEY_L;
-        static const wchar_t KEY_R = _KEY_R;
+        static const char KEY_L = _KEY_L;
+        static const char KEY_R = _KEY_R;
         const T DEFAULT_VAL;
 
         std::vector<Node> nodes;
@@ -32,11 +32,11 @@ namespace scc
 
         virtual ~Trie();
 
-        T& at(const wchar_t* key);
+        T& at(const char* key);
 
-        T& get(const wchar_t* key);
+        T& get(const char* key);
 
-        const T& find(const wchar_t* key);
+        const T& find(const char* key);
 
         void clear();
 

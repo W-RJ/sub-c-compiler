@@ -15,14 +15,14 @@ namespace scc
         #include "sc.lang"
     };
 
-    extern wchar_t typeName[static_cast<unsigned>(WordType::END)][TYPE_NAME_MAX];
+    extern char typeName[static_cast<unsigned>(WordType::END)][TYPE_NAME_MAX];
 
     extern Trie<WordType> lexTrie;
 
     struct Word
     {
         WordType type = WordType::NONE;
-        std::wstring val;
+        std::string val;
     };
 
     void readLang(const char* fileName, bool buildTrie);
@@ -37,7 +37,7 @@ namespace scc
         // File Pointer
         FILE *fp;
 
-        wchar_t ch;
+        char ch;
 
     public:
 
@@ -84,9 +84,9 @@ namespace scc
     {
     private:
 
-        bool isAlpha(wchar_t ch);
+        bool isAlpha(char ch);
 
-        bool isDigit(wchar_t ch);
+        bool isDigit(char ch);
 
     public:
 

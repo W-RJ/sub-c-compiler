@@ -20,11 +20,11 @@ namespace scc
 
         T val;
 
-        wchar_t ch;
+        char ch;
 
-        const wchar_t* reg;
+        const char* reg;
 
-        wchar_t nextChar();
+        char nextChar();
 
         void analyzeTail();
 
@@ -36,17 +36,17 @@ namespace scc
 
         bool star();
 
-        void opt(std::vector< std::pair<wchar_t, wchar_t> >& ranges);
+        void opt(std::vector< std::pair<char, char> >& ranges);
 
-        void optTail(std::vector< std::pair<wchar_t, wchar_t> >& ranges);
+        void optTail(std::vector< std::pair<char, char> >& ranges);
 
-        void optItem(std::vector< std::pair<wchar_t, wchar_t> >& ranges);
+        void optItem(std::vector< std::pair<char, char> >& ranges);
 
-        wchar_t range(wchar_t optCh);
+        char range(char optCh);
 
-        wchar_t itemChar();
+        char itemChar();
 
-        wchar_t optChar();
+        char optChar();
 
     public:
 
@@ -54,7 +54,7 @@ namespace scc
 
         virtual ~RegExp();
 
-        void analyze(const wchar_t* reg, const T& val); // TODO: Trie
+        void analyze(const char* reg, const T& val); // TODO: Trie
     };
 }
 
