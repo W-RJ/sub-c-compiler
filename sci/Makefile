@@ -15,7 +15,7 @@ ifeq ($(OS),Windows_NT)
 endif
 
 # *.o
-objects = $(build)/imain.o $(build)/interpreter.o
+objects = $(build)/imain.o $(build)/interpreter.o $(root)/common/build/exception.o
 
 # scc[.exe]
 ifeq ($(OS),Windows_NT)
@@ -47,7 +47,7 @@ $(target): $(objects) Makefile $(precmd)
 $(build)/imain.o: $(src)/imain.cpp $(src)/interpreter.h $(root)/common/src/bpcode.h Makefile $(precmd)
 	$(call compile,imain) -D imain=main
 
-$(build)/interpreter.o: $(src)/interpreter.cpp $(src)/interpreter.h $(root)/common/src/bpcode.h Makefile $(precmd)
+$(build)/interpreter.o: $(src)/interpreter.cpp $(src)/interpreter.h $(root)/common/src/bpcode.h $(root)/common/src/exception.h Makefile $(precmd)
 	$(call compile,interpreter)
 
 # mkdir & sc.lang
