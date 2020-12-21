@@ -76,12 +76,12 @@ unit_test:
 	# TODO
 
 module_test: main
-	export SCC=$$PWD/$(target); \
-	pytest test/ncg
+	# export SCC=$$PWD/$(target); \
+	# pytest test/ncg
 	# TODO
 
 # clean & rebuild
 all: clean main
 
 clean:
-	-rm $(objects) $(target) $(build)/option $(build)/sc.lang
+	-rm $(objects) $(target) $(build)/option
