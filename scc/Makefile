@@ -18,7 +18,7 @@ else
 endif
 
 # *.o
-objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/config.o $(build)/exception.o
+objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/config.o $(root)/common/build/exception.o
 
 # scc[.exe]
 ifeq ($(OS),Windows_NT)
@@ -55,23 +55,20 @@ $(target): $(objects) Makefile $(precmd)
 
 # make *.o
 $(build)/main.o: $(src)/main.cpp $(src)/lexer.h $(src)/parser.h $(src)/config.h \
-        $(src)/exception.h $(src)/sc.lang Makefile $(precmd)
+        $(root)/common/$(src)/exception.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,main)
 
 $(build)/lexer.o: $(src)/lexer.cpp $(src)/lexer.h $(src)/regexp $(src)/regexp.h \
         $(src)/regexp.tcc $(src)/trie $(src)/trie.h $(src)/trie.tcc $(src)/define.h \
-        $(src)/exception.h $(src)/sc.lang Makefile $(precmd)
+        $(root)/common/$(src)/exception.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,lexer)
 
 $(build)/parser.o: $(src)/parser.cpp $(src)/parser.h $(src)/lexer.h $(src)/trie \
-        $(src)/trie.h $(src)/trie.tcc $(src)/exception.h $(src)/sc.lang Makefile $(precmd)
+        $(src)/trie.h $(src)/trie.tcc $(root)/common/$(src)/exception.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,parser)
 
-$(build)/config.o: $(src)/config.cpp $(src)/config.h $(src)/exception.h $(src)/define.h Makefile $(precmd)
+$(build)/config.o: $(src)/config.cpp $(src)/config.h $(root)/common/$(src)/exception.h $(src)/define.h Makefile $(precmd)
 	$(call compile,config)
-
-$(build)/exception.o: $(src)/exception.cpp $(src)/exception.h $(src)/config.h Makefile $(precmd)
-	$(call compile,exception)
 
 $(build)/cg.o: $(src)/cg.cpp $(src)/cg.h Makefile $(precmd)
 	$(call compile,cg)

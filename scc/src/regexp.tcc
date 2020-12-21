@@ -8,7 +8,7 @@
 #include "regexp"
 #include "trie"
 
-#include "exception.h"
+#include "../../common/src/exception.h"
 
 namespace scc
 {

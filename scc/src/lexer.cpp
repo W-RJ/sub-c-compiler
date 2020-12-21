@@ -6,7 +6,7 @@
 #include "regexp"
 #include "trie"
 #include "define.h"
-#include "exception.h"
+#include "../../common/src/exception.h"
 
 #ifdef CG
 #include "cg.h"

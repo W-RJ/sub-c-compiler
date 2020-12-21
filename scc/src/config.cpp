@@ -2,7 +2,7 @@
 #include <cstring>
 
 #include "config.h"
-#include "exception.h"
+#include "../../common/src/exception.h"
 #include "define.h"
 
 FILE* popen(const void*, const void*)
@@ -156,6 +156,8 @@ void Config::set(int argc, char **argv)
         strcpy(p + 1, langFileName);
         langFileName = buffer;
     }
+
+    RuntimeError::setCmdName(cmdName);
 
 #ifndef CG
 

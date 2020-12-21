@@ -12,6 +12,7 @@ range = 1 2
 
 main:
 	"$(MAKE)" -C tools
+	"$(MAKE)" -C common
 	"$(MAKE)" -C scc
 	"$(MAKE)" -C sci
 	mkdir -p "$(build)"
@@ -19,6 +20,7 @@ main:
 
 release:
 	"$(MAKE)" release=true -C tools
+	"$(MAKE)" release=true -C common
 	"$(MAKE)" release=true -C scc
 	"$(MAKE)" release=true -C sci
 	mkdir -p "$(build)" "$(release)"
@@ -34,13 +36,14 @@ uninstall:
 
 zip: release
 	-rm scc.zip
-	zip -r scc.zip scc sci -x \*.pyc
+	zip -r scc.zip common scc sci -x \*.pyc
 
 test: module_test main
 	# TODO
 
 module_test:
 	"$(MAKE)" test -C tools
+	"$(MAKE)" test -C common
 	"$(MAKE)" unit_test -C scc
 	$(foreach i, $(range), "$(MAKE)" module_test CG=$(i) -C scc;)
 	# $(MAKE) module_test CG= -C scc
@@ -51,6 +54,7 @@ all: clean main
 
 clean:
 	"$(MAKE)" clean -C tools
+	"$(MAKE)" clean -C common
 	"$(MAKE)" clean -C scc
 	"$(MAKE)" clean -C sci
 	-rm "$(build)/scc" "$(build)/sc.lang" "$(build)/sci"

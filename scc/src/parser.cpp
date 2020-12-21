@@ -5,7 +5,7 @@
 
 #include "lexer.h"
 #include "parser.h"
-#include "exception.h"
+#include "../../common/src/exception.h"
 
 namespace scc
 {

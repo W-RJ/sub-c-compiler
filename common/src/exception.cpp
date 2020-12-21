@@ -2,18 +2,24 @@
 #include <cstring>
 #include <cerrno>
 
-#include "config.h"
 #include "exception.h"
 
 // class RuntimeError
+
+const char* RuntimeError::CMD_NAME = nullptr;
 
 const char* RuntimeError::ERROR_PREFIX = ": error: ";
 
 const char* RuntimeError::FATAL_ERROR_PREFIX = ": fatal error: ";
 
+void RuntimeError::setCmdName(const char* cmdName)
+{
+    CMD_NAME = cmdName;
+}
+
 void RuntimeError::print(FILE* fp) const noexcept
 {
-    fprintf(fp, "%s%s%s\n", Config::cmdName, ERROR_PREFIX, what());
+    fprintf(fp, "%s%s%s\n", CMD_NAME, ERROR_PREFIX, what());
 }
 
 // class FileError
@@ -25,8 +31,8 @@ FileError::FileError(const char* fileName, const char* fileType) :
 
 void FileError::print(FILE* fp) const noexcept
 {
-    fprintf(fp, "%s%s%s: %s\n", Config::cmdName, ERROR_PREFIX, fileName, strerror(errnum));
-    fprintf(fp, "%s%sUnable to open %s files\n", Config::cmdName, FATAL_ERROR_PREFIX, fileType);
+    fprintf(fp, "%s%s%s: %s\n", CMD_NAME, ERROR_PREFIX, fileName, strerror(errnum));
+    fprintf(fp, "%s%sUnable to open %s files\n", CMD_NAME, FATAL_ERROR_PREFIX, fileType);
 }
 
 // class InvalidArgumentError
@@ -39,11 +45,11 @@ void InvalidArgumentError::print(FILE* fp) const noexcept
 {
     if (arg != nullptr)
     {
-        fprintf(fp, "%s%s%s '%s'\n", Config::cmdName, FATAL_ERROR_PREFIX, what(), arg); // TODO
+        fprintf(fp, "%s%s%s '%s'\n", CMD_NAME, FATAL_ERROR_PREFIX, what(), arg); // TODO
     }
     else
     {
-        fprintf(fp, "%s%s%s\n", Config::cmdName, FATAL_ERROR_PREFIX, what()); // TODO
+        fprintf(fp, "%s%s%s\n", CMD_NAME, FATAL_ERROR_PREFIX, what()); // TODO
     }
     if (help != nullptr)
     {
@@ -59,5 +65,5 @@ RegExpError::RegExpError(const char *what_arg, char ch) : RuntimeError(what_arg)
 
 void RegExpError::print(FILE* fp) const noexcept
 {
-    fprintf(fp, "%s%s In the definition of '%s': %s (near %c)\n", Config::cmdName, ERROR_PREFIX, typeName, what(), ch);
+    fprintf(fp, "%s%s In the definition of '%s': %s (near %c)\n", CMD_NAME, ERROR_PREFIX, typeName, what(), ch);
 }

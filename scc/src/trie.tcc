@@ -6,7 +6,7 @@
 #include <cstdio>
 
 #include "trie.h"
-#include "exception.h"
+#include "../../common/src/exception.h"
 
 namespace scc
 {

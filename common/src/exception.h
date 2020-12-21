@@ -9,6 +9,8 @@ class RuntimeError : public std::runtime_error
 {
 protected:
 
+    static const char* CMD_NAME;
+
     static const char* ERROR_PREFIX;
 
     static const char* FATAL_ERROR_PREFIX;
@@ -16,6 +18,8 @@ protected:
 public:
 
     using std::runtime_error::runtime_error;
+
+    static void setCmdName(const char* cmdName);
 
     /**
      * print error message

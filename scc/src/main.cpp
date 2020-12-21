@@ -7,7 +7,7 @@
 #include "parser.h"
 
 #include "config.h"
-#include "exception.h"
+#include "../../common/src/exception.h"
 
 void lexerOnly(const Config& config)
 {
