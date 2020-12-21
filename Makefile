@@ -13,26 +13,28 @@ range = 1 2
 main:
 	"$(MAKE)" -C tools
 	"$(MAKE)" -C scc
+	"$(MAKE)" -C sci
 	mkdir -p "$(build)"
-	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "$(build)"
+	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "sci/$(build)/sci" "$(build)" #TODO: Windows
 
 release:
 	"$(MAKE)" release=true -C tools
 	"$(MAKE)" release=true -C scc
+	"$(MAKE)" release=true -C sci
 	mkdir -p "$(build)" "$(release)"
-	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "$(build)"
-	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "$(release)"
+	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "sci/$(build)/sci" "$(build)"
+	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "sci/$(build)/sci" "$(release)"
 
 install: release
 	mkdir -p "$(DESTDIR)"
-	cp "$(release)/scc" "$(release)/sc.lang" -t "$(DESTDIR)"
+	cp "$(release)/scc" "$(release)/sc.lang" "$(release)/sci" -t "$(DESTDIR)"
 
 uninstall:
-	rm "$(DESTDIR)/scc" "$(DESTDIR)/sc.lang"
+	rm "$(DESTDIR)/scc" "$(DESTDIR)/sci" "$(DESTDIR)/sc.lang"
 
 zip: release
 	-rm scc.zip
-	zip -r scc.zip scc -x \*.pyc
+	zip -r scc.zip scc sci -x \*.pyc
 
 test: module_test main
 	# TODO
@@ -42,6 +44,7 @@ module_test:
 	"$(MAKE)" unit_test -C scc
 	$(foreach i, $(range), "$(MAKE)" module_test CG=$(i) -C scc;)
 	# $(MAKE) module_test CG= -C scc
+	"$(MAKE)" test -C sci
 
 # clean & rebuild
 all: clean main
@@ -49,5 +52,6 @@ all: clean main
 clean:
 	"$(MAKE)" clean -C tools
 	"$(MAKE)" clean -C scc
-	-rm "$(build)/scc" "$(build)/sc.lang"
+	"$(MAKE)" clean -C sci
+	-rm "$(build)/scc" "$(build)/sc.lang" "$(build)/sci"
 	-rm scc.zip

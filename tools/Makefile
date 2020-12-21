@@ -34,7 +34,7 @@ $(word2input): $(src)/word2input.cpp Makefile
 
 ## phony targets
 
-test: $(t2str) $(word2input)
+test: main
 	# TODO
 
 # clean & rebuild
