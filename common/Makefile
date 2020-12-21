@@ -56,7 +56,7 @@ endif
 
 ## phony targets
 
-test: unit_test
+test: unit_test main
 
 unit_test:
 	# TODO
