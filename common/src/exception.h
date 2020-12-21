@@ -88,6 +88,11 @@ public:
     virtual void print(FILE* fp) const noexcept;
 };
 
+class InstuctionError : public RuntimeError
+{
+    using RuntimeError::RuntimeError; // TODO
+};
+
 class NullPointerError : public RuntimeError
 {
     using RuntimeError::RuntimeError;

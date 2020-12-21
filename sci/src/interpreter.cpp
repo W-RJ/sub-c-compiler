@@ -7,6 +7,11 @@
 
 namespace sci
 {
+    // class Interpreter
+
+    Interpreter::Interpreter() : ip(-1), top(-1), sp(0)
+    {
+    }
 
     // class BInterpreter
 

@@ -8,7 +8,7 @@ namespace sci
 
     struct BPcode
     {
-        int f;
+        unsigned f;
         int a;
     };
 

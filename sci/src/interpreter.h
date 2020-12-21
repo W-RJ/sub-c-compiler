@@ -12,7 +12,19 @@ namespace sci
 {
     class Interpreter
     {
+    protected:
+
+        std::vector<int> st;
+
+        int ip;
+
+        int top;
+
+        int sp;
+
     public:
+
+        Interpreter();
 
         virtual void read(const char* fileName) = 0;
 
@@ -49,7 +61,7 @@ namespace sci
         union F
         {
             char name[4];
-            int32_t id;
+            uint32_t id;
         };
 
         struct TPcode
