@@ -37,12 +37,12 @@ int t2str(int argc, char** argv)
     {
         switch (ch)
         {
-        case L'\n':
+        case '\n':
             fprintf(ofp, "\\n\\\n");
             break;
-        case L'\\':
-        case L'"':
-            fputc(L'\\', ofp);
+        case '\\':
+        case '"':
+            fputc('\\', ofp);
             fputc(ch, ofp);
             break;
         default:

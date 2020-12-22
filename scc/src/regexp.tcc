@@ -34,12 +34,12 @@ namespace scc
         this->reg = reg;
         this->val = val;
         ch = nextChar();
-        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != L']' && ch != L'*' && ch != L'|')
+        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != ']' && ch != '*' && ch != '|')
         {
             expr();
             analyzeTail();
         }
-        else if (ch == L']' || ch == L'*' || ch > trie.KEY_R)
+        else if (ch == ']' || ch == '*' || ch > trie.KEY_R)
         {
             throw RegExpError("Unexpected character", ch);
         }
@@ -54,7 +54,7 @@ namespace scc
     template<class T>
     void RegExp<T>::analyzeTail()
     {
-        if (ch == L'|')
+        if (ch == '|')
         {
             ch = nextChar();
             expr();
@@ -69,7 +69,7 @@ namespace scc
     template<class T>
     void RegExp<T>::expr()
     {
-        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != L']' && ch != L'*' && ch != L'|')
+        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != ']' && ch != '*' && ch != '|')
         {
             std::vector<int>* heads = new std::vector<int>;
             heads->push_back(0);
@@ -83,7 +83,7 @@ namespace scc
                 }
             }
         }
-        else if (ch == L']' || ch == L'*' || ch > trie.KEY_R)
+        else if (ch == ']' || ch == '*' || ch > trie.KEY_R)
         {
             throw RegExpError("Unexpected character", ch);
         }
@@ -96,12 +96,12 @@ namespace scc
     template<class T>
     void RegExp<T>::exprTail(std::vector<int>*& heads)
     {
-        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != L']' && ch != L'*' && ch != L'|')
+        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != ']' && ch != '*' && ch != '|')
         {
             item(heads);
             exprTail(heads);
         }
-        else if (!(ch < trie.KEY_L || ch == L'|'))
+        else if (!(ch < trie.KEY_L || ch == '|'))
         {
             throw RegExpError("Unexpected character", ch);
         }
@@ -110,12 +110,12 @@ namespace scc
     template<class T>
     void RegExp<T>::item(std::vector<int>*& heads)
     {
-        if (ch == L'[')
+        if (ch == '[')
         {
             ch = nextChar();
             std::vector< std::pair<char, char> > ranges;
             opt(ranges);
-            if (ch != L']')
+            if (ch != ']')
             {
                 throw RegExpError("Unexpected character", ch);
             }
@@ -191,7 +191,7 @@ namespace scc
  
             // TODO
         }
-        else if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != L']' && ch != L'*' && ch != L'|')
+        else if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != ']' && ch != '*' && ch != '|')
         {
             char c = itemChar();
             for (auto itHeads = heads->begin(); itHeads != heads->end(); ++itHeads)
@@ -204,7 +204,7 @@ namespace scc
                 *itHeads = trie.nodes[*itHeads].son[c - trie.KEY_L];
             }
         }
-        else if (ch == L']' || ch == L'*')
+        else if (ch == ']' || ch == '*')
         {
             throw RegExpError("Unexpected character", ch);
         }
@@ -217,7 +217,7 @@ namespace scc
     template<class T>
     bool RegExp<T>::star()
     {
-        if (ch == L'*')
+        if (ch == '*')
         {
             ch = nextChar();
             return true;
@@ -232,12 +232,12 @@ namespace scc
     template<class T>
     void RegExp<T>::opt(std::vector< std::pair<char, char> >& ranges)
     {
-        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != L']' && ch != L'-')
+        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != ']' && ch != '-')
         {
             optItem(ranges);
             optTail(ranges);
         }
-        else if (ch == L'-')
+        else if (ch == '-')
         {
             throw RegExpError("Cannot start with '-'", ch);
         }
@@ -254,16 +254,16 @@ namespace scc
     template<class T>
     void RegExp<T>::optTail(std::vector< std::pair<char, char> >& ranges)
     {
-        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != L']' && ch != L'-')
+        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != ']' && ch != '-')
         {
             optItem(ranges);
             optTail(ranges);
         }
-        else if (ch == L']')
+        else if (ch == ']')
         {
             return;
         }
-        else if (ch == L'-')
+        else if (ch == '-')
         {
             throw RegExpError("'-' is in the wrong place", ch);
         }
@@ -280,12 +280,12 @@ namespace scc
     template<class T>
     void RegExp<T>::optItem(std::vector< std::pair<char, char> >& ranges)
     {
-        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != L']' && ch != L'-')
+        if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != ']' && ch != '-')
         {
             char optCh = optChar();
             ranges.emplace_back(optCh, range(optCh));
         }
-        else if (ch == L'-')
+        else if (ch == '-')
         {
             throw RegExpError("'-' is in the wrong place", ch);
         }
@@ -302,7 +302,7 @@ namespace scc
     template<class T>
     char RegExp<T>::range(char optCh)
     {
-        if (ch == L'-')
+        if (ch == '-')
         {
             ch = nextChar();
             return optChar();
@@ -322,13 +322,13 @@ namespace scc
     char RegExp<T>::itemChar()
     {
         char res;
-        if (ch == L'\\')
+        if (ch == '\\')
         {
             res = nextChar();
             ch = nextChar();
             return res;
         }
-        else if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != L'[' && ch != L']' && ch != L'*' && ch != L'|')
+        else if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != '[' && ch != ']' && ch != '*' && ch != '|')
         {
             res = ch;
             ch = nextChar();
@@ -344,13 +344,13 @@ namespace scc
     char RegExp<T>::optChar()
     {
         char res;
-        if (ch == L'\\')
+        if (ch == '\\')
         {
             res = nextChar();
             ch = nextChar();
             return res;
         }
-        else if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != L']' && ch != L'-')
+        else if (ch >= trie.KEY_L && ch <= trie.KEY_R && ch != ']' && ch != '-')
         {
             res = ch;
             ch = nextChar();

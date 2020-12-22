@@ -49,11 +49,11 @@ namespace scc
 
         bool global;
 
-        Trie<Var, L'0', L'z'> globalTrie;
+        Trie<Var, '0', 'z'> globalTrie;
 
-        Trie<Var, L'0', L'z'> localTrie;
+        Trie<Var, '0', 'z'> localTrie;
 
-        Trie<Fun, L'0', L'z'> funTrie;
+        Trie<Fun, '0', 'z'> funTrie;
 
         static bool EXPRESSION_SELECT[static_cast<unsigned>(WordType::END)];
 
