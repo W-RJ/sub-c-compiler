@@ -117,7 +117,7 @@ namespace sci
                 sp = top - 1;
                 continue;
 
-            case 0041:
+            case 0042:
                 if ((top += 3) >= static_cast<int>(st.size()))
                 {
                     st.resize(top + 1);
@@ -252,6 +252,24 @@ namespace sci
                     continue;
                 };
                 continue;
+
+            case 0110:
+                st[top] = st[sp + codes[ip].a + st[top]];
+                break;
+
+            case 0111:
+                st[top] = st[codes[ip].a + st[top]];
+                break;
+
+            case 0120:
+                st[sp + codes[ip].a + st[top - 1]] = st[top]; // TODO: Optimize
+                top -= 2;
+                break;
+
+            case 0121:
+                st[codes[ip].a + st[top - 1]] = st[top]; // TODO: Optimize
+                top -= 2;
+                break;
 
             default:
                 throw InstuctionError(""); // TODO
