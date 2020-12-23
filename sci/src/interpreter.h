@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include "../../common/src/bpcode.h"
+#include "../../common/src/pcode.h"
 
 namespace sci
 {
