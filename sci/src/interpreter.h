@@ -3,7 +3,6 @@
 #ifndef _SCI_INTERPRETER_H_
 #define _SCI_INTERPRETER_H_
 
-#include <cstdint>
 #include <vector>
 
 #include "../../common/src/bpcode.h"
@@ -57,19 +56,6 @@ namespace sci
     class TInterpreter : public Interpreter
     {
     private:
-
-        union F
-        {
-            char name[4];
-            uint32_t id;
-        };
-
-        struct TPcode
-        {
-            F f;
-            int l;
-            int a;
-        };
 
         std::vector<TPcode> codes;
 
