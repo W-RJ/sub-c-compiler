@@ -27,10 +27,17 @@ public:
     const char *inputFileName;
 
     bool lexOnly;
+
     const char *lexFileName;
 
     const char *parserFileName;
+
     const char *errFileName;
+
+    bool bin;
+
+    const char *objectFileName;
+
     const char *mipsFileName;
 
     bool optimize;
