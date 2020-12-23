@@ -32,7 +32,7 @@ FileError::FileError(const char* fileName, const char* fileType) :
 void FileError::print(FILE* fp) const noexcept
 {
     fprintf(fp, "%s%s%s: %s\n", CMD_NAME, ERROR_PREFIX, fileName, strerror(errnum));
-    fprintf(fp, "%s%sUnable to open %s files\n", CMD_NAME, FATAL_ERROR_PREFIX, fileType);
+    fprintf(fp, "%s%sUnable to open %s file\n", CMD_NAME, FATAL_ERROR_PREFIX, fileType);
 }
 
 // class InvalidArgumentError

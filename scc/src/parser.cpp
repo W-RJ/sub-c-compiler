@@ -73,6 +73,10 @@ namespace scc
     {
         if (lexFileName != nullptr)
         {
+            if (lexFp != nullptr)
+            {
+                fclose(lexFp);
+            }
             if (strcmp(lexFileName, "-") == 0)
             {
                 lexFp = stdout;
@@ -89,6 +93,10 @@ namespace scc
 
         if (parserFileName != nullptr)
         {
+            if (parserFp != nullptr)
+            {
+                fclose(parserFp);
+            }
             if (strcmp(parserFileName, "-") == 0)
             {
                 parserFp = stdout;
