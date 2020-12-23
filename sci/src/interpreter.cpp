@@ -188,7 +188,7 @@ namespace sci
                     continue;
 
                 case 7:
-                    printf("%s", reinterpret_cast<char*>(st.data() + st[top--]));
+                    st[top] = !st[top];
                     continue;
 
                 case 8:
@@ -222,7 +222,7 @@ namespace sci
                     continue;
 
                 case 14:
-                    printf("%d", st[top--]); // TODO: Optimize
+                    printf("%d\n", st[top--]); // TODO: Optimize
                     continue;
 
                 case 15:
@@ -245,6 +245,10 @@ namespace sci
                     }
                     st[top] = getchar();
                     while (getchar() != '\n');
+                    continue;
+
+                case 18:
+                    printf("%s", reinterpret_cast<char*>(st.data() + st[top--]));
                     continue;
 
                 default:
