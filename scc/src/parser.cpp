@@ -393,6 +393,71 @@ namespace scc
         }
     }
 
+    void Parser::allocAddr(int codesH)
+    {
+        Fun& fun = funVector.back();
+        int n = localVector.size();
+        int addr = 2;
+        for (int i = fun.paramTypes.size(); i < n; i++)
+        {
+            if (localVector[i].writable)
+            {
+                if (localVector[i].size == Var::SINGLE)
+                {
+                    localVector[i].addr = addr++;
+                }
+                else
+                {
+                    localVector[i].addr = addr;
+                    addr += localVector[i].size;
+                }
+            }
+        }
+        if (addr > 2)
+        {
+            codes[codesH].code.a = addr - 2;
+        }
+        else if (codes[codesH].code.f == 0050)
+        {
+            codes[codesH].id = -1;
+        }
+
+        n = codes.size();
+        for (int i = codesH; i < n; i++)
+        {
+            if (codes[i].id >= 0)
+            {
+                codes[i].id = ip++;
+            }
+            // TODO
+        }
+
+        for (int i = codesH; i < n; i++)
+        {
+            if (codes[i].id >= 0)
+            {
+                switch (codes[i].code.f)
+                {
+                case 0020:
+                case 0030:
+                case 0032:
+                case 0110:
+                case 0120:
+                    if (codes[i].code.a >= 0)
+                    {
+                        codes[i].code.a = localVector[codes[i].code.a].addr;
+                    }
+                    break;
+
+                case 0060:
+                case 0070:
+                    codes[i].code.a = codes[codes[i].code.a].id;
+                    break;
+                }
+            }
+        }
+    }
+
     // class RecursiveParser
 
     int RecursiveParser::str()
@@ -772,6 +837,8 @@ namespace scc
 
     void RecursiveParser::funDef()
     {
+        const int codeH = codes.size();
+
         declareHead();
         if (buffer[h].type != WordType::LPARENT)
         {
@@ -796,11 +863,15 @@ namespace scc
         }
         nextWord();
 
+        allocAddr(codeH);
+
         print("<有返回值函数定义>\n");
     }
 
     void RecursiveParser::voidFunDef()
     {
+        const int codeH = codes.size();
+
         if (buffer[h].type != WordType::VOIDTK)
         {
             // TODO: ERROR
@@ -846,6 +917,8 @@ namespace scc
             // TODO: ERROR
         }
         nextWord();
+
+        allocAddr(codeH);
 
         print("<无返回值函数定义>\n");
     }
@@ -938,6 +1011,8 @@ namespace scc
 
     void RecursiveParser::mainFun()
     {
+        const int codeH = codes.size();
+
         if (buffer[h].type != WordType::VOIDTK)
         {
             // TODO: ERROR
@@ -972,6 +1047,8 @@ namespace scc
             // TODO: ERROR
         }
         nextWord();
+
+        allocAddr(codeH);
 
         print("<主函数>\n");
     }

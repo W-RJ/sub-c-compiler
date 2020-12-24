@@ -128,6 +128,8 @@ namespace scc
 
         void storeElement(Var* var);
 
+        void allocAddr(int codesH);
+
     public:
 
         explicit Parser(bool optimize);
