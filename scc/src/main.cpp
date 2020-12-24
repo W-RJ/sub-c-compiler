@@ -6,8 +6,14 @@
 #include "lexer.h"
 #include "parser.h"
 
+#include "define.h"
 #include "config.h"
-#include "exception.h"
+
+#include "../../common/src/exception.h"
+
+#if defined(CG) && CG == 4
+void runBin(const char* fileName);
+#endif
 
 void lexerOnly(const Config& config)
 {
@@ -70,12 +76,24 @@ void compile(const Config& config)
     scc::Lexer* lexer = new scc::TrieLexer;
     lexer->open(config.inputFileName);
 
-    scc::Parser* parser = new scc::RecursiveParser;
+    scc::Parser* parser = new scc::RecursiveParser(config.optimize);
     parser->setLexer(lexer);
 
     parser->open(config.lexFileName, config.parserFileName);
 
     parser->parse();
+
+    if (config.objectFileName != nullptr)
+    {
+        if (config.bin)
+        {
+            parser->write(config.objectFileName);
+        }
+        else
+        {
+            parser->writeText(config.objectFileName);
+        }
+    }
 
     parser->close();
     delete parser;
@@ -133,6 +151,11 @@ int main(int argc, char **argv)
             exit(1); // TODO
         }
         // TODO
+
+#if defined(CG) && CG == 4
+        runBin(config.objectFileName);
+#endif
+
     }
     return 0;
 }

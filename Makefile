@@ -4,7 +4,12 @@ DESTDIR = /usr/local/bin
 build = build
 release = release
 
-range = 1 2
+range = 1 2 3 5
+
+targets = "scc/$(build)/scc" "scc/$(build)/sc.lang"
+ifneq ($(CG),4)
+    targets += "sci/$(build)/sci"
+endif
 
 ## phony targets
 
@@ -12,42 +17,50 @@ range = 1 2
 
 main:
 	"$(MAKE)" -C tools
+	"$(MAKE)" -C common
+	"$(MAKE)" -C sci
 	"$(MAKE)" -C scc
 	mkdir -p "$(build)"
-	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "$(build)"
+	cp $(targets) "$(build)" #TODO: Windows
 
 release:
 	"$(MAKE)" release=true -C tools
+	"$(MAKE)" release=true -C common
+	"$(MAKE)" release=true -C sci
 	"$(MAKE)" release=true -C scc
 	mkdir -p "$(build)" "$(release)"
-	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "$(build)"
-	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "$(release)"
+	cp $(targets) "$(build)"
+	cp $(targets) "$(release)"
 
 install: release
 	mkdir -p "$(DESTDIR)"
-	cp "$(release)/scc" "$(release)/sc.lang" -t "$(DESTDIR)"
+	cp "$(release)/scc" "$(release)/sc.lang" "$(release)/sci" -t "$(DESTDIR)"
 
 uninstall:
-	rm "$(DESTDIR)/scc" "$(DESTDIR)/sc.lang"
+	rm "$(DESTDIR)/scc" "$(DESTDIR)/sci" "$(DESTDIR)/sc.lang"
 
 zip: release
 	-rm scc.zip
-	zip -r scc.zip scc -x \*.pyc
+	zip -r scc.zip common scc sci -x \*.pyc
 
 test: module_test main
 	# TODO
 
 module_test:
 	"$(MAKE)" test -C tools
+	"$(MAKE)" test -C common
 	"$(MAKE)" unit_test -C scc
-	$(foreach i, $(range), "$(MAKE)" module_test CG=$(i) -C scc;)
+	$(foreach i, $(range), "$(MAKE)" module_test CG=$(i) -C scc &&) true
 	# $(MAKE) module_test CG= -C scc
+	"$(MAKE)" test -C sci
 
 # clean & rebuild
 all: clean main
 
 clean:
 	"$(MAKE)" clean -C tools
+	"$(MAKE)" clean -C common
+	"$(MAKE)" clean -C sci
 	"$(MAKE)" clean -C scc
-	-rm "$(build)/scc" "$(build)/sc.lang"
+	-rm "$(build)/scc" "$(build)/sc.lang" "$(build)/sci"
 	-rm scc.zip

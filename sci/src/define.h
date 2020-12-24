@@ -1,14 +1,14 @@
 #pragma once
 
-#ifndef _SCC_DEFINE_H_
-#define _SCC_DEFINE_H_
+#ifndef _SCI_DEFINE_H_
+#define _SCI_DEFINE_H_
 
 #if !defined(CG) && !defined(NCG)
-#define CG 5
+#define CG 4
 #endif
 
 #if !defined(DEBUG) && !defined(NDEBUG)
 #define NDEBUG
 #endif
 
-#endif // _SCC_DEFINE_H_
+#endif // _SCI_DEFINE_H_

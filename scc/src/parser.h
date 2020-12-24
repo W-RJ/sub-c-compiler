@@ -4,9 +4,13 @@
 #define _SCC_PARSER_H_
 
 #include <cstdio>
+#include <string>
+#include <vector>
+#include <utility>
 
 #include "lexer.h"
 #include "trie"
+#include "../../common/src/pcode.h"
 
 namespace scc
 {
@@ -22,15 +26,36 @@ namespace scc
     {
         static const int SINGLE = -1;
 
-        bool writable = true;
-        int size = SINGLE;
-        VarType type = VarType::NONE;
+        VarType type;
+        bool global;
+        bool writable;
+        int addr;
+        int size;
+
+        explicit Var(VarType type);
+
+        Var(VarType type, bool global, int addr, bool writable);
+
+        Var(VarType type, bool global, int addr, int size);
     };
 
     struct Fun
     {
-        VarType returnType = VarType::NONE;
+        int addr;
+        VarType returnType;
         std::vector<VarType> paramTypes;
+
+        Fun(VarType returnType, int addr);
+    };
+
+    struct ExCode
+    {
+        sci::BPcode code;
+        int id;
+
+        explicit ExCode(unsigned f);
+
+        ExCode(unsigned f, int a);
     };
 
     class Parser
@@ -45,15 +70,37 @@ namespace scc
 
         int h, size;
 
-        FILE *lexFp, *parserFp;
+        FILE *lexFp;
+
+        FILE *parserFp;
+
+        int ip;
+
+        std::vector<ExCode> codes;
+
+        bool optimize;
 
         bool global;
 
-        Trie<Var, L'0', L'z'> globalTrie;
+        int globalSize;
 
-        Trie<Var, L'0', L'z'> localTrie;
+        int strSize;
 
-        Trie<Fun, L'0', L'z'> funTrie;
+        Trie<int, '0', 'z'> globalTrie;
+
+        Trie<int, '0', 'z'> localTrie;
+
+        Trie<int, '0', 'z'> funTrie;
+
+        Trie<int> strTrie;
+
+        std::vector<Var> globalVector;
+
+        std::vector<Var> localVector;
+
+        std::vector<Fun> funVector;
+
+        std::vector<std::pair<std::string, int> > strVector;
 
         static bool EXPRESSION_SELECT[static_cast<unsigned>(WordType::END)];
 
@@ -71,9 +118,21 @@ namespace scc
 
         void print(const char* name);
 
+        void findVar(Var*& var);
+
+        void loadVar(Var* var);
+
+        void loadElement(Var* var);
+
+        void storeVar(Var* var);
+
+        void storeElement(Var* var);
+
+        void allocAddr(int codesH);
+
     public:
 
-        Parser();
+        explicit Parser(bool optimize);
 
         virtual ~Parser();
 
@@ -84,13 +143,17 @@ namespace scc
         void close();
 
         virtual void parse() = 0;
+
+        void write(const char* fileName);
+
+        void writeText(const char* fileName);
     };
 
     class RecursiveParser : public Parser
     {
     protected:
 
-        void str();
+        int str();
 
         void constBlock();
 
@@ -98,9 +161,9 @@ namespace scc
 
         int uinteger();
 
-        void integer();
+        int integer();
 
-        Fun* declareHead();
+        void declareHead();
 
         void varBlock();
 
@@ -128,17 +191,17 @@ namespace scc
 
         void conditionSt();
 
-        void condition();
+        void condition(bool inv = false);
 
         void loopSt();
 
-        void step();
+        int step();
 
-        void funCall();
+        void funCall(bool remain = true);
 
         void voidFunCall();
 
-        void paramVal();
+        void paramVal(const Fun& fun);
 
         void statementBlock();
 
@@ -149,6 +212,8 @@ namespace scc
         void returnSt();
 
     public:
+
+        using Parser::Parser;
 
         virtual void parse() override;
 

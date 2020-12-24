@@ -40,9 +40,9 @@ int word2input(int argc, char** argv)
     {
         fgets(val, 4096, ifp);
         n = strlen(val);
-        if (val[n - 1] == L'\n')
+        if (val[n - 1] == '\n')
         {
-            val[n - 1] = L'\0';
+            val[n - 1] = '\0';
         }
         if (strcmp(typeName, "CHARCON") == 0)
         {

@@ -2,7 +2,7 @@
 #include <cstring>
 
 #include "config.h"
-#include "exception.h"
+#include "../../common/src/exception.h"
 #include "define.h"
 
 FILE* popen(const void*, const void*)
@@ -107,6 +107,10 @@ Config::Config() :
         errFileName("-"),
 #endif
 
+        bin(true),
+
+        objectFileName(nullptr),
+
 #if defined(CG) && CG == 5
         mipsFileName("mips.txt"),
 #else
@@ -156,6 +160,8 @@ void Config::set(int argc, char **argv)
         strcpy(p + 1, langFileName);
         langFileName = buffer;
     }
+
+    RuntimeError::setCmdName(cmdName);
 
 #ifndef CG
 
@@ -216,6 +222,19 @@ void Config::set(int argc, char **argv)
                     more = true;
                     break;
 
+                case 'o':
+                    fileName = &objectFileName;
+                    more = true;
+                    break;
+
+                case 'b':
+                    bin = true;
+                    break;
+
+                case 't':
+                    bin = false;
+                    break;
+
                 case 'h':
                     printf("%s", HELP);
                     exit(0);
@@ -272,6 +291,18 @@ void Config::set(int argc, char **argv)
             {
                 fileName = &parserFileName;
             }
+            else if (strcmp(argv[i] + 2, "object") == 0)
+            {
+                fileName = &parserFileName;
+            }
+            else if (strcmp(argv[i] + 2, "bin") == 0)
+            {
+                bin = true;
+            }
+            else if (strcmp(argv[i] + 2, "text") == 0)
+            {
+                bin = false;
+            }
             else if (strcmp(argv[i] + 2, "help") == 0)
             {
                 printf("%s", HELP);
@@ -316,6 +347,28 @@ void Config::set(int argc, char **argv)
     if (inputFileName == nullptr)
     {
         throw InvalidArgumentError("no input file", nullptr, HELP);
+    }
+
+#endif
+
+#if !defined(CG) || CG == 4
+
+    if (objectFileName == nullptr)
+    {
+        const char* ext = bin ? "bpc" : "tpc";
+        int n = strlen(inputFileName);
+        buffer = new char[n + 4];
+        strcpy(buffer, inputFileName);
+        p = strrchr(buffer, '.');
+        if (p != nullptr)
+        {
+            strcpy(p + 1, ext);
+        }
+        else
+        {
+            strcpy(buffer + n, ext);
+        }
+        objectFileName = buffer;
     }
 
 #endif

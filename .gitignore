@@ -38,7 +38,9 @@ __pycache__
 # Build
 /release/
 /build/
+/common/build/
 /scc/build/
+/sci/build/
 /tools/build/
 /*.zip
 

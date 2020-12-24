@@ -6,7 +6,7 @@
 #include <cstdio>
 
 #include "trie.h"
-#include "exception.h"
+#include "../../common/src/exception.h"
 
 namespace scc
 {
@@ -34,7 +34,7 @@ namespace scc
     T& Trie<T, KEY_L, KEY_R>::at(const char* key)
     {
         int p = 0;
-        while (*key != L'\0')
+        while (*key != '\0')
         {
             if (*key < KEY_L || *key > KEY_R)
             {
@@ -55,7 +55,7 @@ namespace scc
     T& Trie<T, KEY_L, KEY_R>::get(const char* key)
     {
         int p = 0;
-        while (*key != L'\0')
+        while (*key != '\0')
         {
             p = nodes[p].son[*key - KEY_L];
             key++;
@@ -67,7 +67,7 @@ namespace scc
     const T& Trie<T, KEY_L, KEY_R>::find(const char* key)
     {
         int p = 0;
-        while (*key != L'\0')
+        while (*key != '\0')
         {
             if (*key < KEY_L || *key > KEY_R)
             {
