@@ -1413,6 +1413,10 @@ namespace scc
             {
                 // TODO: ERROR
             }
+
+            Var* var;
+            findVar(var);
+
             nextWord();
             if (buffer[h].type != WordType::ASSIGN)
             {
@@ -1425,16 +1429,28 @@ namespace scc
                 // TODO: ERROR
             }
             nextWord();
+
+            storeVar(var); // NOTE: Cautious when optimize (i)
+
+            int conditionIp = codes.size();
+
             condition();
             if (buffer[h].type != WordType::SEMICN)
             {
                 // TODO: ERROR
             }
             nextWord();
+
+            int jpcIp = codes.size();
+            codes.emplace_back(0070);
+
             if (buffer[h].type != WordType::IDENFR)
             {
                 // TODO: ERROR
             }
+
+            findVar(var);
+
             nextWord();
             if (buffer[h].type != WordType::ASSIGN)
             {
@@ -1445,6 +1461,14 @@ namespace scc
             {
                 // TODO: ERROR
             }
+
+            Var* varR;
+            findVar(varR);
+            /// TODO
+
+            bool plus = true;
+            int st;
+
             nextWord();
             if (buffer[h].type == WordType::PLUS)
             {
@@ -1452,19 +1476,38 @@ namespace scc
             }
             else if (buffer[h].type == WordType::MINU)
             {
+                plus = false;
                 nextWord();
             }
             else
             {
                 // TODO: ERROR
             }
-            step();
+            st = step();
             if (buffer[h].type != WordType::RPARENT)
             {
                 // TODO: ERROR
             }
             nextWord();
             statement();
+
+            loadVar(varR);
+
+            codes.emplace_back(0010, st);
+
+            if (plus)
+            {
+                codes.emplace_back(0100, 2);
+            }
+            else
+            {
+                codes.emplace_back(0100, 3);
+            }
+
+            storeVar(var);
+
+            codes.emplace_back(0060, conditionIp);
+            codes[jpcIp].code.a = codes.size();
         }
         else
         {
