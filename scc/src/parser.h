@@ -67,9 +67,11 @@ namespace scc
 
         std::vector<ExCode> codes;
 
-        bool global;
+        bool optimize;
 
         Trie<Var, '0', 'z'> globalTrie;
+
+        bool global;
 
         int globalSize;
 
@@ -101,7 +103,7 @@ namespace scc
 
     public:
 
-        Parser();
+        explicit Parser(bool optimize);
 
         virtual ~Parser();
 
@@ -181,6 +183,8 @@ namespace scc
         void returnSt();
 
     public:
+
+        using Parser::Parser;
 
         virtual void parse() override;
 

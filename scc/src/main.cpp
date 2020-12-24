@@ -76,7 +76,7 @@ void compile(const Config& config)
     scc::Lexer* lexer = new scc::TrieLexer;
     lexer->open(config.inputFileName);
 
-    scc::Parser* parser = new scc::RecursiveParser;
+    scc::Parser* parser = new scc::RecursiveParser(config.optimize);
     parser->setLexer(lexer);
 
     parser->open(config.lexFileName, config.parserFileName);
