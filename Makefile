@@ -4,7 +4,7 @@ DESTDIR = /usr/local/bin
 build = build
 release = release
 
-range = 1 2
+range = 1 2 3 5
 
 ## phony targets
 
@@ -45,7 +45,7 @@ module_test:
 	"$(MAKE)" test -C tools
 	"$(MAKE)" test -C common
 	"$(MAKE)" unit_test -C scc
-	$(foreach i, $(range), "$(MAKE)" module_test CG=$(i) -C scc;)
+	$(foreach i, $(range), "$(MAKE)" module_test CG=$(i) -C scc &&) true
 	# $(MAKE) module_test CG= -C scc
 	"$(MAKE)" test -C sci
 

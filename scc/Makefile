@@ -114,11 +114,23 @@ unit_test:
 module_test: main
 ifdef CG
 	export SCC=$$PWD/$(target); \
-	pytest test/cg$(CG)
+	pytest test/cg$(CG); \
+	RET=$$?; \
+	if [ "$$RET" != "0" ] && [ "$$RET" != "5" ]; then \
+		exit $$RET; \
+	else \
+		exit 0; \
+	fi
 	# TODO
 else
 	export SCC=$$PWD/$(target); \
-	pytest test/ncg
+	pytest test/ncg; \
+	RET=$$?; \
+	if [ "$$RET" != "0" ] && [ "$$RET" != "5" ]; then \
+		exit $$RET; \
+	else \
+		exit 0; \
+	fi
 	# TODO
 endif
 
