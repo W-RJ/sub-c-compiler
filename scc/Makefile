@@ -20,6 +20,9 @@ endif
 # *.o
 objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/config.o
 externs = $(root)/common/build/exception.o
+ifeq ($(CG),4)
+    externs += $(root)/sci/build/imain.o $(root)/sci/build/interpreter.o
+endif
 
 # scc[.exe]
 ifeq ($(OS),Windows_NT)

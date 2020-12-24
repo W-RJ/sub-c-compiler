@@ -26,6 +26,7 @@ else
 endif
 
 ifneq ($(CG),4)
+    marco = -D imain=main
     override CG=
     CXXFLAGS += -D NCG
 endif
@@ -47,11 +48,14 @@ main: $(precmd) options $(target)
 
 # make sci[.exe]
 $(target): $(objects) $(externs) Makefile $(precmd)
+ifneq ($(CG),4)
 	$(CXX) $(CXXFLAGS) $(objects) $(externs) -o $(target)
+endif
 
 # make *.o
-$(build)/imain.o: $(src)/imain.cpp $(src)/interpreter.h $(root)/common/src/exception.h Makefile $(precmd)
-	$(call compile,imain) -D imain=main
+$(build)/imain.o: $(src)/imain.cpp $(src)/interpreter.h $(src)/define.h \
+        $(root)/common/src/exception.h Makefile $(precmd)
+	$(call compile,imain) $(marco)
 
 $(build)/interpreter.o: $(src)/interpreter.cpp $(src)/interpreter.h \
         $(root)/common/src/pcode.h $(root)/common/src/exception.h Makefile $(precmd)

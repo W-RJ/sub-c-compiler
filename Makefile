@@ -6,6 +6,11 @@ release = release
 
 range = 1 2 3 5
 
+targets = "scc/$(build)/scc" "scc/$(build)/sc.lang"
+ifneq ($(CG),4)
+    targets += "sci/$(build)/sci"
+endif
+
 ## phony targets
 
 .PHONY : main release install uninstall zip test module_test all clean
@@ -13,19 +18,19 @@ range = 1 2 3 5
 main:
 	"$(MAKE)" -C tools
 	"$(MAKE)" -C common
-	"$(MAKE)" -C scc
 	"$(MAKE)" -C sci
+	"$(MAKE)" -C scc
 	mkdir -p "$(build)"
-	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "sci/$(build)/sci" "$(build)" #TODO: Windows
+	cp $(targets) "$(build)" #TODO: Windows
 
 release:
 	"$(MAKE)" release=true -C tools
 	"$(MAKE)" release=true -C common
-	"$(MAKE)" release=true -C scc
 	"$(MAKE)" release=true -C sci
+	"$(MAKE)" release=true -C scc
 	mkdir -p "$(build)" "$(release)"
-	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "sci/$(build)/sci" "$(build)"
-	cp "scc/$(build)/scc" "scc/$(build)/sc.lang" "sci/$(build)/sci" "$(release)"
+	cp $(targets) "$(build)"
+	cp $(targets) "$(release)"
 
 install: release
 	mkdir -p "$(DESTDIR)"
@@ -55,7 +60,7 @@ all: clean main
 clean:
 	"$(MAKE)" clean -C tools
 	"$(MAKE)" clean -C common
-	"$(MAKE)" clean -C scc
 	"$(MAKE)" clean -C sci
+	"$(MAKE)" clean -C scc
 	-rm "$(build)/scc" "$(build)/sc.lang" "$(build)/sci"
 	-rm scc.zip
