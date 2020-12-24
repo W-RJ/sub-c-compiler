@@ -21,6 +21,7 @@ namespace scc
 
     struct Word
     {
+        int row;
         WordType type = WordType::NONE;
         std::string val;
     };
@@ -36,6 +37,8 @@ namespace scc
 
         // File Pointer
         FILE *fp;
+
+        int row;
 
         char ch;
 

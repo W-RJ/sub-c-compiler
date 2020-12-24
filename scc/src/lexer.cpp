@@ -94,6 +94,7 @@ namespace scc
             throw FileError(fileName, "input");
         }
         ch = fgetc(fp);
+        row = 1;
     }
 
     void Lexer::close()
@@ -114,12 +115,18 @@ namespace scc
 
         while (ch != static_cast<char>(EOF) && (ch <= ' ' || isspace(ch)))
         {
+            if (ch == '\n')
+            {
+                ++row;
+            }
             ch = fgetc(fp);
         }
         if (ch == static_cast<char>(EOF))
         {
             return;
         }
+
+        word.row = row;
 
         while (true)
         {
@@ -169,12 +176,18 @@ namespace scc
 
         while (ch != static_cast<char>(EOF) && (ch <= ' ' || isspace(ch)))
         {
+            if (ch == '\n')
+            {
+                ++row;
+            }
             ch = fgetc(fp);
         }
         if (ch == static_cast<char>(EOF))
         {
             return;
         }
+
+        word.row = row;
 
         switch (ch)
         {
