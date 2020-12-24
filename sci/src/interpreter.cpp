@@ -34,14 +34,43 @@ namespace sci
         }
         else
         {
-            fp = fopen(fileName, "r");
+            fp = fopen(fileName, "rb");
         }
         if (fp == nullptr)
         {
             throw FileError(fileName, "input");
         }
-        del = true;
+
+        char prefix[sizeof(BPCODE_PREFIX)];
+        fread(prefix, sizeof(BPCODE_PREFIX), 1, fp);
+        if (memcmp(prefix, BPCODE_PREFIX, sizeof(BPCODE_PREFIX)) != 0)
+        {
+            fclose(fp);
+            throw InvalidFormatError(fileName, "binary pcode");
+        }
+
+        // TODO: verify
+
+        int globalSize, strSize;
+        fread(&globalSize, sizeof(int), 1, fp);
+        fread(&strSize, sizeof(int), 1, fp);
+        top = globalSize + strSize - 1;
+        st.resize(top + 1);
+        fread(st.data() + globalSize, sizeof(int), strSize, fp);
+
+        int codeSize;
+        fread(&codeSize, sizeof(int), 1, fp);
+        codes = new BPcode[codeSize];
+
+        if (static_cast<int>(fread(codes, sizeof(BPcode), codeSize, fp)) != codeSize)
+        {
+            fclose(fp);
+            throw InvalidFormatError(fileName, "binary pcode");
+        }
+
         // TODO
+        fclose(fp);
+        del = true;
     }
 
     void BInterpreter::run()

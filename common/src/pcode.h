@@ -27,6 +27,8 @@ namespace sci
         int a;
     };
 
+    const char BPCODE_PREFIX[] = "\200BPCODE";
+
     const PcodeF fs[] =
     {
         {.name = "POP"},
