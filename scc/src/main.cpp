@@ -6,8 +6,14 @@
 #include "lexer.h"
 #include "parser.h"
 
+#include "define.h"
 #include "config.h"
+
 #include "../../common/src/exception.h"
+
+#if defined(CG) && CG == 4
+void runBin(const char* fileName);
+#endif
 
 void lexerOnly(const Config& config)
 {
@@ -145,6 +151,11 @@ int main(int argc, char **argv)
             exit(1); // TODO
         }
         // TODO
+
+#if defined(CG) && CG == 4
+        runBin(config.objectFileName);
+#endif
+
     }
     return 0;
 }

@@ -59,7 +59,7 @@ $(target): $(objects) $(externs) Makefile $(precmd)
 
 # make *.o
 $(build)/main.o: $(src)/main.cpp $(src)/lexer.h $(src)/parser.h $(src)/config.h \
-        $(root)/common/$(src)/exception.h $(src)/sc.lang Makefile $(precmd)
+        $(src)/define.h $(root)/common/$(src)/exception.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,main)
 
 $(build)/lexer.o: $(src)/lexer.cpp $(src)/lexer.h $(src)/regexp $(src)/regexp.h \
