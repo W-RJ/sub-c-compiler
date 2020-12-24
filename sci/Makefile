@@ -25,6 +25,11 @@ else
     target = $(build)/sci
 endif
 
+ifneq ($(CG),4)
+    override CG=
+    CXXFLAGS += -D NCG
+endif
+
 ifdef release
     CXXFLAGS += -D NDEBUG
 else
@@ -48,7 +53,8 @@ $(target): $(objects) $(externs) Makefile $(precmd)
 $(build)/imain.o: $(src)/imain.cpp $(src)/interpreter.h $(root)/common/src/exception.h Makefile $(precmd)
 	$(call compile,imain) -D imain=main
 
-$(build)/interpreter.o: $(src)/interpreter.cpp $(src)/interpreter.h $(root)/common/src/pcode.h $(root)/common/src/exception.h Makefile $(precmd)
+$(build)/interpreter.o: $(src)/interpreter.cpp $(src)/interpreter.h \
+        $(root)/common/src/pcode.h $(root)/common/src/exception.h Makefile $(precmd)
 	$(call compile,interpreter)
 
 # mkdir & sc.lang
@@ -58,14 +64,19 @@ $(precmd): Makefile
 
 # process options
 options:
+	grep "#define CG $(CG)" < $(src)/define.h > /dev/null; \
+	if [ $$? != 0 ] ; then \
+		sed 's/#define CG [1-5]/#define CG $(CG)/' < $(src)/define.h > $(src)/define_n.h; \
+		mv $(src)/define_n.h $(src)/define.h; \
+	fi
 ifneq ($(option),$(wildcard $(option)))
 	touch $(src)/define.h
 	echo "$(CG)\n$(release)" > $(option)
 else
-	{ read prerelease; } < $(option); \
-	if [ "x$(release)" != "x$$prerelease" ]; then \
+	{ read precg; read prerelease; } < $(option); \
+	if [ "x$(CG)" != "x$$precg" ] || [ "x$(release)" != "x$$prerelease" ]; then \
 		touch $(src)/define.h; \
-		echo "$(release)" > $(option); \
+		echo "$(CG)\n$(release)" > $(option); \
 	fi
 endif
 
