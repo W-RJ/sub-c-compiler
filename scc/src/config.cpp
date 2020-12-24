@@ -125,6 +125,8 @@ void Config::set(int argc, char **argv)
 {
     cmdName = argv[0];
 
+    RuntimeError::setCmdName(cmdName);
+
     char* buffer = new char[FILENAME_MAX];
     buffer[0] = '\0';
     int PREFIX_MAX = FILENAME_MAX - strlen(langFileName);
@@ -160,8 +162,6 @@ void Config::set(int argc, char **argv)
         strcpy(p + 1, langFileName);
         langFileName = buffer;
     }
-
-    RuntimeError::setCmdName(cmdName);
 
 #ifndef CG
 

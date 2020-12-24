@@ -14,6 +14,8 @@ void runBin(const char* fileName)
 
 int imain(int argc, char** argv)
 {
+    RuntimeError::setCmdName(argv[0]);
+
     char* fileName = nullptr;
 
     for (int i = 1; i < argc; i++)
