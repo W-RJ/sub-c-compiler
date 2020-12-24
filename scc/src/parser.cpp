@@ -346,6 +346,7 @@ namespace scc
             }
             else
             {
+                printErr(buffer[h].row, 'c', "'%s' was not declared in this scope", buffer[h].val.c_str());
                 // TODO: ERROR
                 var = nullptr;
             }
@@ -589,6 +590,7 @@ namespace scc
                 {
                     if (funTrie.find(buffer[idH].val.c_str()) != 0)
                     {
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -597,6 +599,7 @@ namespace scc
                         int& id = globalTrie.at(buffer[idH].val.c_str()); // TODO
                         if (id != 0) // TODO
                         {
+                            printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                             // TODO: ERROR
                             continue;
                         }
@@ -614,6 +617,7 @@ namespace scc
                     int& id = localTrie.at(buffer[idH].val.c_str()); // TODO
                     if (id != 0)
                     {
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -652,6 +656,7 @@ namespace scc
                 {
                     if (funTrie.find(buffer[idH].val.c_str()) != 0)
                     {
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -660,6 +665,7 @@ namespace scc
                         int& id = globalTrie.at(buffer[idH].val.c_str()); // TODO
                         if (id != 0) // TODO
                         {
+                            printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                             // TODO: ERROR
                             continue;
                         }
@@ -677,6 +683,7 @@ namespace scc
                     int& id = localTrie.at(buffer[idH].val.c_str()); // TODO
                     if (id != 0)
                     {
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -768,11 +775,13 @@ namespace scc
 
         if (globalTrie.find(buffer[h].val.c_str()) != 0)
         {
+            printErr(buffer[h].row, 'b', "redeclaration of '%s'", buffer[h].val.c_str());
             // TODO: ERROR
         }
         int& id = funTrie.at(buffer[h].val.c_str());
         if (id != 0)
         {
+            printErr(buffer[h].row, 'b', "redeclaration of '%s'", buffer[h].val.c_str());
             // TODO: ERROR
         }
         funVector.emplace_back(type, ip);
@@ -863,6 +872,7 @@ namespace scc
             {
                 if (funTrie.find(buffer[idH].val.c_str()) != 0)
                 {
+                    printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                     // TODO: ERROR
                     continue;
                 }
@@ -871,6 +881,7 @@ namespace scc
                     int& id = globalTrie.at(buffer[idH].val.c_str()); // TODO
                     if (id != 0) // TODO
                     {
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -888,6 +899,7 @@ namespace scc
                 int& id = localTrie.at(buffer[idH].val.c_str()); // TODO
                 if (id != 0)
                 {
+                    printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                     // TODO: ERROR
                     continue;
                 }
@@ -951,11 +963,13 @@ namespace scc
 
         if (globalTrie.find(buffer[h].val.c_str()) != 0)
         {
+            printErr(buffer[h].row, 'b', "redeclaration of '%s'", buffer[h].val.c_str());
             // TODO: ERROR
         }
         int& id = funTrie.at(buffer[h].val.c_str());
         if (id != 0)
         {
+            printErr(buffer[h].row, 'b', "redeclaration of '%s'", buffer[h].val.c_str());
             // TODO: ERROR
         }
         funVector.emplace_back(VarType::VOID, ip);
@@ -1704,6 +1718,7 @@ namespace scc
         int id = funTrie.find(buffer[h].val.c_str());
         if (id == 0)
         {
+            printErr(buffer[h].row, 'c', "'%s' was not declared in this scope", buffer[h].val.c_str());
             // TODO: ERROR
         }
         else
@@ -1764,6 +1779,7 @@ namespace scc
         int id = funTrie.find(buffer[h].val.c_str());
         if (id == 0)
         {
+            printErr(buffer[h].row, 'c', "'%s' was not declared in this scope", buffer[h].val.c_str());
             // TODO: ERROR
         }
         else
