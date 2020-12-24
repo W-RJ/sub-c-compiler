@@ -859,8 +859,10 @@ namespace scc
         if (buffer[h].type == WordType::INTTK || buffer[h].type == WordType::CHARTK)
         {
             varBlock();
+            codes.emplace_back(0050);
         }
-        statementBlock();
+        statementBlock(); // TODO: return
+        codes.emplace_back(0100, 0);
 
         print("<复合语句>\n");
     }
@@ -1671,6 +1673,9 @@ namespace scc
             // TODO: ERROR
         }
         nextWord();
+
+        const Fun& fun = funVector.back();
+
         if (buffer[h].type == WordType::LPARENT)
         {
             nextWord();
@@ -1680,7 +1685,20 @@ namespace scc
                 // TODO: ERROR
             }
             nextWord();
+
+            // TODO: judge
+
+            codes.emplace_back(0030, -std::max(static_cast<int>(fun.paramTypes.size()), 1));
         }
+        else
+        {
+            if (fun.returnType != VarType::VOID)
+            {
+                // TODO: ERROR
+            }
+        }
+
+        codes.emplace_back(0100, 0);
 
         print("<返回语句>\n");
     }
@@ -1722,8 +1740,13 @@ namespace scc
 
         global = false;
 
+        codes.emplace_back(0040);
+        ++ip;
+
         while (true)
         {
+            localTrie.clear();
+            localVector.clear();
             if (buffer[h].type == WordType::INTTK || buffer[h].type == WordType::CHARTK)
             {
                 funDef();
