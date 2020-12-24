@@ -44,7 +44,7 @@ $(target): $(objects) Makefile $(precmd)
 	$(CXX) $(CXXFLAGS) $(objects) -o $(target)
 
 # make *.o
-$(build)/imain.o: $(src)/imain.cpp $(src)/interpreter.h Makefile $(precmd)
+$(build)/imain.o: $(src)/imain.cpp $(src)/interpreter.h $(root)/common/src/exception.h Makefile $(precmd)
 	$(call compile,imain) -D imain=main
 
 $(build)/interpreter.o: $(src)/interpreter.cpp $(src)/interpreter.h $(root)/common/src/pcode.h $(root)/common/src/exception.h Makefile $(precmd)
