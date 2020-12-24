@@ -927,9 +927,13 @@ namespace scc
         param();
         if (buffer[h].type != WordType::RPARENT)
         {
+            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
             // TODO: ERROR
         }
-        nextWord();
+        else
+        {
+            nextWord();
+        }
         if (buffer[h].type != WordType::LBRACE)
         {
             // TODO: ERROR
@@ -984,9 +988,13 @@ namespace scc
         param();
         if (buffer[h].type != WordType::RPARENT)
         {
+            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
             // TODO: ERROR
         }
-        nextWord();
+        else
+        {
+            nextWord();
+        }
         if (buffer[h].type != WordType::LBRACE)
         {
             // TODO: ERROR
@@ -1114,9 +1122,13 @@ namespace scc
         nextWord();
         if (buffer[h].type != WordType::RPARENT)
         {
+            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
             // TODO: ERROR
         }
-        nextWord();
+        else
+        {
+            nextWord();
+        }
         if (buffer[h].type != WordType::LBRACE)
         {
             // TODO: ERROR
@@ -1243,9 +1255,13 @@ namespace scc
             expression();
             if (buffer[h].type != WordType::RPARENT)
             {
+                printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
             break;
 
         case WordType::PLUS:
@@ -1436,9 +1452,13 @@ namespace scc
         condition();
         if (buffer[h].type != WordType::RPARENT)
         {
+            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
             // TODO: ERROR
         }
-        nextWord();
+        else
+        {
+            nextWord();
+        }
 
         int jpcIp = codes.size();
         codes.emplace_back(0070);
@@ -1537,9 +1557,13 @@ namespace scc
             condition();
             if (buffer[h].type != WordType::RPARENT)
             {
+                printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
 
             int jpcIp = codes.size();
             codes.emplace_back(0070);
@@ -1569,9 +1593,13 @@ namespace scc
             condition(true);
             if (buffer[h].type != WordType::RPARENT)
             {
+                printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
 
             codes.emplace_back(0070, doIp);
         }
@@ -1668,9 +1696,13 @@ namespace scc
             st = step();
             if (buffer[h].type != WordType::RPARENT)
             {
+                printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
             statement();
 
             loadVar(varR);
@@ -1740,9 +1772,13 @@ namespace scc
         paramVal(fun);
         if (buffer[h].type != WordType::RPARENT)
         {
+            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
             // TODO: ERROR
         }
-        nextWord();
+        else
+        {
+            nextWord();
+        }
 
         int&& paramCnt = fun.paramTypes.size();
         if (paramCnt == 0)
@@ -1801,9 +1837,13 @@ namespace scc
         paramVal(fun);
         if (buffer[h].type != WordType::RPARENT)
         {
+            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
             // TODO: ERROR
         }
-        nextWord();
+        else
+        {
+            nextWord();
+        }
 
         codes.emplace_back(0040, fun.addr);
         int&& paramCnt = fun.paramTypes.size();
@@ -1881,9 +1921,13 @@ namespace scc
 
         if (buffer[h].type != WordType::RPARENT)
         {
+            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
             // TODO: ERROR
         }
-        nextWord();
+        else
+        {
+            nextWord();
+        }
 
         print("<读语句>\n");
     }
@@ -1922,9 +1966,13 @@ namespace scc
         }
         if (buffer[h].type != WordType::RPARENT)
         {
+            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
             // TODO: ERROR
         }
-        nextWord();
+        else
+        {
+            nextWord();
+        }
 
         print("<写语句>\n");
     }
@@ -1945,9 +1993,13 @@ namespace scc
             expression();
             if (buffer[h].type != WordType::RPARENT)
             {
+                printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
 
             // TODO: judge
 
