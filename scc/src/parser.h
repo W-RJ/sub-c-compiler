@@ -4,6 +4,8 @@
 #define _SCC_PARSER_H_
 
 #include <cstdio>
+#include <cstdarg>
+
 #include <string>
 #include <vector>
 #include <utility>
@@ -119,6 +121,10 @@ namespace scc
         Word& preWord(unsigned n);
 
         void print(const char* name);
+
+        void printWarning(int row, char type, const char* format, ...);
+
+        void printErr(int row, char type, const char* format, ...);
 
         void findVar(Var*& var);
 

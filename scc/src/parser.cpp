@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <climits>
+#include <cstdarg>
 #include <cassert>
+
 #include <algorithm>
 #include <vector>
 #include <string>
@@ -8,6 +10,8 @@
 #include "lexer.h"
 #include "parser.h"
 #include "trie"
+#include "define.h"
+
 #include "../../common/src/pcode.h"
 #include "../../common/src/exception.h"
 
@@ -298,6 +302,32 @@ namespace scc
         {
             fputs(name, parserFp);
         }
+    }
+
+    void Parser::printWarning(int row, char type, const char* format, ...)
+    {
+#if defined(CG) && CG == 3
+        fprintf(errorFp, "%d %c\n", row, type);
+#else
+        va_list args;
+        va_start(args, format);
+        fprintf(errorFp, "%s:%d: warning: ", lexer->getFileName(), row);
+        vfprintf(errorFp, format, args);
+        va_end(args);
+#endif
+    }
+
+    void Parser::printErr(int row, char type, const char* format, ...)
+    {
+#if defined(CG) && CG == 3
+        fprintf(errorFp, "%d %c\n", row, type);
+#else
+        va_list args;
+        va_start(args, format);
+        fprintf(errorFp, "%s:%d: error: ", lexer->getFileName(), row);
+        vfprintf(errorFp, format, args);
+        va_end(args);
+#endif
     }
 
     void Parser::findVar(Var*& var)

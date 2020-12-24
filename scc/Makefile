@@ -68,7 +68,7 @@ $(build)/lexer.o: $(src)/lexer.cpp $(src)/lexer.h $(src)/regexp $(src)/regexp.h 
 	$(call compile,lexer)
 
 $(build)/parser.o: $(src)/parser.cpp $(src)/parser.h $(src)/lexer.h $(src)/trie \
-        $(src)/trie.h $(src)/trie.tcc $(root)/common/$(src)/exception.h \
+        $(src)/trie.h $(src)/trie.tcc $(src)/define.h $(root)/common/$(src)/exception.h \
         $(root)/common/$(src)/pcode.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,parser)
 
