@@ -4,9 +4,13 @@
 #define _SCC_PARSER_H_
 
 #include <cstdio>
+#include <string>
+#include <vector>
+#include <utility>
 
 #include "lexer.h"
 #include "trie"
+#include "../../common/src/pcode.h"
 
 namespace scc
 {
@@ -33,6 +37,16 @@ namespace scc
         std::vector<VarType> paramTypes;
     };
 
+    struct ExCode
+    {
+        sci::BPcode code;
+        int id;
+
+        explicit ExCode(unsigned f);
+
+        ExCode(unsigned f, int a);
+    };
+
     class Parser
     {
     protected:
@@ -45,15 +59,29 @@ namespace scc
 
         int h, size;
 
-        FILE *lexFp, *parserFp;
+        FILE *lexFp;
+
+        FILE *parserFp;
+
+        int ip;
+
+        std::vector<ExCode> codes;
 
         bool global;
 
         Trie<Var, '0', 'z'> globalTrie;
 
+        int globalSize;
+
+        int strSize;
+
         Trie<Var, '0', 'z'> localTrie;
 
         Trie<Fun, '0', 'z'> funTrie;
+
+        Trie<int> strTrie;
+
+        std::vector<std::pair<std::string, int> > strVector;
 
         static bool EXPRESSION_SELECT[static_cast<unsigned>(WordType::END)];
 

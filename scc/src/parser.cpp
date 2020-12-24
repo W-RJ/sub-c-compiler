@@ -1,14 +1,27 @@
 #include <cstdio>
-#include <string>
 #include <climits>
 #include <cassert>
+#include <vector>
+#include <string>
 
 #include "lexer.h"
 #include "parser.h"
+#include "trie"
+#include "../../common/src/pcode.h"
 #include "../../common/src/exception.h"
 
 namespace scc
 {
+    // struct ExCode
+
+    ExCode::ExCode(unsigned f) : code{f}, id(0)
+    {
+    }
+
+    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0)
+    {
+    }
+
     // class Parser
 
     bool Parser::EXPRESSION_SELECT[static_cast<unsigned>(WordType::END)] = {false};
@@ -37,7 +50,8 @@ namespace scc
         STATEMENT_SELECT[static_cast<unsigned>(WordType::RETURNTK)] = true;
     }
 
-    Parser::Parser() : lexer(nullptr), h(0), size(0), lexFp(nullptr), parserFp(nullptr), global(true)
+    Parser::Parser() : lexer(nullptr), h(0), size(0), lexFp(nullptr),
+            parserFp(nullptr), ip(0), global(true), globalSize(0), strSize(0)
     {
         if (!hasInited)
         {
