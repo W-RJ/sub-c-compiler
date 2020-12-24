@@ -74,6 +74,8 @@ namespace scc
 
         FILE *parserFp;
 
+        FILE *errorFp;
+
         int ip;
 
         std::vector<ExCode> codes;
@@ -138,7 +140,7 @@ namespace scc
 
         void setLexer(Lexer* lexer);
 
-        void open(const char* lexFileName, const char* parserFileName);
+        void open(const char* lexFileName, const char* parserFileName, const char* errorFileName);
 
         void close();
 

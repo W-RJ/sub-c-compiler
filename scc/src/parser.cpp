@@ -83,13 +83,17 @@ namespace scc
 
     Parser::~Parser()
     {
-        if (lexFp != nullptr)
+        if (lexFp != nullptr && lexFp != stdout)
         {
             fclose(lexFp);
         }
-        if (parserFp != nullptr && parserFp != lexFp)
+        if (parserFp != nullptr && parserFp != lexFp && parserFp != stdout)
         {
             fclose(parserFp);
+        }
+        if (errorFp != nullptr && errorFp != stderr)
+        {
+            fclose(errorFp);
         }
         // TODO
     }
@@ -104,11 +108,11 @@ namespace scc
     }
 
 
-    void Parser::open(const char* lexFileName, const char* parserFileName)
+    void Parser::open(const char* lexFileName, const char* parserFileName, const char* errorFileName)
     {
         if (lexFileName != nullptr)
         {
-            if (lexFp != nullptr)
+            if (lexFp != nullptr && lexFp != stdout)
             {
                 fclose(lexFp);
             }
@@ -128,7 +132,7 @@ namespace scc
 
         if (parserFileName != nullptr)
         {
-            if (parserFp != nullptr)
+            if (parserFp != nullptr && parserFp != stdout)
             {
                 fclose(parserFp);
             }
@@ -149,20 +153,45 @@ namespace scc
                 throw FileError(parserFileName, "parsing result");
             }
         }
+
+        if (errorFileName != nullptr)
+        {
+            if (errorFp != nullptr && errorFp != stderr)
+            {
+                fclose(errorFp);
+            }
+            if (strcmp(errorFileName, "-") == 0)
+            {
+                errorFp = stderr;
+            }
+            else
+            {
+                errorFp = fopen(errorFileName, "w");
+            }
+            if (errorFp == nullptr)
+            {
+                throw FileError(errorFileName, "error");
+            }
+        }
     }
 
     void Parser::close()
     {
-        if (lexFp != nullptr)
+        if (lexFp != nullptr && lexFp != stdout)
         {
             fclose(lexFp);
         }
-        if (parserFp != nullptr && parserFp != lexFp)
+        if (parserFp != nullptr && parserFp != lexFp && parserFp != stdout)
         {
             fclose(parserFp);
         }
+        if (errorFp != nullptr && errorFp != stderr)
+        {
+            fclose(errorFp);
+        }
         lexFp = nullptr;
         parserFp = nullptr;
+        errorFp = nullptr;
     }
 
     void Parser::write(const char* fileName)

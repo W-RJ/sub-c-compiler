@@ -79,7 +79,7 @@ void compile(const Config& config)
     scc::Parser* parser = new scc::RecursiveParser(config.optimize);
     parser->setLexer(lexer);
 
-    parser->open(config.lexFileName, config.parserFileName);
+    parser->open(config.lexFileName, config.parserFileName, config.errFileName);
 
     parser->parse();
 
