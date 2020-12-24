@@ -75,8 +75,8 @@ namespace scc
         STATEMENT_SELECT[static_cast<unsigned>(WordType::RETURNTK)] = true;
     }
 
-    Parser::Parser(bool optimize) : lexer(nullptr), h(0), size(0), lexFp(nullptr),
-            parserFp(nullptr), ip(0), optimize(optimize), global(true), globalSize(0), strSize(0)
+    Parser::Parser(bool optimize) : lexer(nullptr), h(0), size(0), lexFp(nullptr), parserFp(nullptr),
+            errorFp(nullptr), ip(0), optimize(optimize), global(true), globalSize(0), strSize(0)
     {
         if (!hasInited)
         {
