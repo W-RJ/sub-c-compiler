@@ -771,27 +771,36 @@ namespace scc
         if (buffer[h].type == WordType::PLUS)
         {
             nextWord();
+            item();
         }
         else if (buffer[h].type == WordType::MINU)
         {
             nextWord();
+            item();
+            codes.emplace_back(0100, 1);
         }
-        item();
-        while (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
+        else
+        {
+            item();
+        }
+        while (true)
         {
             if (buffer[h].type == WordType::PLUS)
             {
                 nextWord();
+                item();
+                codes.emplace_back(0100, 2);
             }
             else if (buffer[h].type == WordType::MINU)
             {
                 nextWord();
+                item();
+                codes.emplace_back(0100, 3);
             }
             else
             {
-                // TODO: ERROR
+                break;
             }
-            item();
         }
 
         print("<表达式>\n");
@@ -802,8 +811,22 @@ namespace scc
         factor();
         while (buffer[h].type == WordType::MULT || buffer[h].type == WordType::DIV)
         {
-            nextWord();
-            factor();
+            if (buffer[h].type == WordType::MULT)
+            {
+                nextWord();
+                factor();
+                codes.emplace_back(0100, 4);
+            }
+            else if (buffer[h].type == WordType::DIV)
+            {
+                nextWord();
+                factor();
+                codes.emplace_back(0100, 5);
+            }
+            else
+            {
+                break;
+            }
         }
 
         print("<项>\n");
@@ -850,10 +873,11 @@ namespace scc
         case WordType::PLUS:
         case WordType::MINU:
         case WordType::INTCON:
-            integer();
+            codes.emplace_back(0010, integer());
             break;
 
         case WordType::CHARCON:
+            codes.emplace_back(0010, static_cast<int>(buffer[h].val[0]));
             nextWord();
             break;
 
@@ -1007,17 +1031,31 @@ namespace scc
             // TODO: ERROR
         }
         nextWord();
+
+        int jpcIp = codes.size();
+        codes.emplace_back(0070);
+
         statement();
         if (buffer[h].type == WordType::ELSETK)
         {
+            int jmpIp = codes.size();
+            codes.emplace_back(0060);
+            codes[jpcIp].code.a = codes.size();
+
             nextWord();
             statement();
+
+            codes[jmpIp].code.a = codes.size();
+        }
+        else
+        {
+            codes[jpcIp].code.a = codes.size();
         }
 
         print("<条件语句>\n");
     }
 
-    void RecursiveParser::condition()
+    void RecursiveParser::condition(bool inv)
     {
         expression();
         switch (buffer[h].type)
@@ -1025,35 +1063,51 @@ namespace scc
         case WordType::LSS:
             nextWord();
             expression();
+            codes.emplace_back(0100, inv && optimize ? 11 : 8);
             break;
 
         case WordType::LEQ:
             nextWord();
             expression();
+            codes.emplace_back(0100, inv && optimize ? 10 : 9);
             break;
 
         case WordType::GRE:
             nextWord();
             expression();
+            codes.emplace_back(0100, inv && optimize ? 9 : 10);
             break;
 
         case WordType::GEQ:
             nextWord();
             expression();
+            codes.emplace_back(0100, inv && optimize ? 8 : 11);
             break;
 
         case WordType::EQL:
             nextWord();
             expression();
+            codes.emplace_back(0100, inv && optimize ? 13 : 12);
             break;
 
         case WordType::NEQ:
             nextWord();
             expression();
+            codes.emplace_back(0100, inv && optimize ? 12 : 13);
             break;
 
         default:
+            if (inv && optimize)
+            {
+                codes.emplace_back(0100, 7);
+            }
             break;
+        }
+
+        if (!optimize && inv)
+        {
+            codes.emplace_back(0010, 0);
+            codes.emplace_back(0100, 12);
         }
 
         print("<条件>\n");
@@ -1069,16 +1123,29 @@ namespace scc
                 // TODO: ERROR
             }
             nextWord();
+
+            int conditionIp = codes.size();
+
             condition();
             if (buffer[h].type != WordType::RPARENT)
             {
                 // TODO: ERROR
             }
             nextWord();
+
+            int jpcIp = codes.size();
+            codes.emplace_back(0070);
+
             statement();
+
+            codes.emplace_back(0060, conditionIp);
+
+            codes[jpcIp].code.a = codes.size();
         }
         else if (buffer[h].type == WordType::DOTK)
         {
+            int doIp = codes.size();
+
             nextWord();
             statement();
             if (buffer[h].type != WordType::WHILETK)
@@ -1091,12 +1158,14 @@ namespace scc
                 // TODO: ERROR
             }
             nextWord();
-            condition();
+            condition(true);
             if (buffer[h].type != WordType::RPARENT)
             {
                 // TODO: ERROR
             }
             nextWord();
+
+            codes.emplace_back(0070, doIp);
         }
         else if (buffer[h].type == WordType::FORTK)
         {
@@ -1293,16 +1362,23 @@ namespace scc
         nextWord();
         if (buffer[h].type == WordType::STRCON)
         {
-            str();
+            codes.emplace_back(0010, str());
+            codes.emplace_back(0100, 18);
             if (buffer[h].type == WordType::COMMA)
             {
                 nextWord();
                 expression();
+                codes.emplace_back(0100, 14);
+            }
+            else
+            {
+                codes.emplace_back(0100, 15);
             }
         }
         else if (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
             expression();
+            codes.emplace_back(0100, 14);
         }
         if (buffer[h].type != WordType::RPARENT)
         {

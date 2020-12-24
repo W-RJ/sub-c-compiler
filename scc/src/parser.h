@@ -162,7 +162,7 @@ namespace scc
 
         void conditionSt();
 
-        void condition();
+        void condition(bool inv = false);
 
         void loopSt();
 
