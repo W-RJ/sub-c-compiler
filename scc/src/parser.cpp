@@ -863,9 +863,13 @@ namespace scc
                 }
                 if (buffer[h].type != WordType::RBRACK)
                 {
+                    printErr(preWord().row, 'm', "except ']' after '%s'", preWord().val.c_str());
                     // TODO: ERROR
                 }
-                nextWord();
+                else
+                {
+                    nextWord();
+                }
             }
 
             if (global)
@@ -1237,9 +1241,13 @@ namespace scc
                     expression();
                     if (buffer[h].type != WordType::RBRACK)
                     {
+                        printErr(preWord().row, 'm', "except ']' after '%s'", preWord().val.c_str());
                         // TODO: ERROR
                     }
-                    nextWord();
+                    else
+                    {
+                        nextWord();
+                    }
 
                     loadElement(var);
                 }
@@ -1417,9 +1425,13 @@ namespace scc
             expression();
             if (buffer[h].type != WordType::RBRACK)
             {
+                printErr(preWord().row, 'm', "except ']' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
             if (buffer[h].type != WordType::ASSIGN)
             {
                 // TODO: ERROR
