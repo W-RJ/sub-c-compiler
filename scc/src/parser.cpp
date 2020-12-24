@@ -552,9 +552,13 @@ namespace scc
             constDef();
             if (buffer[h].type != WordType::SEMICN)
             {
+                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
 
         } while (buffer[h].type == WordType::CONSTTK);
 
@@ -786,9 +790,13 @@ namespace scc
             varDef();
             if (buffer[h].type != WordType::SEMICN)
             {
+                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
             if (buffer[h].type != WordType::INTTK && buffer[h].type != WordType::CHARTK)
             {
                 break;
@@ -1296,27 +1304,39 @@ namespace scc
             }
             if (buffer[h].type != WordType::SEMICN)
             {
+                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
             break;
 
         case WordType::SCANFTK:
             readSt();
             if (buffer[h].type != WordType::SEMICN)
             {
+                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
             break;
 
         case WordType::PRINTFTK:
             writeSt();
             if (buffer[h].type != WordType::SEMICN)
             {
+                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
             break;
 
         case WordType::SEMICN:
@@ -1327,9 +1347,13 @@ namespace scc
             returnSt();
             if (buffer[h].type != WordType::SEMICN)
             {
+                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
             break;
 
         default:
@@ -1562,9 +1586,13 @@ namespace scc
             expression();
             if (buffer[h].type != WordType::SEMICN)
             {
+                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
 
             storeVar(var); // NOTE: Cautious when optimize (i)
 
@@ -1573,9 +1601,13 @@ namespace scc
             condition();
             if (buffer[h].type != WordType::SEMICN)
             {
+                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
 
             int jpcIp = codes.size();
             codes.emplace_back(0070);
