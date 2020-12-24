@@ -1056,6 +1056,10 @@ namespace scc
             else
             {
                 rollback(1);
+
+                Var* var;
+                findVar(var);
+
                 nextWord();
                 if (buffer[h].type == WordType::LBRACK)
                 {
@@ -1066,6 +1070,12 @@ namespace scc
                         // TODO: ERROR
                     }
                     nextWord();
+
+                    loadElement(var);
+                }
+                else
+                {
+                    loadVar(var);
                 }
             }
             break;
@@ -1199,11 +1209,17 @@ namespace scc
         {
             // TODO: ERROR
         }
+
+        Var* var;
+        findVar(var);
+
         nextWord();
         if (buffer[h].type == WordType::ASSIGN)
         {
             nextWord();
             expression();
+
+            storeVar(var);
         }
         else if (buffer[h].type == WordType::LBRACK)
         {
@@ -1220,6 +1236,8 @@ namespace scc
             }
             nextWord();
             expression();
+
+            storeElement(var);
         }
         else
         {
@@ -1597,6 +1615,7 @@ namespace scc
 
     void RecursiveParser::readSt()
     {
+        Var* var;
         if (buffer[h].type != WordType::SCANFTK)
         {
             // TODO: ERROR
@@ -1613,7 +1632,24 @@ namespace scc
             {
                 // TODO: ERROR
             }
+
+            findVar(var);
+
+            if (var != nullptr)
+            {
+                if (var->type == VarType::INT)
+                {
+                    codes.emplace_back(0100, 16);
+                }
+                else
+                {
+                    codes.emplace_back(0100, 17);
+                }
+            }
+            storeVar(var);
+
             nextWord();
+
         } while (buffer[h].type == WordType::COMMA);
 
         if (buffer[h].type != WordType::RPARENT)
