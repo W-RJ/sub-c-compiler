@@ -115,6 +115,7 @@ unit_test:
 module_test: main
 ifdef CG
 	export SCC=$$PWD/$(target); \
+	mkdir -p test/cg$(CG); \
 	pytest test/cg$(CG); \
 	RET=$$?; \
 	if [ "$$RET" != "0" ] && [ "$$RET" != "5" ]; then \
@@ -125,6 +126,7 @@ ifdef CG
 	# TODO
 else
 	export SCC=$$PWD/$(target); \
+	mkdir -p test/ncg; \
 	pytest test/ncg; \
 	RET=$$?; \
 	if [ "$$RET" != "0" ] && [ "$$RET" != "5" ]; then \

@@ -40,9 +40,9 @@ compile = $(CXX) $(CXXFLAGS) -c $(src)/$(1).cpp -o $(build)/$(1).o
 
 main: $(precmd) options $(target)
 
-# make scc[.exe]
-$(target): $(objects) Makefile $(precmd)
-	$(CXX) $(CXXFLAGS) $(objects) -o $(target)
+# make sci[.exe]
+$(target): $(objects) $(externs) Makefile $(precmd)
+	$(CXX) $(CXXFLAGS) $(objects) $(externs) -o $(target)
 
 # make *.o
 $(build)/imain.o: $(src)/imain.cpp $(src)/interpreter.h $(root)/common/src/exception.h Makefile $(precmd)
