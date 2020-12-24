@@ -118,7 +118,7 @@ namespace scc
 
         void rollback(unsigned n);
 
-        Word& preWord(unsigned n);
+        Word& preWord(unsigned n = 1);
 
         void print(const char* name);
 

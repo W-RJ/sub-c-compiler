@@ -553,7 +553,7 @@ namespace scc
             constDef();
             if (buffer[h].type != WordType::SEMICN)
             {
-                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
+                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
             else
@@ -714,7 +714,7 @@ namespace scc
         print("<无符号整数>\n");
         try
         {
-            return std::stoi(preWord(1).val);
+            return std::stoi(preWord().val);
         }
         catch(const std::invalid_argument& e)
         {
@@ -799,7 +799,7 @@ namespace scc
             varDef();
             if (buffer[h].type != WordType::SEMICN)
             {
-                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
+                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
             else
@@ -1318,7 +1318,7 @@ namespace scc
             }
             if (buffer[h].type != WordType::SEMICN)
             {
-                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
+                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
             else
@@ -1331,7 +1331,7 @@ namespace scc
             readSt();
             if (buffer[h].type != WordType::SEMICN)
             {
-                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
+                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
             else
@@ -1344,7 +1344,7 @@ namespace scc
             writeSt();
             if (buffer[h].type != WordType::SEMICN)
             {
-                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
+                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
             else
@@ -1361,7 +1361,7 @@ namespace scc
             returnSt();
             if (buffer[h].type != WordType::SEMICN)
             {
-                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
+                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
             else
@@ -1600,7 +1600,7 @@ namespace scc
             expression();
             if (buffer[h].type != WordType::SEMICN)
             {
-                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
+                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
             else
@@ -1615,7 +1615,7 @@ namespace scc
             condition();
             if (buffer[h].type != WordType::SEMICN)
             {
-                printErr(preWord(1).row, 'k', "expect ';' after '%s'", preWord(1).val.c_str());
+                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
                 // TODO: ERROR
             }
             else
