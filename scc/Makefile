@@ -18,7 +18,8 @@ else
 endif
 
 # *.o
-objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/config.o $(root)/common/build/exception.o
+objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/config.o
+externs = $(root)/common/build/exception.o
 
 # scc[.exe]
 ifeq ($(OS),Windows_NT)
@@ -50,8 +51,8 @@ compile = $(CXX) $(CXXFLAGS) -c $(src)/$(1).cpp -o $(build)/$(1).o
 main: $(precmd) options $(target)
 
 # make scc[.exe]
-$(target): $(objects) Makefile $(precmd)
-	$(CXX) $(CXXFLAGS) $(objects) -o $(target)
+$(target): $(objects) $(externs) Makefile $(precmd)
+	$(CXX) $(CXXFLAGS) $(objects) $(externs) -o $(target)
 
 # make *.o
 $(build)/main.o: $(src)/main.cpp $(src)/lexer.h $(src)/parser.h $(src)/config.h \

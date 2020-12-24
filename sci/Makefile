@@ -15,7 +15,8 @@ ifeq ($(OS),Windows_NT)
 endif
 
 # *.o
-objects = $(build)/imain.o $(build)/interpreter.o $(root)/common/build/exception.o
+objects = $(build)/imain.o $(build)/interpreter.o
+externs = $(root)/common/build/exception.o
 
 # scc[.exe]
 ifeq ($(OS),Windows_NT)
