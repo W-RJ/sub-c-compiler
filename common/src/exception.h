@@ -88,9 +88,42 @@ public:
     virtual void print(FILE* fp) const noexcept;
 };
 
-class InstuctionError : public RuntimeError
+class InstructionError : public RuntimeError
 {
-    using RuntimeError::RuntimeError; // TODO
+private:
+
+    unsigned fbin;
+
+    const char* ftext;
+
+public:
+
+    InstructionError(const char *what_arg, unsigned fbin);
+
+    InstructionError(const char *what_arg, const char* ftext);
+
+    /**
+     * print error message
+     */
+    virtual void print(FILE* fp) const noexcept;
+};
+
+class InvalidFormatError : public RuntimeError
+{
+private:
+
+    const char* fileName;
+
+    const char* fileType;
+
+public:
+
+    InvalidFormatError(const char* fileName, const char* fileType);
+
+    /**
+     * print error message
+     */
+    virtual void print(FILE* fp) const noexcept;
 };
 
 class NullPointerError : public RuntimeError

@@ -67,3 +67,37 @@ void RegExpError::print(FILE* fp) const noexcept
 {
     fprintf(fp, "%s%s In the definition of '%s': %s (near %c)\n", CMD_NAME, ERROR_PREFIX, typeName, what(), ch);
 }
+
+// class InstructionError
+
+InstructionError::InstructionError(const char *what_arg, unsigned fbin) : RuntimeError(what_arg), fbin(fbin), ftext(nullptr)
+{
+}
+
+InstructionError::InstructionError(const char *what_arg, const char* ftext) : RuntimeError(what_arg), ftext(ftext)
+{
+}
+
+void InstructionError::print(FILE* fp) const noexcept
+{
+    if (ftext != nullptr)
+    {
+        fprintf(fp, "%s%s%s: %s\n", CMD_NAME, ERROR_PREFIX, ftext, what());
+    }
+    else
+    {
+        fprintf(fp, "%s%s%04o: %s\n", CMD_NAME, ERROR_PREFIX, fbin, what());
+    }
+}
+
+
+// class InvalidFormatError
+
+InvalidFormatError::InvalidFormatError(const char* fileName, const char* fileType) : RuntimeError(fileType), fileName(fileName), fileType(fileType)
+{
+}
+
+void InvalidFormatError::print(FILE* fp) const noexcept
+{
+    fprintf(fp, "%s%s%s: Not a %s file\n", CMD_NAME, FATAL_ERROR_PREFIX, fileName, fileType);
+}

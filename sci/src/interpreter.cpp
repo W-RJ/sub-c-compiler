@@ -252,7 +252,7 @@ namespace sci
                     continue;
 
                 default:
-                    throw InstuctionError(""); // TODO
+                    throw InstructionError("no such instruction", codes[ip].f); // TODO
                 };
 
             case 0110:
@@ -274,7 +274,7 @@ namespace sci
                 continue;
 
             default:
-                throw InstuctionError(""); // TODO
+                throw InstructionError("no such instruction", codes[ip].f); // TODO
             }
         }
 
