@@ -77,6 +77,18 @@ void compile(const Config& config)
 
     parser->parse();
 
+    if (config.objectFileName != nullptr)
+    {
+        if (config.bin)
+        {
+            parser->write(config.objectFileName);
+        }
+        else
+        {
+            parser->writeText(config.objectFileName);
+        }
+    }
+
     parser->close();
     delete parser;
     lexer->close();

@@ -349,6 +349,10 @@ void Config::set(int argc, char **argv)
         throw InvalidArgumentError("no input file", nullptr, HELP);
     }
 
+#endif
+
+#if !defined(CG) || CG == 4
+
     if (objectFileName == nullptr)
     {
         const char* ext = bin ? "bpc" : "tpc";
