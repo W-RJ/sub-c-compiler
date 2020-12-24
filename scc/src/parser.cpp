@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <climits>
 #include <cassert>
+#include <algorithm>
 #include <vector>
 #include <string>
 
@@ -252,15 +253,25 @@ namespace scc
 
     // class RecursiveParser
 
-    void RecursiveParser::str()
+    int RecursiveParser::str()
     {
         if (buffer[h].type != WordType::STRCON)
         {
             // TODO: ERROR
         }
+        int& id = strTrie.at(buffer[h].val.c_str());
+        if (id == 0)
+        {
+            strVector.emplace_back(buffer[h].val, globalSize + strSize);
+            id = strVector.size();
+            strSize += (buffer[h].val.size()) / sizeof(int) + 1;
+        }
+
         nextWord();
 
         print("<字符串>\n");
+
+        return strVector[id - 1].second;
     }
 
     void RecursiveParser::constBlock()
@@ -416,21 +427,23 @@ namespace scc
         }
     }
 
-    void RecursiveParser::integer()
+    int RecursiveParser::integer()
     {
+        int res = 0;
+
         if (buffer[h].type == WordType::PLUS)
         {
             nextWord();
-            uinteger();
+            res = uinteger();
         }
         else if (buffer[h].type == WordType::MINU)
         {
             nextWord();
-            uinteger();
+            res = -uinteger();
         }
         else if (buffer[h].type == WordType::INTCON)
         {
-            uinteger();
+            res = uinteger();
         }
         else
         {
@@ -438,6 +451,8 @@ namespace scc
         }
 
         print("<整数>\n");
+
+        return res;
     }
 
     Fun* RecursiveParser::declareHead()
@@ -1156,11 +1171,13 @@ namespace scc
         print("<循环语句>\n");
     }
 
-    void RecursiveParser::step()
+    int RecursiveParser::step()
     {
-        uinteger();
+        int res = uinteger();
 
         print("<步长>\n");
+
+        return res;
     }
 
     void RecursiveParser::funCall()

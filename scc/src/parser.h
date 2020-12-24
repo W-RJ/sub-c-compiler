@@ -124,7 +124,7 @@ namespace scc
     {
     protected:
 
-        void str();
+        int str();
 
         void constBlock();
 
@@ -132,7 +132,7 @@ namespace scc
 
         int uinteger();
 
-        void integer();
+        int integer();
 
         Fun* declareHead();
 
@@ -166,7 +166,7 @@ namespace scc
 
         void loopSt();
 
-        void step();
+        int step();
 
         void funCall();
 
