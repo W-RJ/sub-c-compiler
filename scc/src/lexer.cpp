@@ -67,7 +67,7 @@ namespace scc
 
     // class Lexer
 
-    Lexer::Lexer() : fp(nullptr)
+    Lexer::Lexer() : fp(nullptr), fileName(nullptr)
     {
     }
 
@@ -93,6 +93,7 @@ namespace scc
         {
             throw FileError(fileName, "input");
         }
+        this->fileName = fileName;
         ch = fgetc(fp);
         row = 1;
     }
@@ -104,6 +105,11 @@ namespace scc
             fclose(fp);
             fp = nullptr;
         }
+    }
+
+    const char* Lexer::getFileName()
+    {
+        return fileName;
     }
 
     // class TrieLexer

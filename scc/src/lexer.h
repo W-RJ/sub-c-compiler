@@ -38,6 +38,8 @@ namespace scc
         // File Pointer
         FILE *fp;
 
+        const char* fileName;
+
         int row;
 
         char ch;
@@ -61,6 +63,8 @@ namespace scc
          * Close source file
          */
         void close();
+
+        const char* getFileName();
 
         /**
          * Get next word
