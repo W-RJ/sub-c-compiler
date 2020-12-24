@@ -153,11 +153,11 @@ namespace sci
                     top = sp - 1;
                     ip = st[sp + 1];
                     sp = st[sp];
-                    if (sp == 0)
+                    if (sp != 0)
                     {
-                        return;
+                        continue;
                     }
-                    continue;
+                    return;
 
                 case 1:
                     st[top] = -st[top];
@@ -253,31 +253,28 @@ namespace sci
 
                 default:
                     throw InstuctionError(""); // TODO
-                    continue;
                 };
-                continue;
 
             case 0110:
                 st[top] = st[sp + codes[ip].a + st[top]];
-                break;
+                continue;
 
             case 0111:
                 st[top] = st[codes[ip].a + st[top]];
-                break;
+                continue;
 
             case 0120:
                 st[sp + codes[ip].a + st[top - 1]] = st[top]; // TODO: Optimize
                 top -= 2;
-                break;
+                continue;
 
             case 0121:
                 st[codes[ip].a + st[top - 1]] = st[top]; // TODO: Optimize
                 top -= 2;
-                break;
+                continue;
 
             default:
                 throw InstuctionError(""); // TODO
-                continue;
             }
         }
 
