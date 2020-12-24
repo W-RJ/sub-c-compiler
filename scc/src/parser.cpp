@@ -144,6 +144,74 @@ namespace scc
         parserFp = nullptr;
     }
 
+    void Parser::write(const char* fileName)
+    {
+        assert(fileName != nullptr);
+
+        FILE* fp;
+        if (strcmp(fileName, "-") == 0)
+        {
+            fp = stdout;
+        }
+        else
+        {
+            fp = fopen(fileName, "wb");
+        }
+        if (fp == nullptr)
+        {
+            throw FileError(fileName, "object");
+        }
+
+        fwrite(&sci::BPCODE_PREFIX, sizeof(sci::BPCODE_PREFIX), 1, fp);
+
+        fwrite(&globalSize, sizeof(int), 1, fp);
+
+        fwrite(&strSize, sizeof(int), 1, fp);
+
+        int zero = 0;
+
+        for (auto it : strVector)
+        {
+            fwrite(it.first.c_str(), it.first.size(), 1, fp);
+            fwrite(&zero, sizeof(int) - (it.first.size()) % sizeof(int), 1, fp);
+        }
+
+        fwrite(&ip, sizeof(int), 1, fp);
+
+        for (auto it : codes)
+        {
+            if (it.id >= 0)
+            {
+                fwrite(&it.code, sizeof(it.code), 1, fp);
+            }
+        }
+
+        fclose(fp);
+    }
+
+    void Parser::writeText(const char* fileName)
+    {
+        assert(fileName != nullptr);
+
+        FILE* fp;
+        if (strcmp(fileName, "-") == 0)
+        {
+            fp = stdout;
+        }
+        else
+        {
+            fp = fopen(fileName, "w");
+        }
+        if (fp == nullptr)
+        {
+            throw FileError(fileName, "object");
+        }
+
+        // TODO
+
+        fclose(fp);
+    }
+
     void Parser::nextWord(bool accept)
     {
         if (accept && lexFp != nullptr)

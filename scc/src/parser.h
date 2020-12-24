@@ -112,6 +112,10 @@ namespace scc
         void close();
 
         virtual void parse() = 0;
+
+        void write(const char* fileName);
+
+        void writeText(const char* fileName);
     };
 
     class RecursiveParser : public Parser
