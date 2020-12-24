@@ -13,6 +13,26 @@
 
 namespace scc
 {
+    // struct Var
+
+    Var::Var(VarType type) : type(type), global(false), writable(true), size(SINGLE)
+    {
+    }
+
+    Var::Var(VarType type, bool global, int addr, bool writable) : type(type), global(global), writable(writable), addr(addr), size(SINGLE)
+    {
+    }
+
+    Var::Var(VarType type, bool global, int addr, int size) : type(type), global(global), writable(true), addr(addr), size(size)
+    {
+    }
+
+    // struct Fun
+
+    Fun::Fun(VarType returnType, int addr) : addr(addr), returnType(returnType)
+    {
+    }
+
     // struct ExCode
 
     ExCode::ExCode(unsigned f) : code{f}, id(0)
@@ -251,6 +271,128 @@ namespace scc
         }
     }
 
+    void Parser::findVar(Var*& var)
+    {
+        int id = localTrie.find(buffer[h].val.c_str());
+        if (id != 0)
+        {
+            var = localVector.data() + id - 1;
+        }
+        else
+        {
+            id = globalTrie.find(buffer[h].val.c_str());
+            if (id != 0)
+            {
+                var = globalVector.data() + id - 1;
+            }
+            else
+            {
+                // TODO: ERROR
+                var = nullptr;
+            }
+        }
+    }
+
+    void Parser::loadVar(Var* var)
+    {
+        if (var == nullptr)
+        {
+            // TODO: ERROR
+        }
+        else if (var->writable)
+        {
+            if (var->size != Var::SINGLE)
+            {
+                // TODO: ERROR
+            }
+            if (var->global)
+            {
+                codes.emplace_back(0021, var->addr);
+            }
+            else
+            {
+                codes.emplace_back(0020, var->addr);
+            }
+        }
+        else
+        {
+            codes.emplace_back(0010, var->addr);
+        }
+    }
+
+    void Parser::loadElement(Var* var)
+    {
+        if (var == nullptr)
+        {
+            // TODO: ERROR
+        }
+        else if (var->size == Var::SINGLE)
+        {
+            // TODO: ERROR
+        }
+        else
+        {
+            if (var->global)
+            {
+                codes.emplace_back(0111, var->addr);
+            }
+            else
+            {
+                codes.emplace_back(0110, var->addr);
+            }
+        }
+    }
+
+    void Parser::storeVar(Var* var)
+    {
+        if (var == nullptr)
+        {
+            // TODO: ERROR
+        }
+        else if (!var->writable)
+        {
+            // TODO: ERROR
+        }
+        else if (var->size != Var::SINGLE)
+        {
+            // TODO: ERROR
+        }
+        else
+        {
+            if (var->global)
+            {
+                codes.emplace_back(0031, var->addr);
+            }
+            else
+            {
+                codes.emplace_back(0030, var->addr);
+            }
+        }
+    }
+
+    void Parser::storeElement(Var* var)
+    {
+        if (var == nullptr)
+        {
+            // TODO: ERROR
+        }
+        else if (var->size == Var::SINGLE)
+        {
+            // TODO: ERROR
+        }
+        else
+        {
+            if (var->global)
+            {
+                codes.emplace_back(0121, var->addr);
+            }
+            else
+            {
+                codes.emplace_back(0120, var->addr);
+            }
+        }
+    }
+
     // class RecursiveParser
 
     int RecursiveParser::str()
@@ -313,36 +455,45 @@ namespace scc
                     // TODO: ERROR
                 }
                 nextWord();
-                integer();
+                int data = integer();
 
-                Var* var;
                 if (global)
                 {
-                    if (funTrie.find(buffer[idH].val.c_str()).returnType != VarType::NONE)
+                    if (funTrie.find(buffer[idH].val.c_str()) != 0)
                     {
                         // TODO: ERROR
                         continue;
                     }
                     else
                     {
-                        var = &localTrie.at(buffer[idH].val.c_str()); // TODO
+                        int& id = globalTrie.at(buffer[idH].val.c_str()); // TODO
+                        if (id != 0) // TODO
+                        {
+                            // TODO: ERROR
+                            continue;
+                        }
+                        else
+                        {
+                            globalVector.emplace_back(VarType::INT, global, data, false);
+                            id = globalVector.size();
+
+                            // TODO
+                        }
                     }
                 }
                 else
                 {
-                    var = &localTrie.at(buffer[idH].val.c_str()); // TODO
-                }
-                if (var->type != VarType::NONE)
-                {
-                    // TODO: ERROR
-                    continue;
-                }
-                else
-                {
-                    var->type = VarType::INT;
-                    var->writable = false;
-
-                    // TODO
+                    int& id = localTrie.at(buffer[idH].val.c_str()); // TODO
+                    if (id != 0)
+                    {
+                        // TODO: ERROR
+                        continue;
+                    }
+                    else
+                    {
+                        localVector.emplace_back(VarType::INT, global, data, false); // TODO
+                        id = localVector.size();
+                    }
                 }
             } while (buffer[h].type == WordType::COMMA);
         }
@@ -366,36 +517,46 @@ namespace scc
                 {
                     // TODO: ERROR
                 }
+                char data = buffer[h].val[0];
                 nextWord();
 
-                Var* var;
                 if (global)
                 {
-                    if (funTrie.find(buffer[idH].val.c_str()).returnType != VarType::NONE)
+                    if (funTrie.find(buffer[idH].val.c_str()) != 0)
                     {
                         // TODO: ERROR
                         continue;
                     }
                     else
                     {
-                        var = &localTrie.at(buffer[idH].val.c_str()); // TODO
+                        int& id = globalTrie.at(buffer[idH].val.c_str()); // TODO
+                        if (id != 0) // TODO
+                        {
+                            // TODO: ERROR
+                            continue;
+                        }
+                        else
+                        {
+                            globalVector.emplace_back(VarType::CHAR, global, data, false);
+                            id = globalVector.size();
+
+                            // TODO
+                        }
                     }
                 }
                 else
                 {
-                    var = &localTrie.at(buffer[idH].val.c_str()); // TODO
-                }
-                if (var->type != VarType::NONE)
-                {
-                    // TODO: ERROR
-                    continue;
-                }
-                else
-                {
-                    var->type = VarType::CHAR;
-                    var->writable = false;
-
-                    // TODO
+                    int& id = localTrie.at(buffer[idH].val.c_str()); // TODO
+                    if (id != 0)
+                    {
+                        // TODO: ERROR
+                        continue;
+                    }
+                    else
+                    {
+                        localVector.emplace_back(VarType::CHAR, global, data, false); // TODO
+                        id = localVector.size();
+                    }
                 }
             } while (buffer[h].type == WordType::COMMA);
         }
@@ -455,9 +616,8 @@ namespace scc
         return res;
     }
 
-    Fun* RecursiveParser::declareHead()
+    void RecursiveParser::declareHead()
     {
-        Fun* fun = nullptr;
         VarType type = VarType::NONE;
         if (buffer[h].type == WordType::INTTK)
         {
@@ -471,31 +631,28 @@ namespace scc
         {
             // TODO: ERROR
         }
-        if (type != VarType::NONE)
+
+        nextWord();
+        if (buffer[h].type != WordType::IDENFR)
         {
-            nextWord();
-            if (buffer[h].type != WordType::IDENFR)
-            {
-                // TODO: ERROR
-            }
-
-            if (globalTrie.find(buffer[h].val.c_str()).type != VarType::NONE)
-            {
-                // TODO: ERROR
-            }
-            fun = &funTrie.at(buffer[h].val.c_str());
-            if (fun->returnType != VarType::NONE)
-            {
-                // TODO: ERROR
-            }
-            fun->returnType = type;
-
-            nextWord();
+            // TODO: ERROR
         }
 
-        print("<声明头部>\n");
+        if (globalTrie.find(buffer[h].val.c_str()) != 0)
+        {
+            // TODO: ERROR
+        }
+        int& id = funTrie.at(buffer[h].val.c_str());
+        if (id != 0)
+        {
+            // TODO: ERROR
+        }
+        funVector.emplace_back(type, ip);
+        id = funVector.size();
 
-        return fun;
+        nextWord();
+
+        print("<声明头部>\n");
     }
 
     void RecursiveParser::varBlock()
@@ -570,37 +727,44 @@ namespace scc
                 nextWord();
             }
 
-            Var* var;
             if (global)
             {
-                if (funTrie.find(buffer[idH].val.c_str()).returnType != VarType::NONE)
+                if (funTrie.find(buffer[idH].val.c_str()) != 0)
                 {
                     // TODO: ERROR
                     continue;
                 }
                 else
                 {
-                    var = &localTrie.at(buffer[idH].val.c_str()); // TODO
+                    int& id = globalTrie.at(buffer[idH].val.c_str()); // TODO
+                    if (id != 0) // TODO
+                    {
+                        // TODO: ERROR
+                        continue;
+                    }
+                    else
+                    {
+                        globalVector.emplace_back(type, global, globalSize++, size);
+                        id = globalVector.size();
+
+                        // TODO
+                    }
                 }
             }
             else
             {
-                var = &localTrie.at(buffer[idH].val.c_str()); // TODO
+                int& id = localTrie.at(buffer[idH].val.c_str()); // TODO
+                if (id != 0)
+                {
+                    // TODO: ERROR
+                    continue;
+                }
+                else
+                {
+                    id = localVector.size() + 1;
+                    localVector.emplace_back(type, global, id - 1, size); // TODO
+                }
             }
-            if (var->type != VarType::NONE)
-            {
-                // TODO: ERROR
-                continue;
-            }
-            else
-            {
-                var->size = size;
-                var->type = type;
-
-                // TODO
-            }
-
-            // TODO
         } while (buffer[h].type == WordType::COMMA);
 
         print("<变量定义>\n");
@@ -608,7 +772,7 @@ namespace scc
 
     void RecursiveParser::funDef()
     {
-        /*Fun* fun =*/ declareHead();
+        declareHead();
         if (buffer[h].type != WordType::LPARENT)
         {
             // TODO: ERROR
@@ -647,16 +811,17 @@ namespace scc
             // TODO: ERROR
         }
 
-        if (globalTrie.find(buffer[h].val.c_str()).type != VarType::NONE)
+        if (globalTrie.find(buffer[h].val.c_str()) != 0)
         {
             // TODO: ERROR
         }
-        Fun& fun = funTrie.at(buffer[h].val.c_str());
-        if (fun.returnType != VarType::NONE)
+        int& id = funTrie.at(buffer[h].val.c_str());
+        if (id != 0)
         {
             // TODO: ERROR
         }
-        fun.returnType = VarType::VOID;
+        funVector.emplace_back(VarType::VOID, ip);
+        id = funVector.size();
 
         nextWord();
         if (buffer[h].type != WordType::LPARENT)
@@ -702,19 +867,46 @@ namespace scc
 
     void RecursiveParser::param()
     {
-        if (buffer[h].type == WordType::INTTK || buffer[h].type == WordType::CHARTK)
+        VarType type = VarType::NONE;
+        if (buffer[h].type == WordType::INTTK)
+        {
+            type = VarType::INT;
+        }
+        else if (buffer[h].type == WordType::CHARTK)
+        {
+            type = VarType::CHAR;
+        }
+        if (type != VarType::NONE)
         {
             nextWord();
             if (buffer[h].type != WordType::IDENFR)
             {
                 // TODO: ERROR
             }
+            int* id = &localTrie.at(buffer[h].val.c_str());
+            if (*id != 0)
+            {
+                // TODO: ERROR
+            }
+            Fun& fun = funVector.back();
+            fun.paramTypes.push_back(type);
+            localVector.emplace_back(type);
+            *id = localVector.size();
             nextWord();
             while (buffer[h].type == WordType::COMMA)
             {
                 nextWord();
-                if (buffer[h].type != WordType::INTTK && buffer[h].type != WordType::CHARTK)
+                if (buffer[h].type == WordType::INTTK)
                 {
+                    type = VarType::INT;
+                }
+                else if (buffer[h].type == WordType::CHARTK)
+                {
+                    type = VarType::CHAR;
+                }
+                else
+                {
+                    type = VarType::NONE;
                     // TODO: ERROR
                 }
                 nextWord();
@@ -722,7 +914,20 @@ namespace scc
                 {
                     // TODO: ERROR
                 }
+                id = &localTrie.at(buffer[h].val.c_str());
+                if (*id != 0)
+                {
+                    // TODO: ERROR
+                }
+                fun.paramTypes.push_back(type);
+                localVector.emplace_back(type);
+                *id = localVector.size();
                 nextWord();
+            }
+            int n = static_cast<int>(localVector.size());
+            for (int i = 0; i < n; i++)
+            {
+                localVector[i].addr = i - n;
             }
         }
 
@@ -740,6 +945,9 @@ namespace scc
         {
             // TODO: ERROR
         }
+        funVector.emplace_back(VarType::VOID, ip);
+        funTrie.at(buffer[h].val.c_str()) = funVector.size();
+        codes[0].code.a = ip;
         nextWord();
         if (buffer[h].type != WordType::LPARENT)
         {
@@ -923,13 +1131,19 @@ namespace scc
             else
             {
                 rollback(1);
-                if (funTrie.find(buffer[h].val.c_str()).returnType == VarType::VOID)
+                int id = funTrie.find(buffer[h].val.c_str());
+                if (id == 0)
+                {
+                    // TODO: ERROR
+                    funCall(false);
+                }
+                else if (funVector[--id].returnType == VarType::VOID)
                 {
                     voidFunCall();
                 }
                 else
                 {
-                    funCall();
+                    funCall(false);
                 }
             }
             if (buffer[h].type != WordType::SEMICN)
@@ -1249,24 +1463,62 @@ namespace scc
         return res;
     }
 
-    void RecursiveParser::funCall()
+    void RecursiveParser::funCall(bool remain)
     {
         if (buffer[h].type != WordType::IDENFR)
         {
             // TODO: ERROR
         }
+
+        int id = funTrie.find(buffer[h].val.c_str());
+        if (id == 0)
+        {
+            // TODO: ERROR
+        }
+        else
+        {
+            --id;
+        }
+        const Fun& fun = funVector[id];
+        if (fun.returnType == VarType::VOID)
+        {
+            // TODO: ERROR
+        }
+
         nextWord();
         if (buffer[h].type != WordType::LPARENT)
         {
             // TODO: ERROR
         }
         nextWord();
-        paramVal();
+        paramVal(fun);
         if (buffer[h].type != WordType::RPARENT)
         {
             // TODO: ERROR
         }
         nextWord();
+
+        int&& paramCnt = fun.paramTypes.size();
+        if (paramCnt == 0)
+        {
+            codes.emplace_back(0042, fun.addr);
+            if (!remain)
+            {
+                codes.emplace_back(0000, 1);
+            }
+        }
+        else
+        {
+            codes.emplace_back(0040, fun.addr);
+            if (!remain)
+            {
+                codes.emplace_back(0000, paramCnt);
+            }
+            else if (paramCnt > 1)
+            {
+                codes.emplace_back(0000, paramCnt - 1);
+            }
+        }
 
         print("<有返回值函数调用语句>\n");
     }
@@ -1277,31 +1529,54 @@ namespace scc
         {
             // TODO: ERROR
         }
+
+        int id = funTrie.find(buffer[h].val.c_str());
+        if (id == 0)
+        {
+            // TODO: ERROR
+        }
+        else
+        {
+            --id;
+        }
+        const Fun& fun = funVector[id];
+        if (fun.returnType != VarType::VOID)
+        {
+            // TODO: ERROR
+        }
+
         nextWord();
         if (buffer[h].type != WordType::LPARENT)
         {
             // TODO: ERROR
         }
         nextWord();
-        paramVal();
+        paramVal(fun);
         if (buffer[h].type != WordType::RPARENT)
         {
             // TODO: ERROR
         }
         nextWord();
 
+        codes.emplace_back(0040, fun.addr);
+        int&& paramCnt = fun.paramTypes.size();
+        if (paramCnt != 0)
+        {
+            codes.emplace_back(0000, paramCnt);
+        }
+
         print("<无返回值函数调用语句>\n");
     }
 
-    void RecursiveParser::paramVal()
+    void RecursiveParser::paramVal(const Fun& fun)
     {
         if (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
-            expression();
+            expression(); // TODO: judge
             while (buffer[h].type == WordType::COMMA)
             {
                 nextWord();
-                expression();
+                expression(); // TODO: judge
             }
         }
 

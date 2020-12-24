@@ -26,15 +26,26 @@ namespace scc
     {
         static const int SINGLE = -1;
 
-        bool writable = true;
-        int size = SINGLE;
-        VarType type = VarType::NONE;
+        VarType type;
+        bool global;
+        bool writable;
+        int addr;
+        int size;
+
+        explicit Var(VarType type);
+
+        Var(VarType type, bool global, int addr, bool writable);
+
+        Var(VarType type, bool global, int addr, int size);
     };
 
     struct Fun
     {
-        VarType returnType = VarType::NONE;
+        int addr;
+        VarType returnType;
         std::vector<VarType> paramTypes;
+
+        Fun(VarType returnType, int addr);
     };
 
     struct ExCode
@@ -69,19 +80,25 @@ namespace scc
 
         bool optimize;
 
-        Trie<Var, '0', 'z'> globalTrie;
-
         bool global;
 
         int globalSize;
 
         int strSize;
 
-        Trie<Var, '0', 'z'> localTrie;
+        Trie<int, '0', 'z'> globalTrie;
 
-        Trie<Fun, '0', 'z'> funTrie;
+        Trie<int, '0', 'z'> localTrie;
+
+        Trie<int, '0', 'z'> funTrie;
 
         Trie<int> strTrie;
+
+        std::vector<Var> globalVector;
+
+        std::vector<Var> localVector;
+
+        std::vector<Fun> funVector;
 
         std::vector<std::pair<std::string, int> > strVector;
 
@@ -100,6 +117,16 @@ namespace scc
         Word& preWord(unsigned n);
 
         void print(const char* name);
+
+        void findVar(Var*& var);
+
+        void loadVar(Var* var);
+
+        void loadElement(Var* var);
+
+        void storeVar(Var* var);
+
+        void storeElement(Var* var);
 
     public:
 
@@ -134,7 +161,7 @@ namespace scc
 
         int integer();
 
-        Fun* declareHead();
+        void declareHead();
 
         void varBlock();
 
@@ -168,11 +195,11 @@ namespace scc
 
         int step();
 
-        void funCall();
+        void funCall(bool remain = true);
 
         void voidFunCall();
 
-        void paramVal();
+        void paramVal(const Fun& fun);
 
         void statementBlock();
 
