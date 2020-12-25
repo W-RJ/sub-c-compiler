@@ -84,6 +84,8 @@ namespace scc
 
         bool optimize;
 
+        bool hasError;
+
         bool global;
 
         int globalSize;
@@ -151,6 +153,8 @@ namespace scc
         void close();
 
         virtual void parse() = 0;
+
+        bool hasErr();
 
         void write(const char* fileName);
 

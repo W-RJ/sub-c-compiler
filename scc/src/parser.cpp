@@ -75,8 +75,9 @@ namespace scc
         STATEMENT_SELECT[static_cast<unsigned>(WordType::RETURNTK)] = true;
     }
 
-    Parser::Parser(bool optimize) : lexer(nullptr), h(0), size(0), lexFp(nullptr), parserFp(nullptr),
-            errorFp(nullptr), ip(0), optimize(optimize), global(true), globalSize(0), strSize(0)
+    Parser::Parser(bool optimize) : lexer(nullptr), h(0), size(0), lexFp(nullptr),
+            parserFp(nullptr), errorFp(nullptr), ip(0), optimize(optimize),
+            hasError(false), global(true), globalSize(0), strSize(0)
     {
         if (!hasInited)
         {
@@ -198,6 +199,11 @@ namespace scc
         errorFp = nullptr;
     }
 
+    bool Parser::hasErr()
+    {
+        return hasError;
+    }
+
     void Parser::write(const char* fileName)
     {
         assert(fileName != nullptr);
@@ -307,7 +313,10 @@ namespace scc
     void Parser::printWarning(int row, char type, const char* format, ...)
     {
 #if defined(CG) && CG == 3
-        fprintf(errorFp, "%d %c\n", row, type);
+        if (type != '\0')
+        {
+            fprintf(errorFp, "%d %c\n", row, type);
+        }
 #else
         va_list args;
         va_start(args, format);
@@ -319,8 +328,12 @@ namespace scc
 
     void Parser::printErr(int row, char type, const char* format, ...)
     {
+        hasError = true;
 #if defined(CG) && CG == 3
-        fprintf(errorFp, "%d %c\n", row, type);
+        if (type != '\0')
+        {
+            fprintf(errorFp, "%d %c\n", row, type);
+        }
 #else
         va_list args;
         va_start(args, format);
