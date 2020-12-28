@@ -322,6 +322,7 @@ namespace scc
         va_start(args, format);
         fprintf(errorFp, "%s:%d: warning: ", lexer->getFileName(), row);
         vfprintf(errorFp, format, args);
+        fputs("\n", errorFp);
         va_end(args);
 #endif
     }
@@ -339,6 +340,7 @@ namespace scc
         va_start(args, format);
         fprintf(errorFp, "%s:%d: error: ", lexer->getFileName(), row);
         vfprintf(errorFp, format, args);
+        fputs("\n", errorFp);
         va_end(args);
 #endif
     }
@@ -626,7 +628,7 @@ namespace scc
                 }
                 catch (const ParsingError& e)
                 {
-                    printErr(buffer[idH].row, 'o', "except numeric constant, not '%s'", buffer[idH].val.c_str());
+                    printErr(buffer[idH].row, 'o', "except numeric constant, not '%s'", buffer[h].val.c_str());
                 }
 
                 if (global)
@@ -690,7 +692,7 @@ namespace scc
                 nextWord();
                 if (buffer[h].type != WordType::CHARCON)
                 {
-                    printErr(buffer[idH].row, 'o', "except character constant, not '%s'", buffer[idH].val.c_str());
+                    printErr(buffer[idH].row, 'o', "except character constant, not '%s'", buffer[h].val.c_str());
                     // TODO: ERROR
                 }
                 char data = buffer[h].val[0];
