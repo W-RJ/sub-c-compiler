@@ -129,6 +129,7 @@ namespace scc
         }
         if (ch == static_cast<char>(EOF))
         {
+            word.type = WordType::FEOF;
             return;
         }
 
@@ -190,6 +191,7 @@ namespace scc
         }
         if (ch == static_cast<char>(EOF))
         {
+            word.type = WordType::FEOF;
             return;
         }
 

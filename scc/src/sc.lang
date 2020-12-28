@@ -35,5 +35,6 @@ RBRACK,//\]
 LBRACE,//{
 RBRACE,//}
 IDENFR,//[_a-zA-Z][_a-zA-Z0-9]*
+FEOF,
 END,
 #define TYPE_NAME_MAX 10
