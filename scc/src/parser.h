@@ -130,6 +130,12 @@ namespace scc
 
         void findVar(Var*& var);
 
+        void verifyVar(Var*& var, const Word& word);
+
+        void verifyWritableVar(Var*& var, const Word& word);
+
+        void verifyElement(Var*& var, const Word& word);
+
         void loadVar(Var* var);
 
         void loadElement(Var* var);

@@ -366,44 +366,77 @@ namespace scc
         }
     }
 
-    void Parser::loadVar(Var* var)
+    void Parser::verifyVar(Var*& var, const Word& word)
     {
-        if (var == nullptr)
-        {
-            // TODO: ERROR
-        }
-        else if (var->writable)
+        if (var != nullptr)
         {
             if (var->size != Var::SINGLE)
             {
                 // TODO: ERROR
+                var = nullptr;
             }
-            if (var->global)
+        }
+    }
+
+    void Parser::verifyWritableVar(Var*& var, const Word& word)
+    {
+        if (var != nullptr)
+        {
+            if (!var->writable)
             {
-                codes.emplace_back(0021, var->addr);
+                printErr(word.row, 'j', "assignment of read-only variable '%s'", word.val.c_str());
+                // TODO: ERROR
+                var = nullptr;
+            }
+            else if (var->size != Var::SINGLE)
+            {
+                // TODO: ERROR
+                var = nullptr;
+            }
+        }
+    }
+
+    void Parser::verifyElement(Var*& var, const Word& word)
+    {
+        if (var != nullptr)
+        {
+            if (var->size == Var::SINGLE)
+            {
+                // TODO: ERROR
+                var = nullptr;
+            }
+        }
+    }
+
+    void Parser::loadVar(Var* var)
+    {
+        if (var != nullptr)
+        {
+            if (var->writable)
+            {
+                if (var->size != Var::SINGLE)
+                {
+                    // TODO: ERROR
+                }
+                if (var->global)
+                {
+                    codes.emplace_back(0021, var->addr);
+                }
+                else
+                {
+                    codes.emplace_back(0020, var->addr);
+                }
             }
             else
             {
-                codes.emplace_back(0020, var->addr);
+                codes.emplace_back(0010, var->addr);
             }
-        }
-        else
-        {
-            codes.emplace_back(0010, var->addr);
         }
     }
 
     void Parser::loadElement(Var* var)
     {
-        if (var == nullptr)
-        {
-            // TODO: ERROR
-        }
-        else if (var->size == Var::SINGLE)
-        {
-            // TODO: ERROR
-        }
-        else
+        if (var != nullptr)
         {
             if (var->global)
             {
@@ -418,19 +451,7 @@ namespace scc
 
     void Parser::storeVar(Var* var)
     {
-        if (var == nullptr)
-        {
-            // TODO: ERROR
-        }
-        else if (!var->writable)
-        {
-            // TODO: ERROR
-        }
-        else if (var->size != Var::SINGLE)
-        {
-            // TODO: ERROR
-        }
-        else
+        if (var != nullptr)
         {
             if (var->global)
             {
@@ -445,15 +466,7 @@ namespace scc
 
     void Parser::storeElement(Var* var)
     {
-        if (var == nullptr)
-        {
-            // TODO: ERROR
-        }
-        else if (var->size == Var::SINGLE)
-        {
-            // TODO: ERROR
-        }
-        else
+        if (var != nullptr)
         {
             if (var->global)
             {
@@ -1262,6 +1275,7 @@ namespace scc
                 nextWord();
                 if (buffer[h].type == WordType::LBRACK)
                 {
+                    verifyElement(var, preWord());
                     nextWord();
                     expression();
                     if (buffer[h].type != WordType::RBRACK)
@@ -1278,6 +1292,7 @@ namespace scc
                 }
                 else
                 {
+                    verifyVar(var, preWord());
                     loadVar(var);
                 }
             }
@@ -1439,6 +1454,8 @@ namespace scc
         nextWord();
         if (buffer[h].type == WordType::ASSIGN)
         {
+            verifyWritableVar(var, preWord());
+
             nextWord();
             expression();
 
@@ -1446,6 +1463,8 @@ namespace scc
         }
         else if (buffer[h].type == WordType::LBRACK)
         {
+            verifyElement(var, preWord());
+
             nextWord();
             expression();
             if (buffer[h].type != WordType::RBRACK)
@@ -1659,6 +1678,7 @@ namespace scc
 
             Var* var;
             findVar(var);
+            verifyWritableVar(var, buffer[h]);
 
             nextWord();
             if (buffer[h].type != WordType::ASSIGN)
@@ -1701,6 +1721,7 @@ namespace scc
             }
 
             findVar(var);
+            verifyWritableVar(var, buffer[h]);
 
             nextWord();
             if (buffer[h].type != WordType::ASSIGN)
@@ -1715,6 +1736,7 @@ namespace scc
 
             Var* varR;
             findVar(varR);
+            verifyVar(var, buffer[h]);
             /// TODO
 
             bool plus = true;
@@ -1942,6 +1964,7 @@ namespace scc
             }
 
             findVar(var);
+            verifyWritableVar(var, buffer[h]);
 
             if (var != nullptr)
             {
