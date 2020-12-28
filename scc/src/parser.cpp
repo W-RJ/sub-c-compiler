@@ -1978,13 +1978,40 @@ namespace scc
 
     void RecursiveParser::paramVal(const Fun& fun)
     {
+        int i = 0;
+        int n = fun.paramTypes.size();
+
         if (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
-            expression(); // TODO: judge
+            VarType type;
+            type = expression(); // TODO: judge
+            if (i < n && type != fun.paramTypes[i])
+            {
+                printErr(preWord().row, 'e', "the type of 0th parameter mismatches");
+            }
+            ++i;
+
             while (buffer[h].type == WordType::COMMA)
             {
                 nextWord();
-                expression(); // TODO: judge
+                type = expression(); // TODO: judge
+                if (i < n && type != fun.paramTypes[i])
+                {
+                    printErr(preWord().row, 'e', "the type of %dth parameter mismatches", i);
+                }
+                ++i;
+            }
+        }
+
+        if (i != n)
+        {
+            if (i > n)
+            {
+                printErr(buffer[h].row, 'd', "too many arguments");
+            }
+            else
+            {
+                printErr(buffer[h].row, 'd', "too few arguments");
             }
         }
 
@@ -2113,7 +2140,17 @@ namespace scc
         if (buffer[h].type == WordType::LPARENT)
         {
             nextWord();
-            expression();
+            if (expression() != fun.returnType)
+            {
+                if (fun.returnType == VarType::VOID)
+                {
+                    printErr(buffer[h].row, 'g', "return-statement with a value, in function returning 'void'");
+                }
+                else
+                {
+                    printErr(buffer[h].row, 'h', "the type of return value mismatches");
+                }
+            }
             if (buffer[h].type != WordType::RPARENT)
             {
                 printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
@@ -2132,6 +2169,7 @@ namespace scc
         {
             if (fun.returnType != VarType::VOID)
             {
+                printErr(buffer[h].row, 'h', "return-statement with no value, in non-void function");
                 // TODO: ERROR
             }
         }
