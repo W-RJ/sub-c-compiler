@@ -158,7 +158,7 @@ namespace scc
         }
 
         word.type = lexTrie.nodes[p].data;
-        if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
+        if (word.type == WordType::CHARCON || word.type == WordType::STRCON || word.type == WordType::CHARERR)
         {
             word.val.pop_back();
             word.val = word.val.substr(1);

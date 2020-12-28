@@ -288,6 +288,20 @@ namespace scc
             buffer[h].type = WordType::NONE;
             buffer[h].val.clear();
             lexer->nextWord(buffer[h]);
+            if (buffer[h].type == WordType::INTERR)
+            {
+                printErr(buffer[h].row, 'a', "invalid integer constant '%s'", buffer[h].val.c_str());
+                buffer[h].type = WordType::INTCON;
+            }
+            else if (buffer[h].type == WordType::CHARERR)
+            {
+                printErr(buffer[h].row, 'a', "invalid character constant '%c'", buffer[h].val[0]);
+                buffer[h].type = WordType::CHARCON;
+            }
+            else if (buffer[h].type == WordType::NONE)
+            {
+                printErr(buffer[h].row, 'a', "invalid word '%c'", buffer[h].val.c_str());
+            }
         }
     }
 
