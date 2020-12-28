@@ -61,8 +61,6 @@ namespace sci
 
     public:
 
-        TInterpreter();
-
         virtual void read(const char* fileName) override;
 
         virtual void run() override;

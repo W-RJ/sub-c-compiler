@@ -319,4 +319,86 @@ namespace sci
         }
     }
 
+    // class TInterpreter
+
+    void TInterpreter::read(const char* fileName)
+    {
+        FILE* fp;
+        if (strcmp(fileName, "-") == 0)
+        {
+            fp = stdin;
+        }
+        else
+        {
+            fp = fopen(fileName, "r");
+        }
+        if (fp == nullptr)
+        {
+            throw FileError(fileName, "input");
+        }
+
+        char buffer[8];
+        fscanf(fp, "%8s", buffer);
+        if (memcmp(buffer, TPCODE_DATA, sizeof(TPCODE_DATA) / sizeof(char)) == 0)
+        {
+            int size;
+            while (true)
+            {
+                fscanf(fp, "%8s", buffer);
+
+                if (memcmp(buffer, fs[013].name, 4) == 0)
+                {
+                    if (fscanf(fp, " %*d %d", &size) != 1)
+                    {
+                        fclose(fp);
+                        throw InvalidFormatError(fileName, "text pcode");
+                    }
+                    st.resize(top + size + 1);
+                    fscanf(fp, " %[^\n]", reinterpret_cast<char*>(st.data() + top + 1));
+                    top += size;
+                }
+                else if (memcmp(buffer, fs[005].name, 4) == 0)
+                {
+                    if (fscanf(fp, " %*d %d", &size) != 1)
+                    {
+                        fclose(fp);
+                        throw InvalidFormatError(fileName, "text pcode");
+                    }
+                    top += size;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            st.resize(top + 1);
+        }
+
+        if (memcmp(buffer, TPCODE_CODE, sizeof(TPCODE_CODE) / sizeof(char)) != 0)
+        {
+            fclose(fp);
+            throw InvalidFormatError(fileName, "text pcode");
+        }
+
+        TPcode code;
+        while (fscanf(fp, "%3s %d %d", code.f.name, &code.l, &code.a) >= 0)
+        {
+            codes.push_back(code);
+        }
+
+        if (!feof(fp))
+        {
+            fclose(fp);
+            throw InvalidFormatError(fileName, "text pcode");
+        }
+
+        // TODO
+        fclose(fp);
+    }
+
+    void TInterpreter::run()
+    {
+    }
+
 } // namespace sci
