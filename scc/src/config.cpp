@@ -355,14 +355,14 @@ void Config::set(int argc, char **argv)
 
     if (objectFileName == nullptr)
     {
-        const char* ext = bin ? "bpc" : "tpc";
+        const char* ext = bin ? ".bpc" : ".tpc";
         int n = strlen(inputFileName);
-        buffer = new char[n + 4];
+        buffer = new char[n + 5];
         strcpy(buffer, inputFileName);
         p = strrchr(buffer, '.');
         if (p != nullptr)
         {
-            strcpy(p + 1, ext);
+            strcpy(p, ext);
         }
         else
         {
