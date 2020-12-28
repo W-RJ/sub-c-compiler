@@ -449,10 +449,14 @@ namespace scc
         }
     }
 
-    void Parser::storeVar(Var* var)
+    void Parser::storeVar(Var* var, VarType type)
     {
         if (var != nullptr)
         {
+            if (var->type != type)
+            {
+                // TODO: ERROR
+            }
             if (var->global)
             {
                 codes.emplace_back(0031, var->addr);
@@ -464,10 +468,14 @@ namespace scc
         }
     }
 
-    void Parser::storeElement(Var* var)
+    void Parser::storeElement(Var* var, VarType type)
     {
         if (var != nullptr)
         {
+            if (var->type != type)
+            {
+                // TODO: ERROR
+            }
             if (var->global)
             {
                 codes.emplace_back(0121, var->addr);
@@ -1486,9 +1494,8 @@ namespace scc
             verifyWritableVar(var, preWord());
 
             nextWord();
-            expression();
 
-            storeVar(var);
+            storeVar(var, expression());
         }
         else if (buffer[h].type == WordType::LBRACK)
         {
@@ -1510,9 +1517,8 @@ namespace scc
                 // TODO: ERROR
             }
             nextWord();
-            expression();
 
-            storeElement(var);
+            storeElement(var, expression());
         }
         else
         {
@@ -1715,7 +1721,9 @@ namespace scc
                 // TODO: ERROR
             }
             nextWord();
-            expression();
+
+            storeVar(var, expression()); // NOTE: Cautious when optimize (i)
+
             if (buffer[h].type != WordType::SEMICN)
             {
                 printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
@@ -1725,8 +1733,6 @@ namespace scc
             {
                 nextWord();
             }
-
-            storeVar(var); // NOTE: Cautious when optimize (i)
 
             int conditionIp = codes.size();
 
@@ -1810,7 +1816,7 @@ namespace scc
                 codes.emplace_back(0100, 3);
             }
 
-            storeVar(var);
+            storeVar(var, VarType::INT);
 
             codes.emplace_back(0060, conditionIp);
             codes[jpcIp].code.a = codes.size();
@@ -2007,8 +2013,9 @@ namespace scc
                 {
                     codes.emplace_back(0100, 17);
                 }
+
+                storeVar(var, var->type);
             }
-            storeVar(var);
 
             nextWord();
 

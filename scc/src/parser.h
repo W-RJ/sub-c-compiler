@@ -140,9 +140,9 @@ namespace scc
 
         void loadElement(Var* var);
 
-        void storeVar(Var* var);
+        void storeVar(Var* var, VarType type);
 
-        void storeElement(Var* var);
+        void storeElement(Var* var, VarType typer);
 
         void allocAddr(int codesH);
 
