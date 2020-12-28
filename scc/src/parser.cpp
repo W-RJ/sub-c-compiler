@@ -1188,22 +1188,28 @@ namespace scc
         print("<主函数>\n");
     }
 
-    void RecursiveParser::expression()
+    VarType RecursiveParser::expression()
     {
+        VarType type;
+
         if (buffer[h].type == WordType::PLUS)
         {
             nextWord();
             item();
+
+            type = VarType::INT;
         }
         else if (buffer[h].type == WordType::MINU)
         {
             nextWord();
             item();
             codes.emplace_back(0100, 1);
+
+            type = VarType::INT;
         }
         else
         {
-            item();
+            type = item();
         }
         while (true)
         {
@@ -1212,12 +1218,16 @@ namespace scc
                 nextWord();
                 item();
                 codes.emplace_back(0100, 2);
+
+                type = VarType::INT;
             }
             else if (buffer[h].type == WordType::MINU)
             {
                 nextWord();
                 item();
                 codes.emplace_back(0100, 3);
+
+                type = VarType::INT;
             }
             else
             {
@@ -1226,11 +1236,14 @@ namespace scc
         }
 
         print("<表达式>\n");
+
+        return type;
     }
 
-    void RecursiveParser::item()
+    VarType RecursiveParser::item()
     {
-        factor();
+        VarType type = factor();
+
         while (buffer[h].type == WordType::MULT || buffer[h].type == WordType::DIV)
         {
             if (buffer[h].type == WordType::MULT)
@@ -1238,12 +1251,16 @@ namespace scc
                 nextWord();
                 factor();
                 codes.emplace_back(0100, 4);
+
+                type = VarType::INT;
             }
             else if (buffer[h].type == WordType::DIV)
             {
                 nextWord();
                 factor();
                 codes.emplace_back(0100, 5);
+
+                type = VarType::INT;
             }
             else
             {
@@ -1252,10 +1269,14 @@ namespace scc
         }
 
         print("<项>\n");
+
+        return type;
     }
 
-    void RecursiveParser::factor()
+    VarType RecursiveParser::factor()
     {
+        VarType type = VarType::INT;
+
         switch (buffer[h].type)
         {
         case WordType::IDENFR:
@@ -1263,7 +1284,7 @@ namespace scc
             if (buffer[h].type == WordType::LPARENT)
             {
                 rollback(1);
-                funCall();
+                type = funCall();
             }
             else
             {
@@ -1295,6 +1316,11 @@ namespace scc
                     verifyVar(var, preWord());
                     loadVar(var);
                 }
+
+                if (var != nullptr)
+                {
+                    type = var->type;
+                }
             }
             break;
 
@@ -1321,6 +1347,7 @@ namespace scc
         case WordType::CHARCON:
             codes.emplace_back(0010, static_cast<int>(buffer[h].val[0]));
             nextWord();
+            type = VarType::CHAR;
             break;
 
         default:
@@ -1329,6 +1356,8 @@ namespace scc
         }
 
         print("<因子>\n");
+
+        return type;
     }
 
     void RecursiveParser::statement()
@@ -1803,7 +1832,7 @@ namespace scc
         return res;
     }
 
-    void RecursiveParser::funCall(bool remain)
+    VarType RecursiveParser::funCall(bool remain)
     {
         if (buffer[h].type != WordType::IDENFR)
         {
@@ -1866,6 +1895,8 @@ namespace scc
         }
 
         print("<有返回值函数调用语句>\n");
+
+        return fun.returnType;
     }
 
     void RecursiveParser::voidFunCall()

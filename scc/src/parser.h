@@ -197,11 +197,11 @@ namespace scc
 
         void mainFun();
 
-        void expression();
+        VarType expression();
 
-        void item();
+        VarType item();
 
-        void factor();
+        VarType factor();
 
         void statement();
 
@@ -215,7 +215,7 @@ namespace scc
 
         int step();
 
-        void funCall(bool remain = true);
+        VarType funCall(bool remain = true);
 
         void voidFunCall();
 
