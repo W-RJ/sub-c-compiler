@@ -989,7 +989,19 @@ namespace scc
             // TODO: ERROR
         }
         nextWord();
-        compoundSt();
+
+        int retStatus = compoundSt();
+        if (retStatus == RET_NONE)
+        {
+            printWarning(buffer[h].row, 'h', "no return statement in function returning non-void");
+            codes.emplace_back(0100, 0);
+        }
+        else if (retStatus == RET_PARTIAL)
+        {
+            printWarning(buffer[h].row, '\0', "control reaches end of non-void function");
+            codes.emplace_back(0100, 0);
+        }
+
         if (buffer[h].type != WordType::RBRACE)
         {
             // TODO: ERROR
@@ -1050,7 +1062,12 @@ namespace scc
             // TODO: ERROR
         }
         nextWord();
-        compoundSt();
+
+        if (compoundSt() != RET_ALL)
+        {
+            codes.emplace_back(0100, 0);
+        }
+
         if (buffer[h].type != WordType::RBRACE)
         {
             // TODO: ERROR
@@ -1075,7 +1092,6 @@ namespace scc
         }
 
         int retStatus = statementBlock(); // TODO: return
-        codes.emplace_back(0100, 0);
 
         print("<复合语句>\n");
 
@@ -1187,7 +1203,12 @@ namespace scc
             // TODO: ERROR
         }
         nextWord();
-        compoundSt();
+
+        if (compoundSt() != RET_ALL)
+        {
+            codes.emplace_back(0100, 0);
+        }
+
         if (buffer[h].type != WordType::RBRACE)
         {
             // TODO: ERROR
