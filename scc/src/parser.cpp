@@ -267,7 +267,24 @@ namespace scc
             throw FileError(fileName, "object");
         }
 
-        // TODO
+        fprintf(fp, "%s\n", sci::TPCODE_DATA);
+
+        fprintf(fp, "%s 0 %d\n", sci::fs[005].name, globalSize);
+
+        for (auto it : strVector)
+        {
+            fprintf(fp, "%s 0 %d %s\n", sci::fs[013].name, static_cast<int>(it.first.size() / sizeof(int)) + 1, it.first.c_str());
+        }
+
+        fprintf(fp, "%s\n", sci::TPCODE_CODE);
+
+        for (auto it : codes)
+        {
+            if (it.id >= 0)
+            {
+                fprintf(fp, "%s %u %d\n", sci::fs[it.code.f >> 3].name, it.code.f & 07, it.code.a);
+            }
+        }
 
         fclose(fp);
     }
