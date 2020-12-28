@@ -1,0 +1,22 @@
+int g_list[20];
+int abs(int a){
+    if(a < 0){
+        return (-a);
+    }
+    return (a);
+}
+int times(int a, int b){
+    return (a * b);
+}
+int sum4(int a, int b, int c, int d){
+    return (a + b+ c+ d);
+}
+void main(){
+    int a;
+    int theSum, i;
+    char f;
+    int testarray[50];
+    testarray['a'] = 6;
+    testarray[0] = 1;
+    scanf(a);
+}

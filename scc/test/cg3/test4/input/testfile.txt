@@ -1,0 +1,27 @@
+const int _begini = 0, _endi = +18, testfg = -6, test_int_const = 1;
+const char lowera = 'a', lowerz = 'z', capitalZ = 'Z', char2 = '2', minusSy = '-';
+int random_name1, random_name2;
+void init(){
+    int i;
+    test_int_const = 2;
+    printf("---- ---- ---- test for (0->17)");
+    for(i = 0; i < _endi; i = i + 1){
+        if( i - (+i/3)*3 == 0)
+            printf("i = ", i);
+    }
+    printf("end i = ", i);
+    printf("---- ---- ---- test for (15->-5)");
+    for(i = 15; i >= -5; i = i - 1){
+        printf("i = ", i);
+    }
+    printf("end i = ", i;
+    return;
+}
+
+int fibic(int a){
+    const int return1 = 2;
+    return (0);
+}
+
+void main(){
+}
