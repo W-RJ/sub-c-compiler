@@ -54,6 +54,7 @@ namespace scc
     {
         sci::BPcode code;
         int id;
+        bool fork;
 
         explicit ExCode(unsigned f);
 

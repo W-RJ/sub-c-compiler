@@ -39,11 +39,11 @@ namespace scc
 
     // struct ExCode
 
-    ExCode::ExCode(unsigned f) : code{f}, id(0)
+    ExCode::ExCode(unsigned f) : code{f}, id(0), fork(false)
     {
     }
 
-    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0)
+    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0), fork(false)
     {
     }
 
@@ -447,17 +447,28 @@ namespace scc
         {
             if (var->writable)
             {
-                if (var->size != Var::SINGLE)
-                {
-                    // TODO: ERROR
-                }
+                ExCode& preCode = codes.back();
                 if (var->global)
                 {
-                    codes.emplace_back(0021, var->addr);
+                    if (preCode.code.f == 0031 && preCode.code.a == var->addr && preCode.id >= 0 && !preCode.fork && optimize)
+                    {
+                        preCode.code.f |= 2u;
+                    }
+                    else
+                    {
+                        codes.emplace_back(0021, var->addr);
+                    }
                 }
                 else
                 {
-                    codes.emplace_back(0020, var->addr);
+                    if (preCode.code.f == 0030 && preCode.code.a == var->addr && preCode.id >= 0 && !preCode.fork && optimize)
+                    {
+                        preCode.code.f |= 2u;
+                    }
+                    else
+                    {
+                        codes.emplace_back(0020, var->addr);
+                    }
                 }
             }
             else
@@ -1114,6 +1125,8 @@ namespace scc
 
     int RecursiveParser::compoundSt()
     {
+        codes.back().fork = true;
+
         if (buffer[h].type == WordType::CONSTTK)
         {
             constBlock();
@@ -1629,6 +1642,9 @@ namespace scc
         codes.emplace_back(0070);
 
         retStatus1 = statement();
+
+        codes.back().fork = true;
+
         if (buffer[h].type == WordType::ELSETK)
         {
             int jmpIp = codes.size();
@@ -1642,6 +1658,9 @@ namespace scc
             retStatus &= retStatus1 | 1;
 
             codes[jmpIp].code.a = codes.size();
+
+            codes.back().fork = true;
+
         }
         else
         {
@@ -1730,6 +1749,8 @@ namespace scc
 
         if (buffer[h].type == WordType::WHILETK)
         {
+            codes.back().fork = true;
+
             nextWord();
             if (buffer[h].type != WordType::LPARENT)
             {
@@ -1758,10 +1779,15 @@ namespace scc
             codes.emplace_back(0060, conditionIp);
 
             codes[jpcIp].code.a = codes.size();
+
+            codes.back().fork = true;
+
         }
         else if (buffer[h].type == WordType::DOTK)
         {
             int doIp = codes.size();
+
+            codes.back().fork = true;
 
             nextWord();
             retStatus = statement();
@@ -1817,6 +1843,8 @@ namespace scc
             nextWord();
 
             storeVar(var, expression()); // NOTE: Cautious when optimize (i)
+
+            codes.back().fork = true;
 
             if (buffer[h].type != WordType::SEMICN)
             {
@@ -1915,6 +1943,8 @@ namespace scc
 
             codes.emplace_back(0060, conditionIp);
             codes[jpcIp].code.a = codes.size();
+
+            codes.back().fork = true;
         }
         else
         {
