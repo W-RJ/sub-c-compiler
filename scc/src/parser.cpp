@@ -1306,7 +1306,12 @@ namespace scc
                 {
                     verifyElement(var, preWord());
                     nextWord();
-                    expression();
+
+                    if (expression() != VarType::INT)
+                    {
+                        printErr(preWord().row, 'i', "invalid type for array subscript");
+                    }
+
                     if (buffer[h].type != WordType::RBRACK)
                     {
                         printErr(preWord().row, 'm', "except ']' after '%s'", preWord().val.c_str());
@@ -1502,7 +1507,12 @@ namespace scc
             verifyElement(var, preWord());
 
             nextWord();
-            expression();
+
+            if (expression() != VarType::INT)
+            {
+                printErr(preWord().row, 'i', "invalid type for array subscript");
+            }
+
             if (buffer[h].type != WordType::RBRACK)
             {
                 printErr(preWord().row, 'm', "except ']' after '%s'", preWord().val.c_str());
@@ -1576,42 +1586,48 @@ namespace scc
 
     void RecursiveParser::condition(bool inv)
     {
-        expression();
+        VarType type = VarType::INT;
+
+        if (expression() != VarType::INT)
+        {
+            printErr(preWord().row, 'f', "invalid type for condition");
+        }
+
         switch (buffer[h].type)
         {
         case WordType::LSS:
             nextWord();
-            expression();
+            type = expression();
             codes.emplace_back(0100, inv && optimize ? 11 : 8);
             break;
 
         case WordType::LEQ:
             nextWord();
-            expression();
+            type = expression();
             codes.emplace_back(0100, inv && optimize ? 10 : 9);
             break;
 
         case WordType::GRE:
             nextWord();
-            expression();
+            type = expression();
             codes.emplace_back(0100, inv && optimize ? 9 : 10);
             break;
 
         case WordType::GEQ:
             nextWord();
-            expression();
+            type = expression();
             codes.emplace_back(0100, inv && optimize ? 8 : 11);
             break;
 
         case WordType::EQL:
             nextWord();
-            expression();
+            type = expression();
             codes.emplace_back(0100, inv && optimize ? 13 : 12);
             break;
 
         case WordType::NEQ:
             nextWord();
-            expression();
+            type = expression();
             codes.emplace_back(0100, inv && optimize ? 12 : 13);
             break;
 
@@ -1627,6 +1643,11 @@ namespace scc
         {
             codes.emplace_back(0010, 0);
             codes.emplace_back(0100, 12);
+        }
+
+        if (type != VarType::INT)
+        {
+            printErr(preWord().row, 'f', "invalid type for condition");
         }
 
         print("<条件>\n");
