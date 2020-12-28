@@ -597,7 +597,16 @@ namespace scc
                     // TODO: ERROR
                 }
                 nextWord();
-                int data = integer();
+
+                int data;
+                try
+                {
+                    data = integer();
+                }
+                catch (const ParsingError& e)
+                {
+                    printErr(buffer[idH].row, 'o', "except numeric constant, not '%s'", buffer[idH].val.c_str());
+                }
 
                 if (global)
                 {
@@ -660,6 +669,7 @@ namespace scc
                 nextWord();
                 if (buffer[h].type != WordType::CHARCON)
                 {
+                    printErr(buffer[idH].row, 'o', "except character constant, not '%s'", buffer[idH].val.c_str());
                     // TODO: ERROR
                 }
                 char data = buffer[h].val[0];
@@ -720,6 +730,7 @@ namespace scc
     {
         if (buffer[h].type != WordType::INTCON)
         {
+            throw ParsingError("not a uinteger");
             // TODO: ERROR
         }
         nextWord();
@@ -756,6 +767,7 @@ namespace scc
         }
         else
         {
+            throw ParsingError("not a integer");
             // TODO: ERROR
         }
 
@@ -1607,9 +1619,13 @@ namespace scc
             statement();
             if (buffer[h].type != WordType::WHILETK)
             {
+                printErr(buffer[h].row, 'n', "except 'while' before '%s'", buffer[h].val.c_str());
                 // TODO: ERROR
             }
-            nextWord();
+            else
+            {
+                nextWord();
+            }
             if (buffer[h].type != WordType::LPARENT)
             {
                 // TODO: ERROR
