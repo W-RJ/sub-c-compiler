@@ -171,6 +171,12 @@ namespace scc
     {
     protected:
 
+        static const int RET_NONE = 0;
+
+        static const int RET_PARTIAL = 1;
+
+        static const int RET_ALL = 3;
+
         int str();
 
         void constBlock();
@@ -191,7 +197,7 @@ namespace scc
 
         void voidFunDef();
 
-        void compoundSt();
+        int compoundSt();
 
         void param();
 
@@ -203,15 +209,15 @@ namespace scc
 
         VarType factor();
 
-        void statement();
+        int statement();
 
         void assignSt();
 
-        void conditionSt();
+        int conditionSt();
 
         void condition(bool inv = false);
 
-        void loopSt();
+        int loopSt();
 
         int step();
 
@@ -221,7 +227,7 @@ namespace scc
 
         void paramVal(const Fun& fun);
 
-        void statementBlock();
+        int statementBlock();
 
         void readSt();
 

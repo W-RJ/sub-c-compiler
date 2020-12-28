@@ -1062,7 +1062,7 @@ namespace scc
         print("<无返回值函数定义>\n");
     }
 
-    void RecursiveParser::compoundSt()
+    int RecursiveParser::compoundSt()
     {
         if (buffer[h].type == WordType::CONSTTK)
         {
@@ -1073,10 +1073,13 @@ namespace scc
             varBlock();
             codes.emplace_back(0050);
         }
-        statementBlock(); // TODO: return
+
+        int retStatus = statementBlock(); // TODO: return
         codes.emplace_back(0100, 0);
 
         print("<复合语句>\n");
+
+        return retStatus;
     }
 
     void RecursiveParser::param()
@@ -1373,23 +1376,25 @@ namespace scc
         return type;
     }
 
-    void RecursiveParser::statement()
+    int RecursiveParser::statement()
     {
+        int retStatus = RET_NONE;
+
         switch (buffer[h].type)
         {
         case WordType::IFTK:
-            conditionSt();
+            retStatus = conditionSt();
             break;
 
         case WordType::WHILETK:
         case WordType::DOTK:
         case WordType::FORTK:
-            loopSt();
+            retStatus = loopSt();
             break;
 
         case WordType::LBRACE:
             nextWord();
-            statementBlock();
+            retStatus = statementBlock();
             if (buffer[h].type != WordType::RBRACE)
             {
                 // TODO: ERROR
@@ -1474,6 +1479,7 @@ namespace scc
             {
                 nextWord();
             }
+            retStatus = RET_ALL;
             break;
 
         default:
@@ -1481,6 +1487,8 @@ namespace scc
         }
 
         print("<语句>\n");
+
+        return retStatus;
     }
 
     void RecursiveParser::assignSt()
@@ -1538,8 +1546,10 @@ namespace scc
         print("<赋值语句>\n");
     }
 
-    void RecursiveParser::conditionSt()
+    int RecursiveParser::conditionSt()
     {
+        int retStatus1, retStatus;
+
         if (buffer[h].type != WordType::IFTK)
         {
             // TODO: ERROR
@@ -1564,7 +1574,7 @@ namespace scc
         int jpcIp = codes.size();
         codes.emplace_back(0070);
 
-        statement();
+        retStatus1 = statement();
         if (buffer[h].type == WordType::ELSETK)
         {
             int jmpIp = codes.size();
@@ -1572,16 +1582,23 @@ namespace scc
             codes[jpcIp].code.a = codes.size();
 
             nextWord();
-            statement();
+
+            retStatus = statement();
+            retStatus |= retStatus1 & 1;
+            retStatus &= retStatus1 | 1;
 
             codes[jmpIp].code.a = codes.size();
         }
         else
         {
+            retStatus = retStatus1 & 1;
+
             codes[jpcIp].code.a = codes.size();
         }
 
         print("<条件语句>\n");
+
+        return retStatus;
     }
 
     void RecursiveParser::condition(bool inv)
@@ -1653,8 +1670,10 @@ namespace scc
         print("<条件>\n");
     }
 
-    void RecursiveParser::loopSt()
+    int RecursiveParser::loopSt()
     {
+        int retStatus = RET_NONE;
+
         if (buffer[h].type == WordType::WHILETK)
         {
             nextWord();
@@ -1680,7 +1699,7 @@ namespace scc
             int jpcIp = codes.size();
             codes.emplace_back(0070);
 
-            statement();
+            retStatus = statement() & 1;
 
             codes.emplace_back(0060, conditionIp);
 
@@ -1691,7 +1710,7 @@ namespace scc
             int doIp = codes.size();
 
             nextWord();
-            statement();
+            retStatus = statement();
             if (buffer[h].type != WordType::WHILETK)
             {
                 printErr(buffer[h].row, 'n', "except 'while' before '%s'", buffer[h].val.c_str());
@@ -1822,7 +1841,8 @@ namespace scc
             {
                 nextWord();
             }
-            statement();
+
+            retStatus = statement() & 1;
 
             loadVar(varR);
 
@@ -1848,6 +1868,8 @@ namespace scc
         }
 
         print("<循环语句>\n");
+
+        return retStatus;
     }
 
     int RecursiveParser::step()
@@ -2018,14 +2040,18 @@ namespace scc
         print("<值参数表>\n");
     }
 
-    void RecursiveParser::statementBlock()
+    int RecursiveParser::statementBlock()
     {
+        int retStatus = RET_NONE;
+
         while (STATEMENT_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
-            statement();
+            retStatus |= statement();
         }
 
         print("<语句列>\n");
+
+        return retStatus;
     }
 
     void RecursiveParser::readSt()
