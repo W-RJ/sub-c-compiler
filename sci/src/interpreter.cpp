@@ -252,10 +252,12 @@ namespace sci
 
                 case 14:
                     printf("%d\n", st[top--]); // TODO: Optimize
+                    fflush(stdout);
                     continue;
 
                 case 15:
                     puts("");
+                    fflush(stdout);
                     continue;
 
                 case 16:
