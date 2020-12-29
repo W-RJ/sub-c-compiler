@@ -247,7 +247,7 @@ namespace scc
 
         for (auto it : codes)
         {
-            if (it.id >= 1)
+            if (it.id >= static_cast<int>(optimize))
             {
                 fwrite(&it.code, sizeof(it.code), 1, fp);
             }
@@ -288,7 +288,7 @@ namespace scc
         fprintf(fp, "%s %u %d\n", sci::fs[codes[0].code.f >> 3].name, codes[0].code.f & 07, codes[0].code.a);
         for (auto it = codes.begin() + 1; it != codes.end(); it++)
         {
-            if (it->id >= 1)
+            if (it->id >= static_cast<int>(optimize))
             {
                 fprintf(fp, "%s %u %d\n", sci::fs[it->code.f >> 3].name, it->code.f & 07, it->code.a);
             }
@@ -642,7 +642,7 @@ namespace scc
         n = codes.size();
         for (int i = codesH; i < n; i++)
         {
-            if (codes[i].id >= 1)
+            if (codes[i].id >= static_cast<int>(optimize))
             {
                 codes[i].id = ip++;
             }
@@ -651,7 +651,7 @@ namespace scc
 
         for (int i = codesH; i < n; i++)
         {
-            if (codes[i].id >= 1)
+            if (codes[i].id >= static_cast<int>(optimize))
             {
                 switch (codes[i].code.f)
                 {
