@@ -1,0 +1,9 @@
+const int _begini = 0, _endi = +18, testfg = -6;
+const char testemm = "buaa1606";
+void main(){
+    int a, b, i, testvar;
+    char testvar;
+    scanf(i);
+    a = i
+    printf(a);
+}

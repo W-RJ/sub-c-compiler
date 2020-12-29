@@ -29,6 +29,10 @@ namespace sci
 
     const char BPCODE_PREFIX[] = "\200BPCODE";
 
+    const char TPCODE_DATA[] = ".data";
+
+    const char TPCODE_CODE[] = ".code";
+
     const PcodeF fs[] =
     {
         {.name = "POP"},

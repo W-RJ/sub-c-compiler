@@ -4,6 +4,8 @@
 #define _SCC_PARSER_H_
 
 #include <cstdio>
+#include <cstdarg>
+
 #include <string>
 #include <vector>
 #include <utility>
@@ -52,6 +54,7 @@ namespace scc
     {
         sci::BPcode code;
         int id;
+        bool fork;
 
         explicit ExCode(unsigned f);
 
@@ -74,11 +77,15 @@ namespace scc
 
         FILE *parserFp;
 
+        FILE *errorFp;
+
         int ip;
 
         std::vector<ExCode> codes;
 
         bool optimize;
+
+        bool hasError;
 
         bool global;
 
@@ -114,19 +121,29 @@ namespace scc
 
         void rollback(unsigned n);
 
-        Word& preWord(unsigned n);
+        Word& preWord(unsigned n = 1);
 
         void print(const char* name);
 
+        void printWarning(int row, char type, const char* format, ...);
+
+        void printErr(int row, char type, const char* format, ...);
+
         void findVar(Var*& var);
+
+        void verifyVar(Var*& var, const Word& word);
+
+        void verifyWritableVar(Var*& var, const Word& word);
+
+        void verifyElement(Var*& var, const Word& word);
 
         void loadVar(Var* var);
 
         void loadElement(Var* var);
 
-        void storeVar(Var* var);
+        void storeVar(Var* var, VarType type);
 
-        void storeElement(Var* var);
+        void storeElement(Var* var, VarType typer);
 
         void allocAddr(int codesH);
 
@@ -138,11 +155,13 @@ namespace scc
 
         void setLexer(Lexer* lexer);
 
-        void open(const char* lexFileName, const char* parserFileName);
+        void open(const char* lexFileName, const char* parserFileName, const char* errorFileName);
 
         void close();
 
         virtual void parse() = 0;
+
+        bool hasErr();
 
         void write(const char* fileName);
 
@@ -152,6 +171,12 @@ namespace scc
     class RecursiveParser : public Parser
     {
     protected:
+
+        static const int RET_NONE = 0;
+
+        static const int RET_PARTIAL = 1;
+
+        static const int RET_ALL = 3;
 
         int str();
 
@@ -173,37 +198,37 @@ namespace scc
 
         void voidFunDef();
 
-        void compoundSt();
+        int compoundSt();
 
         void param();
 
         void mainFun();
 
-        void expression();
+        VarType expression();
 
-        void item();
+        VarType item();
 
-        void factor();
+        VarType factor();
 
-        void statement();
+        int statement();
 
         void assignSt();
 
-        void conditionSt();
+        int conditionSt();
 
         void condition(bool inv = false);
 
-        void loopSt();
+        int loopSt();
 
         int step();
 
-        void funCall(bool remain = true);
+        VarType funCall(bool remain = true);
 
         void voidFunCall();
 
         void paramVal(const Fun& fun);
 
-        void statementBlock();
+        int statementBlock();
 
         void readSt();
 

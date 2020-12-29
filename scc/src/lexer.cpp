@@ -67,7 +67,7 @@ namespace scc
 
     // class Lexer
 
-    Lexer::Lexer() : fp(nullptr)
+    Lexer::Lexer() : fp(nullptr), fileName(nullptr)
     {
     }
 
@@ -93,7 +93,9 @@ namespace scc
         {
             throw FileError(fileName, "input");
         }
+        this->fileName = fileName;
         ch = fgetc(fp);
+        row = 1;
     }
 
     void Lexer::close()
@@ -105,6 +107,11 @@ namespace scc
         }
     }
 
+    const char* Lexer::getFileName()
+    {
+        return fileName;
+    }
+
     // class TrieLexer
 
     void TrieLexer::nextWord(Word& word)
@@ -114,12 +121,19 @@ namespace scc
 
         while (ch != static_cast<char>(EOF) && (ch <= ' ' || isspace(ch)))
         {
+            if (ch == '\n')
+            {
+                ++row;
+            }
             ch = fgetc(fp);
         }
         if (ch == static_cast<char>(EOF))
         {
+            word.type = WordType::FEOF;
             return;
         }
+
+        word.row = row;
 
         while (true)
         {
@@ -144,7 +158,7 @@ namespace scc
         }
 
         word.type = lexTrie.nodes[p].data;
-        if (word.type == WordType::CHARCON || word.type == WordType::STRCON)
+        if (word.type == WordType::CHARCON || word.type == WordType::STRCON || word.type == WordType::CHARERR)
         {
             word.val.pop_back();
             word.val = word.val.substr(1);
@@ -169,12 +183,19 @@ namespace scc
 
         while (ch != static_cast<char>(EOF) && (ch <= ' ' || isspace(ch)))
         {
+            if (ch == '\n')
+            {
+                ++row;
+            }
             ch = fgetc(fp);
         }
         if (ch == static_cast<char>(EOF))
         {
+            word.type = WordType::FEOF;
             return;
         }
+
+        word.row = row;
 
         switch (ch)
         {

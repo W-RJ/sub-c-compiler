@@ -1,0 +1,28 @@
+const int _begini = 0, _endi = +18, testfg = -6;
+const char lowera = 'a', lowerz = 'z', capitalZ = 'Z', char2 = '2', minusSy = '-';
+int fibicnum[20], random_name1, random_name2;
+char alphaBet[26];
+void testfunc1(){
+    printf("This is a test function!");
+    return (3);
+}
+void testfunc2(int num1, int num2){
+    int i, ans;
+    i = 0;
+    ans = 0;
+    do{
+    ans = ans + num1 * i * num2;
+    i = i + 1;
+    }(i < 10);
+    printf(ans);
+}
+int testfunc3(int num1, int num2){
+    if('a' > 2){
+        printf(num1);
+    }
+    else{
+    }
+    return (0);
+}
+void main(){
+}

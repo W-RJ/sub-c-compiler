@@ -37,7 +37,7 @@ void lexerOnly(const Config& config)
             word.val.clear();
             lexer.nextWord(word);
         }
-        while (word.type != scc::WordType::NONE);
+        while (word.type != scc::WordType::FEOF);
     }
     else
     {
@@ -58,7 +58,7 @@ void lexerOnly(const Config& config)
 
         // Analyze
         lexer.nextWord(word);
-        while (word.type != scc::WordType::NONE)
+        while (word.type != scc::WordType::FEOF)
         {
             fprintf(fp, "%s %s\n", scc::typeName[static_cast<unsigned>(word.type)], word.val.c_str());
             word.type = scc::WordType::NONE;
@@ -79,7 +79,7 @@ void compile(const Config& config)
     scc::Parser* parser = new scc::RecursiveParser(config.optimize);
     parser->setLexer(lexer);
 
-    parser->open(config.lexFileName, config.parserFileName);
+    parser->open(config.lexFileName, config.parserFileName, config.errFileName);
 
     parser->parse();
 

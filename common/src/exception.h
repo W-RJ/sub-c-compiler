@@ -88,6 +88,11 @@ public:
     virtual void print(FILE* fp) const noexcept;
 };
 
+class ParsingError : public RuntimeError
+{
+    using RuntimeError::RuntimeError;
+};
+
 class InstructionError : public RuntimeError
 {
 private:
