@@ -203,16 +203,20 @@ namespace scc
             ch = fgetc(fp);
             if (!(ch == '+' || ch == '-' || ch == '*' || ch == '/' || isAlpha(ch) || isDigit(ch)))
             {
-                return; // TODO: ERROR
+                word.type = WordType::CHARERR;
+            }
+            else
+            {
+                word.type = WordType::CHARCON;
             }
             word.val.push_back(ch);
             ch = fgetc(fp);
             if (ch != '\'')
             {
+                word.type = WordType::NONE;
                 return; // TODO: ERROR
             }
             ch = fgetc(fp);
-            word.type = WordType::CHARCON;
             break;
 
         case '"':
@@ -360,7 +364,19 @@ namespace scc
         case '0': // TODO: ERROR
             word.val.push_back(ch);
             ch = fgetc(fp);
-            word.type = WordType::INTCON;
+            if (isDigit(ch) || isAlpha(ch))
+            {
+                word.type = WordType::INTERR;
+                do
+                {
+                    ch = fgetc(fp);
+
+                } while (isDigit(ch) || isAlpha(ch));
+            }
+            else
+            {
+                word.type = WordType::INTCON;
+            }
             break;
 
         default:
@@ -370,6 +386,7 @@ namespace scc
                 {
                     word.val.push_back(ch);
                     ch = fgetc(fp);
+
                 } while (isDigit(ch));
                 word.type = WordType::INTCON;
             }
