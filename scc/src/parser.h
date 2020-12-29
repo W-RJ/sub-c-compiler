@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <utility>
 
 #include "lexer.h"
@@ -34,6 +35,10 @@ namespace scc
         int addr;
         int size;
 
+        std::vector<std::list<int> > preAssign;
+
+        std::vector<bool> isPreAssign;
+
         explicit Var(VarType type);
 
         Var(VarType type, bool global, int addr, bool writable);
@@ -55,6 +60,12 @@ namespace scc
         sci::BPcode code;
         int id;
         bool fork;
+
+        int bg;
+
+        std::vector<int> dependentCodes;
+
+        int dependentVar;
 
         explicit ExCode(unsigned f);
 
@@ -82,6 +93,10 @@ namespace scc
         int ip;
 
         std::vector<ExCode> codes;
+
+        int loopCode;
+
+        int loopLevel;
 
         bool optimize;
 
@@ -137,13 +152,13 @@ namespace scc
 
         void verifyElement(Var*& var, const Word& word);
 
-        void loadVar(Var* var);
+        int loadVar(Var* var);
 
         void loadElement(Var* var);
 
-        void storeVar(Var* var, VarType type);
+        void storeVar(Var* var, VarType type, int exp);
 
-        void storeElement(Var* var, VarType typer);
+        void storeElement(Var* var, VarType typer, int exp1, int exp2);
 
         void allocAddr(int codesH);
 
@@ -178,6 +193,10 @@ namespace scc
 
         static const int RET_ALL = 3;
 
+        void beginLoop();
+
+        void endLoop(bool isLoop = true);
+
         int str();
 
         void constBlock();
@@ -204,11 +223,11 @@ namespace scc
 
         void mainFun();
 
-        VarType expression();
+        VarType expression(int& lastCode);
 
-        VarType item();
+        VarType item(int& lastCode);
 
-        VarType factor();
+        VarType factor(int& lastCode);
 
         int statement();
 
@@ -216,7 +235,7 @@ namespace scc
 
         int conditionSt();
 
-        void condition(bool inv = false);
+        int condition(bool inv = false);
 
         int loopSt();
 
