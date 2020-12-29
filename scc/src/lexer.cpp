@@ -117,51 +117,71 @@ namespace scc
     void TrieLexer::nextWord(Word& word)
     {
         assert(fp != nullptr);
-        int p = 0;
-
-        while (ch != static_cast<char>(EOF) && (ch <= ' ' || isspace(ch)))
-        {
-            if (ch == '\n')
-            {
-                ++row;
-            }
-            ch = fgetc(fp);
-        }
-        if (ch == static_cast<char>(EOF))
-        {
-            word.type = WordType::FEOF;
-            return;
-        }
-
-        word.row = row;
 
         while (true)
         {
-            if (ch < lexTrie.KEY_L || ch == static_cast<char>(EOF)) // TODO: merge
-            {
-                break;
-            }
-            else if (ch > lexTrie.KEY_R)
-            {
-                return; // TODO: ERROR
-            }
-            else if (lexTrie.nodes[p].son[ch - lexTrie.KEY_L] == 0)
-            {
-                break;
-            }
-            else
-            {
-                p = lexTrie.nodes[p].son[ch - lexTrie.KEY_L];
-            }
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-        }
+            int p = 0;
 
-        word.type = lexTrie.nodes[p].data;
-        if (word.type == WordType::CHARCON || word.type == WordType::STRCON || word.type == WordType::CHARERR)
-        {
-            word.val.pop_back();
-            word.val = word.val.substr(1);
+            while (ch != static_cast<char>(EOF) && (ch <= ' ' || isspace(ch)))
+            {
+                if (ch == '\n')
+                {
+                    ++row;
+                }
+                ch = fgetc(fp);
+            }
+            if (ch == static_cast<char>(EOF))
+            {
+                word.type = WordType::FEOF;
+                return;
+            }
+
+            word.row = row;
+
+            while (true)
+            {
+                if (ch < lexTrie.KEY_L || ch == static_cast<char>(EOF)) // TODO: merge
+                {
+                    break;
+                }
+                else if (ch > lexTrie.KEY_R)
+                {
+                    return; // TODO: ERROR
+                }
+                else if (lexTrie.nodes[p].son[ch - lexTrie.KEY_L] == 0)
+                {
+                    break;
+                }
+                else
+                {
+                    p = lexTrie.nodes[p].son[ch - lexTrie.KEY_L];
+                }
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+            }
+
+            word.type = lexTrie.nodes[p].data;
+
+            if (word.type == WordType::COMMENT)
+            {
+                while (ch != '\n' && ch != static_cast<char>(EOF))
+                {
+                    ch = fgetc(fp);
+                }
+                ++row;
+                ch = fgetc(fp);
+                word.type = WordType::NONE;
+                word.val.clear();
+                continue;
+            }
+
+            if (word.type == WordType::CHARCON || word.type == WordType::STRCON || word.type == WordType::CHARERR)
+            {
+                word.val.pop_back();
+                word.val = word.val.substr(1);
+            }
+
+            return;
         }
     }
 
@@ -263,6 +283,7 @@ namespace scc
                     } while (ch != '\n' && ch != static_cast<char>(EOF));
                     ++row;
                     ch = fgetc(fp);
+                    word.type = WordType::NONE;
                     word.val.clear();
                     continue;
                 }
