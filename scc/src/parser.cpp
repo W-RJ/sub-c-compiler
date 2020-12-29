@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <queue>
 
 #include "lexer.h"
 #include "parser.h"
@@ -21,14 +22,20 @@ namespace scc
 
     Var::Var(VarType type) : type(type), global(false), writable(true), size(SINGLE)
     {
+        preAssign.emplace_back();
+        isPreAssign.push_back(false);
     }
 
     Var::Var(VarType type, bool global, int addr, bool writable) : type(type), global(global), writable(writable), addr(addr), size(SINGLE)
     {
+        preAssign.emplace_back();
+        isPreAssign.push_back(false);
     }
 
     Var::Var(VarType type, bool global, int addr, int size) : type(type), global(global), writable(true), addr(addr), size(size)
     {
+        preAssign.emplace_back();
+        isPreAssign.push_back(false);
     }
 
     // struct Fun
@@ -39,11 +46,11 @@ namespace scc
 
     // struct ExCode
 
-    ExCode::ExCode(unsigned f) : code{f}, id(0), fork(false)
+    ExCode::ExCode(unsigned f) : code{f}, id(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
     {
     }
 
-    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0), fork(false)
+    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
     {
     }
 
@@ -76,7 +83,7 @@ namespace scc
     }
 
     Parser::Parser(bool optimize) : lexer(nullptr), h(0), size(0), lexFp(nullptr),
-            parserFp(nullptr), errorFp(nullptr), ip(0), optimize(optimize),
+            parserFp(nullptr), errorFp(nullptr), ip(0), loopCode(0), loopLevel(0), optimize(optimize),
             hasError(false), global(true), globalSize(0), strSize(0)
     {
         if (!hasInited)
@@ -240,7 +247,7 @@ namespace scc
 
         for (auto it : codes)
         {
-            if (it.id >= 0)
+            if (it.id >= 1)
             {
                 fwrite(&it.code, sizeof(it.code), 1, fp);
             }
@@ -278,11 +285,12 @@ namespace scc
 
         fprintf(fp, "%s\n", sci::TPCODE_CODE);
 
-        for (auto it : codes)
+        fprintf(fp, "%s %u %d\n", sci::fs[codes[0].code.f >> 3].name, codes[0].code.f & 07, codes[0].code.a);
+        for (auto it = codes.begin() + 1; it != codes.end(); it++)
         {
-            if (it.id >= 0)
+            if (it->id >= 1)
             {
-                fprintf(fp, "%s %u %d\n", sci::fs[it.code.f >> 3].name, it.code.f & 07, it.code.a);
+                fprintf(fp, "%s %u %d\n", sci::fs[it->code.f >> 3].name, it->code.f & 07, it->code.a);
             }
         }
 
@@ -441,8 +449,10 @@ namespace scc
         }
     }
 
-    void Parser::loadVar(Var* var)
+    int Parser::loadVar(Var* var)
     {
+        int res = 0;
+
         if (var != nullptr)
         {
             if (var->writable)
@@ -464,18 +474,44 @@ namespace scc
                     if (preCode.code.f == 0030 && preCode.code.a == var->addr && preCode.id >= 0 && !preCode.fork && optimize)
                     {
                         preCode.code.f |= 2u;
+                        res = codes.size() - 2;
+                        while (codes[res].code.f == 0032 && codes[res].id >= 0)
+                        {
+                            res--;
+                        }
                     }
                     else
                     {
+                        res = codes.size();
                         codes.emplace_back(0020, var->addr);
+                        // TODO
+                        int bg = loopLevel; // TODO: FIXME
+                        while (bg >= 0 && !var->isPreAssign[bg])
+                        {
+                            --bg;
+                        }
+                        if (bg < 0)
+                        {
+                            bg = 0;
+                        }
+                        codes.back().bg = bg; // TODO: FIXME
+                        while (bg <= loopLevel)
+                        {
+                            codes.back().dependentCodes.insert(codes.back().dependentCodes.end(), var->preAssign[bg].begin(), var->preAssign[bg].end());
+                            bg++;
+                        }
+                        codes.back().dependentVar = var - localVector.data();
                     }
                 }
             }
             else
             {
+                res = codes.size();
                 codes.emplace_back(0010, var->addr);
             }
         }
+
+        return res;
     }
 
     void Parser::loadElement(Var* var)
@@ -493,7 +529,7 @@ namespace scc
         }
     }
 
-    void Parser::storeVar(Var* var, VarType type)
+    void Parser::storeVar(Var* var, VarType type, int exp)
     {
         if (var != nullptr)
         {
@@ -504,15 +540,21 @@ namespace scc
             if (var->global)
             {
                 codes.emplace_back(0031, var->addr);
+                codes.back().dependentCodes.push_back(exp);
             }
             else
             {
+                var->preAssign.resize(loopLevel);
+                var->preAssign.emplace_back();
+                var->preAssign.back().push_back(codes.size());
+                var->isPreAssign.back() = true;
                 codes.emplace_back(0030, var->addr);
+                codes.back().dependentCodes.push_back(exp);
             }
         }
     }
 
-    void Parser::storeElement(Var* var, VarType type)
+    void Parser::storeElement(Var* var, VarType type, int exp1, int exp2)
     {
         if (var != nullptr)
         {
@@ -523,10 +565,14 @@ namespace scc
             if (var->global)
             {
                 codes.emplace_back(0121, var->addr);
+                codes.back().dependentCodes.push_back(exp1);
+                codes.back().dependentCodes.push_back(exp2);
             }
             else
             {
                 codes.emplace_back(0120, var->addr);
+                codes.back().dependentCodes.push_back(exp1);
+                codes.back().dependentCodes.push_back(exp2);
             }
         }
     }
@@ -534,8 +580,41 @@ namespace scc
     void Parser::allocAddr(int codesH)
     {
         Fun& fun = funVector.back();
-        int n = localVector.size();
+        int n = codes.size();
+        int tmp;
+        std::queue<int> q;
+        bool* vis = new bool[n - codesH];
+        memset(vis, false, (n - codesH) * sizeof(bool));
+        for (int i = n - 1; i >= codesH; --i)
+        {
+            if (codes[i].id == 1
+                || (codes[i].code.f != 0010 && codes[i].code.f != 0020
+                    && codes[i].code.f != 0030 && codes[i].code.f != 0032)
+                || (codes[i].code.f == 0100 && (codes[i].code.a < 2 || codes[i].code.a > 5)))
+            {
+                codes[i].id = 1;
+                vis[i - codesH] = true;
+                q.push(i);
+            }
+        }
+        while (!q.empty())
+        {
+            tmp = q.front();     
+
+            for (auto it : codes[tmp].dependentCodes)
+            {
+                if (it != 0 && !vis[it - codesH])
+                {
+                    codes[it].id = 1;
+                    vis[it - codesH] = true;
+                    q.push(it);
+                }
+            }
+            q.pop();
+        }
+        delete[] vis;
         int addr = 2;
+        n = localVector.size();
         for (int i = fun.paramTypes.size(); i < n; i++)
         {
             if (localVector[i].writable)
@@ -563,7 +642,7 @@ namespace scc
         n = codes.size();
         for (int i = codesH; i < n; i++)
         {
-            if (codes[i].id >= 0)
+            if (codes[i].id >= 1)
             {
                 codes[i].id = ip++;
             }
@@ -572,7 +651,7 @@ namespace scc
 
         for (int i = codesH; i < n; i++)
         {
-            if (codes[i].id >= 0)
+            if (codes[i].id >= 1)
             {
                 switch (codes[i].code.f)
                 {
@@ -597,6 +676,39 @@ namespace scc
     }
 
     // class RecursiveParser
+
+    void RecursiveParser::beginLoop()
+    {
+        for (auto& it : localVector)
+        {
+            it.preAssign.resize(loopLevel + 1);
+            it.isPreAssign.push_back(false);
+        }
+    }
+
+    void RecursiveParser::endLoop(bool isLoop)
+    {
+        if (isLoop)
+        {
+            int n = codes.size();
+            for (int i = loopCode; i < n; ++i)
+            {
+                if (codes[i].bg < loopLevel)
+                {
+                    for (auto it : localVector[codes[i].dependentVar].preAssign[loopLevel])
+                    {
+                        codes[i].dependentCodes.push_back(it);
+                    }
+                }
+            }
+        }
+        for (auto& it : localVector)
+        {
+            it.preAssign[loopLevel - 1].splice(it.preAssign[loopLevel - 1].begin(), std::move(it.preAssign[loopLevel]));
+            it.preAssign.resize(loopLevel);
+            it.isPreAssign.resize(loopLevel);
+        }
+    }
 
     int RecursiveParser::str()
     {
@@ -1266,44 +1378,53 @@ namespace scc
         print("<主函数>\n");
     }
 
-    VarType RecursiveParser::expression()
+    VarType RecursiveParser::expression(int& lastCode)
     {
         VarType type;
+
+        int curCode;
 
         if (buffer[h].type == WordType::PLUS)
         {
             nextWord();
-            item();
+            item(lastCode);
 
             type = VarType::INT;
         }
         else if (buffer[h].type == WordType::MINU)
         {
             nextWord();
-            item();
+            item(lastCode);
             codes.emplace_back(0100, 1);
+            codes.back().dependentCodes.push_back(lastCode);
+            lastCode = codes.size() - 1;
 
             type = VarType::INT;
         }
         else
         {
-            type = item();
+            type = item(lastCode);
         }
+
         while (true)
         {
             if (buffer[h].type == WordType::PLUS)
             {
                 nextWord();
-                item();
+                item(curCode);
                 codes.emplace_back(0100, 2);
+                codes.back().dependentCodes.push_back(curCode);
+                codes.back().dependentCodes.push_back(lastCode);
 
                 type = VarType::INT;
             }
             else if (buffer[h].type == WordType::MINU)
             {
                 nextWord();
-                item();
+                item(curCode);
                 codes.emplace_back(0100, 3);
+                codes.back().dependentCodes.push_back(curCode);
+                codes.back().dependentCodes.push_back(lastCode);
 
                 type = VarType::INT;
             }
@@ -1311,6 +1432,8 @@ namespace scc
             {
                 break;
             }
+
+            lastCode = codes.size() - 1;
         }
 
         print("<表达式>\n");
@@ -1318,25 +1441,31 @@ namespace scc
         return type;
     }
 
-    VarType RecursiveParser::item()
+    VarType RecursiveParser::item(int& lastCode)
     {
-        VarType type = factor();
+        VarType type = factor(lastCode);
+
+        int curCode;
 
         while (buffer[h].type == WordType::MULT || buffer[h].type == WordType::DIV)
         {
             if (buffer[h].type == WordType::MULT)
             {
                 nextWord();
-                factor();
+                factor(curCode);
                 codes.emplace_back(0100, 4);
+                codes.back().dependentCodes.push_back(curCode);
+                codes.back().dependentCodes.push_back(lastCode);
 
                 type = VarType::INT;
             }
             else if (buffer[h].type == WordType::DIV)
             {
                 nextWord();
-                factor();
+                factor(curCode);
                 codes.emplace_back(0100, 5);
+                codes.back().dependentCodes.push_back(curCode);
+                codes.back().dependentCodes.push_back(lastCode);
 
                 type = VarType::INT;
             }
@@ -1344,6 +1473,8 @@ namespace scc
             {
                 break;
             }
+
+            lastCode = codes.size() - 1;
         }
 
         print("<项>\n");
@@ -1351,7 +1482,7 @@ namespace scc
         return type;
     }
 
-    VarType RecursiveParser::factor()
+    VarType RecursiveParser::factor(int& lastCode)
     {
         VarType type = VarType::INT;
 
@@ -1363,6 +1494,7 @@ namespace scc
             {
                 rollback(1);
                 type = funCall();
+                lastCode = codes.size() - 1;
             }
             else
             {
@@ -1377,7 +1509,7 @@ namespace scc
                     verifyElement(var, preWord());
                     nextWord();
 
-                    if (expression() != VarType::INT)
+                    if (expression(lastCode) != VarType::INT)
                     {
                         printErr(preWord().row, 'i', "invalid type for array subscript");
                     }
@@ -1393,11 +1525,13 @@ namespace scc
                     }
 
                     loadElement(var);
+
+                    lastCode = codes.size() - 1;
                 }
                 else
                 {
                     verifyVar(var, preWord());
-                    loadVar(var);
+                    lastCode = loadVar(var);
                 }
 
                 if (var != nullptr)
@@ -1409,7 +1543,7 @@ namespace scc
 
         case WordType::LPARENT:
             nextWord();
-            expression();
+            expression(lastCode);
             if (buffer[h].type != WordType::RPARENT)
             {
                 printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
@@ -1425,10 +1559,12 @@ namespace scc
         case WordType::MINU:
         case WordType::INTCON:
             codes.emplace_back(0010, integer());
+            lastCode = codes.size() - 1;
             break;
 
         case WordType::CHARCON:
             codes.emplace_back(0010, static_cast<int>(buffer[h].val[0]));
+            lastCode = codes.size() - 1;
             nextWord();
             type = VarType::CHAR;
             break;
@@ -1575,7 +1711,9 @@ namespace scc
 
             nextWord();
 
-            storeVar(var, expression());
+            int lastCode;
+            VarType type = expression(lastCode);
+            storeVar(var, type, lastCode);
         }
         else if (buffer[h].type == WordType::LBRACK)
         {
@@ -1583,7 +1721,9 @@ namespace scc
 
             nextWord();
 
-            if (expression() != VarType::INT)
+            int exp1, exp2;
+
+            if (expression(exp1) != VarType::INT)
             {
                 printErr(preWord().row, 'i', "invalid type for array subscript");
             }
@@ -1603,7 +1743,8 @@ namespace scc
             }
             nextWord();
 
-            storeElement(var, expression());
+            VarType type = expression(exp2);
+            storeElement(var, type, exp1, exp2);
         }
         else
         {
@@ -1627,7 +1768,7 @@ namespace scc
             // TODO: ERROR
         }
         nextWord();
-        condition();
+        int lastCode = condition();
         if (buffer[h].type != WordType::RPARENT)
         {
             printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
@@ -1640,8 +1781,18 @@ namespace scc
 
         int jpcIp = codes.size();
         codes.emplace_back(0070);
+        codes.back().dependentCodes.push_back(lastCode);
+
+        int preLoopCode = loopCode;
+        loopCode = codes.size();
+        loopLevel++;
+        beginLoop();
 
         retStatus1 = statement();
+
+        endLoop(false);
+        loopCode = preLoopCode;
+        --loopLevel;
 
         codes.back().fork = true;
 
@@ -1653,9 +1804,18 @@ namespace scc
 
             nextWord();
 
+            int preLoopCode = loopCode;
+            loopCode = codes.size();
+            loopLevel++;
+            beginLoop();
+
             retStatus = statement();
             retStatus |= retStatus1 & 1;
             retStatus &= retStatus1 | 1;
+
+            endLoop(false);
+            loopCode = preLoopCode;
+            --loopLevel;
 
             codes[jmpIp].code.a = codes.size();
 
@@ -1674,11 +1834,13 @@ namespace scc
         return retStatus;
     }
 
-    void RecursiveParser::condition(bool inv)
+    int RecursiveParser::condition(bool inv)
     {
         VarType type = VarType::INT;
 
-        if (expression() != VarType::INT)
+        int lastCode, curCode;
+
+        if (expression(lastCode) != VarType::INT)
         {
             printErr(preWord().row, 'f', "invalid type for condition");
         }
@@ -1687,44 +1849,64 @@ namespace scc
         {
         case WordType::LSS:
             nextWord();
-            type = expression();
+            type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 11 : 8);
+            codes.back().dependentCodes.push_back(curCode);
+            codes.back().dependentCodes.push_back(lastCode);
+            lastCode = codes.size() - 1;
             break;
 
         case WordType::LEQ:
             nextWord();
-            type = expression();
+            type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 10 : 9);
+            codes.back().dependentCodes.push_back(curCode);
+            codes.back().dependentCodes.push_back(lastCode);
+            lastCode = codes.size() - 1;
             break;
 
         case WordType::GRE:
             nextWord();
-            type = expression();
+            type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 9 : 10);
+            codes.back().dependentCodes.push_back(curCode);
+            codes.back().dependentCodes.push_back(lastCode);
+            lastCode = codes.size() - 1;
             break;
 
         case WordType::GEQ:
             nextWord();
-            type = expression();
+            type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 8 : 11);
+            codes.back().dependentCodes.push_back(curCode);
+            codes.back().dependentCodes.push_back(lastCode);
+            lastCode = codes.size() - 1;
             break;
 
         case WordType::EQL:
             nextWord();
-            type = expression();
+            type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 13 : 12);
+            codes.back().dependentCodes.push_back(curCode);
+            codes.back().dependentCodes.push_back(lastCode);
+            lastCode = codes.size() - 1;
             break;
 
         case WordType::NEQ:
             nextWord();
-            type = expression();
+            type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 12 : 13);
+            codes.back().dependentCodes.push_back(curCode);
+            codes.back().dependentCodes.push_back(lastCode);
+            lastCode = codes.size() - 1;
             break;
 
         default:
             if (inv && optimize)
             {
                 codes.emplace_back(0100, 7);
+                codes.back().dependentCodes.push_back(lastCode);
+                lastCode = codes.size() - 1;
             }
             break;
         }
@@ -1733,6 +1915,9 @@ namespace scc
         {
             codes.emplace_back(0010, 0);
             codes.emplace_back(0100, 12);
+            codes.back().dependentCodes.push_back(codes.size() - 2);
+            codes.back().dependentCodes.push_back(lastCode);
+            lastCode = codes.size() - 1;
         }
 
         if (type != VarType::INT)
@@ -1741,6 +1926,8 @@ namespace scc
         }
 
         print("<条件>\n");
+
+        return lastCode;
     }
 
     int RecursiveParser::loopSt()
@@ -1759,8 +1946,12 @@ namespace scc
             nextWord();
 
             int conditionIp = codes.size();
+            int preLoopCode = loopCode;
+            loopCode = conditionIp;
+            loopLevel++;
+            beginLoop();
 
-            condition();
+            int lastCode = condition();
             if (buffer[h].type != WordType::RPARENT)
             {
                 printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
@@ -1773,6 +1964,7 @@ namespace scc
 
             int jpcIp = codes.size();
             codes.emplace_back(0070);
+            codes.back().dependentCodes.push_back(lastCode);
 
             retStatus = statement() & 1;
 
@@ -1782,10 +1974,18 @@ namespace scc
 
             codes.back().fork = true;
 
+            endLoop();
+            loopCode = preLoopCode;
+            --loopLevel;
+
         }
         else if (buffer[h].type == WordType::DOTK)
         {
             int doIp = codes.size();
+            int preLoopCode = loopCode;
+            loopCode = doIp;
+            loopLevel++;
+            beginLoop();
 
             codes.back().fork = true;
 
@@ -1805,7 +2005,7 @@ namespace scc
                 // TODO: ERROR
             }
             nextWord();
-            condition(true);
+            int lastCode = condition(true);
             if (buffer[h].type != WordType::RPARENT)
             {
                 printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
@@ -1817,6 +2017,12 @@ namespace scc
             }
 
             codes.emplace_back(0070, doIp);
+            codes.back().dependentCodes.push_back(lastCode);
+
+            endLoop();
+            loopCode = preLoopCode;
+            --loopLevel;
+
         }
         else if (buffer[h].type == WordType::FORTK)
         {
@@ -1842,7 +2048,9 @@ namespace scc
             }
             nextWord();
 
-            storeVar(var, expression()); // NOTE: Cautious when optimize (i)
+            int lastCode;
+            VarType type = expression(lastCode);
+            storeVar(var, type, lastCode); // NOTE: Cautious when optimize (i)
 
             codes.back().fork = true;
 
@@ -1857,8 +2065,12 @@ namespace scc
             }
 
             int conditionIp = codes.size();
+            int preLoopCode = loopCode;
+            loopCode = conditionIp;
+            loopLevel++;
+            beginLoop();
 
-            condition();
+            lastCode = condition();
             if (buffer[h].type != WordType::SEMICN)
             {
                 printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
@@ -1871,6 +2083,7 @@ namespace scc
 
             int jpcIp = codes.size();
             codes.emplace_back(0070);
+            codes.back().dependentCodes.push_back(lastCode);
 
             if (buffer[h].type != WordType::IDENFR)
             {
@@ -1926,25 +2139,34 @@ namespace scc
 
             retStatus = statement() & 1;
 
-            loadVar(varR);
+            lastCode = loadVar(varR);
 
             codes.emplace_back(0010, st);
 
             if (plus)
             {
                 codes.emplace_back(0100, 2);
+                codes.back().dependentCodes.push_back(lastCode);
+                codes.back().dependentCodes.push_back(codes.size() - 2);
             }
             else
             {
                 codes.emplace_back(0100, 3);
+                codes.back().dependentCodes.push_back(lastCode);
+                codes.back().dependentCodes.push_back(codes.size() - 2);
             }
 
-            storeVar(var, VarType::INT);
+            storeVar(var, VarType::INT, codes.size() - 1);
 
             codes.emplace_back(0060, conditionIp);
             codes[jpcIp].code.a = codes.size();
 
             codes.back().fork = true;
+
+            endLoop();
+            loopCode = preLoopCode;
+            --loopLevel;
+
         }
         else
         {
@@ -2090,7 +2312,9 @@ namespace scc
         if (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
             VarType type;
-            type = expression(); // TODO: judge
+            int lastCode;
+            type = expression(lastCode); // TODO: judge
+            codes[lastCode].id = 1;
             if (i < n && type != fun.paramTypes[i])
             {
                 printErr(preWord().row, 'e', "the type of 0th parameter mismatches");
@@ -2100,7 +2324,9 @@ namespace scc
             while (buffer[h].type == WordType::COMMA)
             {
                 nextWord();
-                type = expression(); // TODO: judge
+                int lastCode;
+                type = expression(lastCode); // TODO: judge
+                codes[lastCode].id = 1;
                 if (i < n && type != fun.paramTypes[i])
                 {
                     printErr(preWord().row, 'e', "the type of %dth parameter mismatches", i);
@@ -2172,7 +2398,7 @@ namespace scc
                     codes.emplace_back(0100, 17);
                 }
 
-                storeVar(var, var->type);
+                storeVar(var, var->type, codes.size() - 1);
             }
 
             nextWord();
@@ -2204,15 +2430,20 @@ namespace scc
             // TODO: ERROR
         }
         nextWord();
+
+        int lastCode;
+
         if (buffer[h].type == WordType::STRCON)
         {
             codes.emplace_back(0010, str());
             codes.emplace_back(0100, 18);
+            codes.back().dependentCodes.push_back(codes.size() - 2);
             if (buffer[h].type == WordType::COMMA)
             {
                 nextWord();
-                expression();
+                expression(lastCode);
                 codes.emplace_back(0100, 14);
+                codes.back().dependentCodes.push_back(lastCode);
             }
             else
             {
@@ -2221,8 +2452,9 @@ namespace scc
         }
         else if (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
-            expression();
+            expression(lastCode);
             codes.emplace_back(0100, 14);
+            codes.back().dependentCodes.push_back(lastCode);
         }
         if (buffer[h].type != WordType::RPARENT)
         {
@@ -2250,7 +2482,10 @@ namespace scc
         if (buffer[h].type == WordType::LPARENT)
         {
             nextWord();
-            if (expression() != fun.returnType)
+
+            int lastCode;
+
+            if (expression(lastCode) != fun.returnType)
             {
                 if (fun.returnType == VarType::VOID)
                 {
@@ -2274,6 +2509,8 @@ namespace scc
             // TODO: judge
 
             codes.emplace_back(0030, -std::max(static_cast<int>(fun.paramTypes.size()), 1));
+            codes.back().dependentCodes.push_back(lastCode);
+            codes.back().id = 1;
         }
         else
         {
