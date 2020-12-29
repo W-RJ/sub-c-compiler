@@ -4,7 +4,7 @@ DESTDIR = /usr/local/bin
 build = build
 release = release
 
-range = 1 2 3 5
+range = 1 2 3
 
 targets = "scc/$(build)/scc" "scc/$(build)/sc.lang"
 ifneq ($(CG),4)

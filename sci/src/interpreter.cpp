@@ -75,6 +75,7 @@ namespace sci
 
     void BInterpreter::run()
     {
+        sp = -1;
         while (true)
         {
             switch (codes[++ip].f)
@@ -182,7 +183,7 @@ namespace sci
                     top = sp - 1;
                     ip = st[sp + 1];
                     sp = st[sp];
-                    if (sp != 0)
+                    if (sp != -1)
                     {
                         continue;
                     }
@@ -399,6 +400,8 @@ namespace sci
 
     void TInterpreter::run()
     {
+        sp = -1;
+
         while (true)
         {
             switch (codes[++ip].f.id)
@@ -516,7 +519,7 @@ namespace sci
                     top = sp - 1;
                     ip = st[sp + 1];
                     sp = st[sp];
-                    if (sp != 0)
+                    if (sp != -1)
                     {
                         continue;
                     }
