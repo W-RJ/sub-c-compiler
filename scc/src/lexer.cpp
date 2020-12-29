@@ -388,7 +388,20 @@ namespace scc
                     ch = fgetc(fp);
 
                 } while (isDigit(ch));
-                word.type = WordType::INTCON;
+
+                if (isAlpha(ch))
+                {
+                    word.type = WordType::INTERR;
+                    do
+                    {
+                        ch = fgetc(fp);
+
+                    } while (isDigit(ch) || isAlpha(ch));
+                }
+                else
+                {
+                    word.type = WordType::INTCON;
+                }
             }
             else if (isAlpha(ch))
             {
