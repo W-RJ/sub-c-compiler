@@ -245,11 +245,12 @@ namespace scc
 
         fwrite(&ip, sizeof(int), 1, fp);
 
-        for (auto it : codes)
+        fwrite(&codes[0].code, sizeof(codes[0].code), 1, fp);
+        for (auto it = codes.begin() + 1; it != codes.end(); ++it)
         {
-            if (it.id >= static_cast<int>(optimize))
+            if (it->id >= static_cast<int>(optimize))
             {
-                fwrite(&it.code, sizeof(it.code), 1, fp);
+                fwrite(&it->code, sizeof(it->code), 1, fp);
             }
         }
 
@@ -286,7 +287,7 @@ namespace scc
         fprintf(fp, "%s\n", sci::TPCODE_CODE);
 
         fprintf(fp, "%s %u %d\n", sci::fs[codes[0].code.f >> 3].name, codes[0].code.f & 07, codes[0].code.a);
-        for (auto it = codes.begin() + 1; it != codes.end(); it++)
+        for (auto it = codes.begin() + 1; it != codes.end(); ++it)
         {
             if (it->id >= static_cast<int>(optimize))
             {
