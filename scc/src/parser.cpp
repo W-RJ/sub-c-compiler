@@ -1094,7 +1094,15 @@ namespace scc
                     }
                     else
                     {
-                        globalVector.emplace_back(type, global, globalSize++, size);
+                        globalVector.emplace_back(type, global, globalSize, size);
+                        if (size >= 0)
+                        {
+                            globalSize += size;
+                        }
+                        else
+                        {
+                            globalSize++;
+                        }
                         id = globalVector.size();
 
                         // TODO
