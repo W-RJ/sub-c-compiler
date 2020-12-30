@@ -139,7 +139,7 @@ void Config::set(int argc, char **argv)
     }
     else
     {
-        FILE* fp = popen("which scc", "r");
+        FILE *fp = popen("where scc", "r");
         if (fp != nullptr)
         {
             fgets(buffer, PREFIX_MAX, fp);
@@ -148,7 +148,7 @@ void Config::set(int argc, char **argv)
         p = splitPath(buffer);
         if (p == nullptr)
         {
-            fp = popen("where scc", "r");
+            fp = popen("which scc", "r");
             if (fp != nullptr)
             {
                 fgets(buffer, PREFIX_MAX, fp);
