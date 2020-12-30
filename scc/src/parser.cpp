@@ -2450,8 +2450,14 @@ namespace scc
             if (buffer[h].type == WordType::COMMA)
             {
                 nextWord();
-                expression(lastCode);
-                codes.emplace_back(0100, 14);
+                if (expression(lastCode) == VarType::INT)
+                {
+                    codes.emplace_back(0100, 14);
+                }
+                else
+                {
+                    codes.emplace_back(0100, 19);
+                }
                 codes.back().dependentCodes.push_back(lastCode);
             }
             else
@@ -2462,7 +2468,14 @@ namespace scc
         else if (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
             expression(lastCode);
-            codes.emplace_back(0100, 14);
+            if (expression(lastCode) == VarType::INT)
+            {
+                codes.emplace_back(0100, 14);
+            }
+            else
+            {
+                codes.emplace_back(0100, 19);
+            }
             codes.back().dependentCodes.push_back(lastCode);
         }
         if (buffer[h].type != WordType::RPARENT)
