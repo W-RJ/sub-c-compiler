@@ -2467,7 +2467,6 @@ namespace scc
         }
         else if (EXPRESSION_SELECT[static_cast<unsigned>(buffer[h].type)])
         {
-            expression(lastCode);
             if (expression(lastCode) == VarType::INT)
             {
                 codes.emplace_back(0100, 14);

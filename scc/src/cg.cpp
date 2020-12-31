@@ -40,6 +40,7 @@ RBRACK,//\\]\n\
 LBRACE,//{\n\
 RBRACE,//}\n\
 IDENFR,//[_a-zA-Z][_a-zA-Z0-9]*\n\
+COMMENT,////\n\
 INTERR,//[0-9][_a-zA-Z0-9]*\n\
 CHARERR,//'[ -~]'\n\
 FEOF,\n\

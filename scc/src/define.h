@@ -4,7 +4,7 @@
 #define _SCC_DEFINE_H_
 
 #if !defined(CG) && !defined(NCG)
-#define CG 3
+#define CG 2
 #endif
 
 #if !defined(DEBUG) && !defined(NDEBUG)
