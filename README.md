@@ -4,7 +4,7 @@ Compiler for the Sub C Programing Language defined by CG.
 
 针对希冀平台定义的 Sub C 程序设计语言的编译器。
 
-## Build & Installation & Test | 构建、安装、自测方法
+## Build & Installation & Test | 构建、安装、自动测试方法
 
 ### Linux / macOS
 
@@ -55,14 +55,14 @@ make zip CG=?
 > 若一定要自行打包代码提交，请先使用`make release CG=?`命令（`?`的范围为1～5）编译一次，
 > 然后再打包，并请注意不要将`*.pyc`文件打包进压缩包。
 
-若要执行本程序自带的自我测试脚本，首先确保您已安装`python3`，然后使用如下命令安装`pytest`（如已安装可以跳过）：
+若要执行本程序自带的自动测试脚本，首先确保您已安装`python3`，然后使用如下命令安装`pytest`（如已安装可以跳过）：
 
 ``` bash
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-在某些操作系统中，您可能需要将`python`替换为`python3`。安装`pytest`后，可输入如下命令执行自我测试脚本：
+在某些操作系统中，您可能需要将`python`替换为`python3`。安装`pytest`后，可输入如下命令执行自动测试脚本：
 
 ``` bash
 make test
@@ -102,14 +102,14 @@ mingw32-make release CG=1
 > 若要打包代码提交，请先使用`mingw32-make release CG=?`命令（`?`的范围为1～5）编译一次，
 > 然后再打包，并请注意不要将`*.pyc`文件打包进压缩包。
 
-若要执行本程序自带的自我测试脚本，首先确保您已安装`python3`，然后使用如下命令安装`pytest`（如已安装可以跳过）：
+若要执行本程序自带的自动测试脚本，首先确保您已安装`python3`，然后使用如下命令安装`pytest`（如已安装可以跳过）：
 
 ``` bash
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-安装`pytest`后，可输入如下命令执行自我测试脚本：
+安装`pytest`后，可输入如下命令执行自动测试脚本：
 
 ``` bash
 mingw32-make test
@@ -121,10 +121,10 @@ mingw32-make test
 
 ## Project Structure | 项目结构
 
-目前本项目分为4个子项目，其中在每个子项目中`src`为子项目源码目录，`build`为子项目构建生成的目标文件目录，
+目前本项目分为5个子项目，其中在每个子项目中`src`为子项目源码目录，`build`为子项目构建生成的目标文件目录，
 `test`为子项目的自动测试目录，`Makefile`为子项目的编译脚本。
 
-另外，在本项目根目录中除了4个子项目目录外还有`release`目录（构建生成的最终发布版本的可执行程序目录）、
+另外，在本项目根目录中除了5个子项目目录外还有`release`目录（构建生成的最终发布版本的可执行程序目录）、
 `build`目录（构建生成的目标文件目录）、`test`目录 （整体自动测试目录）、`Makefile`（总编译脚本）。
 
 代码的编译由`Makefile`管理。
@@ -143,14 +143,29 @@ mingw32-make test
 | regexp    | 包含对 **正则表达式** 的词法、语法、语义分析和字典树的生成，支持范型                  |
 | trie      | 包含字典树数据结构，支持范型                                                          |
 | sc.lang   | 包含各词法类型的类型码和正则表达式，支持 **在运行时动态修改**                         |
-| exception | 包含各种异常类，支持不同等级的运行时异常                                              |
 | config    | 包含对各种预定义参数与命令行参数的处理                                                |
 | define    | 包含各种编译选项的宏定义                                                              |
 | cg        | 包含对希冀系统不支持 Makefile 的问题的处理                                            |
 
 ### SCI
 
-是目标代码的解释器部分。
+是目标代码的解释器部分。各源文件的功能如下：
+
+|   源文件    | 主要功能                                                                 |
+| :---------: | ------------------------------------------------------------------------ |
+| imain       | 程序入口，包含对各种命令行参数的处理                                     |
+| interpreter | 包含各个解释器类，包含文本形式的PCODE的解释器和二进制形式的PCODE的解释器 |
+| define      | 包含各种编译选项的宏定义                                                 |
+
+### Common
+
+是公共代码部分。各源文件的功能如下：
+
+|  源文件   | 主要功能                                           |
+| :-------: | -------------------------------------------------- |
+| pcode     | 包含二进制形式的PCODE的定义和文本形式的PCODE的定义 |
+| exception | 包含各种异常类，支持不同等级的运行时异常           |
+| define    | 包含各种编译选项的宏定义                           |
 
 ### IDE
 
@@ -255,3 +270,9 @@ Sub C 程序设计语言的EBNF语法定义如下：
        <writeSt> -> PRINTFTK LPARENT <str> COMMA <expression> RPARENT | PRINTFTK LPARENT <str> RPARENT | PRINTFTK LPARENT <expression> RPARENT
       <returnSt> -> RETURNTK [LPARENT <expression> RPARENT]
 ```
+
+## Author | 作者
+
+编译成功组。
+[@WRJ](https://github.com/W-RJ)
+[@GZ](https://github.com/FaltingsA)
