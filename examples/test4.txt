@@ -1,0 +1,49 @@
+int func3;
+
+int func1()
+{
+}
+
+int func2()
+{
+    return (0);
+}
+
+int func3(int x)
+{
+    if (x > 0)
+        return (x);
+}
+
+int func4(int x)
+{
+    if (x > 0)
+        if (x > 1)
+            return (x);
+        else
+            return (10 * x);
+    else
+        return (-x);
+}
+
+int func5(int x)
+{
+    while (x > 0)
+    {
+        if (x > 0)
+            return (x);
+        else
+            return (-x);
+    }
+}
+
+void main()
+{
+    const char c = '.';
+    char c2;
+    func5();
+    i = c2 + 1;
+    c = c2;
+    func1(0)
+    return (0);
+}
