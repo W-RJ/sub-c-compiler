@@ -283,6 +283,12 @@ namespace sci
                     printf("%s", reinterpret_cast<char*>(st.data() + st[top--]));
                     continue;
 
+                case 19:
+                    putchar(st[top--]);
+                    puts("");
+                    fflush(stdout);
+                    continue;
+
                 default:
                     throw InstructionError("no such instruction", codes[ip].f); // TODO
                 };
@@ -617,6 +623,12 @@ namespace sci
 
                 case 18:
                     printf("%s", reinterpret_cast<char*>(st.data() + st[top--]));
+                    continue;
+
+                case 19:
+                    putchar(st[top--]);
+                    puts("");
+                    fflush(stdout);
                     continue;
 
                 default:

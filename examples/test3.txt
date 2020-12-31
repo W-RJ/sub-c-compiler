@@ -1,0 +1,41 @@
+const char c1='+',c2='-', c3='*',c4='/'; // CHARCON & COMMENT test
+
+int i3, _i_4_;
+
+int func(int x)
+{
+    return
+    (x+1);
+}
+
+void main()
+{
+    const char c1 = '_', c2 = 'a', c3 = 'z',
+            c4 = 'A', c5 = 'Z', c6 = '0', c7 = '9'; // CHARCON test
+    const int i1 = 0, i2 = -1;
+
+    int i3,i5,I6[100];
+    
+    i3 = +2147000000; // INTCON test
+
+    i3 = -2147000000;
+    _i_4_ = 2147000000;
+
+    printf("Hello World");
+
+    printf(func(func(func(func(func(_i_4_))))));
+
+    // STRCON TEST
+    printf(" !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
+
+    printf("expect '+': ", '+');
+
+    for(i5=0;i5<3;i5=i5+1)
+        do
+            if (i3 != 2)
+                scanf(i3);
+            else i3=-0;
+        while (i3 >= 1);
+
+    return;
+}

@@ -31,6 +31,9 @@
 *.out
 *.app
 
+# IDE
+/ide/
+
 # Python
 __pycache__
 .pytest_cache

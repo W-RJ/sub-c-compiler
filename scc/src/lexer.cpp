@@ -117,51 +117,71 @@ namespace scc
     void TrieLexer::nextWord(Word& word)
     {
         assert(fp != nullptr);
-        int p = 0;
-
-        while (ch != static_cast<char>(EOF) && (ch <= ' ' || isspace(ch)))
-        {
-            if (ch == '\n')
-            {
-                ++row;
-            }
-            ch = fgetc(fp);
-        }
-        if (ch == static_cast<char>(EOF))
-        {
-            word.type = WordType::FEOF;
-            return;
-        }
-
-        word.row = row;
 
         while (true)
         {
-            if (ch < lexTrie.KEY_L || ch == static_cast<char>(EOF)) // TODO: merge
-            {
-                break;
-            }
-            else if (ch > lexTrie.KEY_R)
-            {
-                return; // TODO: ERROR
-            }
-            else if (lexTrie.nodes[p].son[ch - lexTrie.KEY_L] == 0)
-            {
-                break;
-            }
-            else
-            {
-                p = lexTrie.nodes[p].son[ch - lexTrie.KEY_L];
-            }
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-        }
+            int p = 0;
 
-        word.type = lexTrie.nodes[p].data;
-        if (word.type == WordType::CHARCON || word.type == WordType::STRCON || word.type == WordType::CHARERR)
-        {
-            word.val.pop_back();
-            word.val = word.val.substr(1);
+            while (ch != static_cast<char>(EOF) && (ch <= ' ' || isspace(ch)))
+            {
+                if (ch == '\n')
+                {
+                    ++row;
+                }
+                ch = fgetc(fp);
+            }
+            if (ch == static_cast<char>(EOF))
+            {
+                word.type = WordType::FEOF;
+                return;
+            }
+
+            word.row = row;
+
+            while (true)
+            {
+                if (ch < lexTrie.KEY_L || ch == static_cast<char>(EOF)) // TODO: merge
+                {
+                    break;
+                }
+                else if (ch > lexTrie.KEY_R)
+                {
+                    return; // TODO: ERROR
+                }
+                else if (lexTrie.nodes[p].son[ch - lexTrie.KEY_L] == 0)
+                {
+                    break;
+                }
+                else
+                {
+                    p = lexTrie.nodes[p].son[ch - lexTrie.KEY_L];
+                }
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+            }
+
+            word.type = lexTrie.nodes[p].data;
+
+            if (word.type == WordType::COMMENT)
+            {
+                while (ch != '\n' && ch != static_cast<char>(EOF))
+                {
+                    ch = fgetc(fp);
+                }
+                ++row;
+                ch = fgetc(fp);
+                word.type = WordType::NONE;
+                word.val.clear();
+                continue;
+            }
+
+            if (word.type == WordType::CHARCON || word.type == WordType::STRCON || word.type == WordType::CHARERR)
+            {
+                word.val.pop_back();
+                word.val = word.val.substr(1);
+            }
+
+            return;
         }
     }
 
@@ -181,212 +201,259 @@ namespace scc
     {
         assert(fp != nullptr);
 
-        while (ch != static_cast<char>(EOF) && (ch <= ' ' || isspace(ch)))
+        while (true)
         {
-            if (ch == '\n')
+            while (ch != static_cast<char>(EOF) && (ch <= ' ' || isspace(ch)))
             {
-                ++row;
-            }
-            ch = fgetc(fp);
-        }
-        if (ch == static_cast<char>(EOF))
-        {
-            word.type = WordType::FEOF;
-            return;
-        }
-
-        word.row = row;
-
-        switch (ch)
-        {
-        case '\'':
-            ch = fgetc(fp);
-            if (!(ch == '+' || ch == '-' || ch == '*' || ch == '/' || isAlpha(ch) || isDigit(ch)))
-            {
-                return; // TODO: ERROR
-            }
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            if (ch != '\'')
-            {
-                return; // TODO: ERROR
-            }
-            ch = fgetc(fp);
-            word.type = WordType::CHARCON;
-            break;
-
-        case '"':
-            while ((ch = fgetc(fp)) != '"')
-            {
-                if (ch < ' ' || ch > static_cast<char>(126) || ch == static_cast<char>(EOF))
+                if (ch == '\n')
                 {
-                    return; // TODO: ERROR
+                    ++row;
                 }
-                word.val.push_back(ch);
-            }
-            ch = fgetc(fp);
-            word.type = WordType::STRCON;
-            break;
-
-        case '+':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::PLUS;
-            break;
-
-        case '-':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::MINU;
-            break;
-
-        case '*':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::MULT;
-            break;
-
-        case '/':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::DIV;
-            break;
-
-        case '<':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            if (ch == '=')
-            {
-                word.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::LEQ;
             }
-            else
+            if (ch == static_cast<char>(EOF))
             {
-                word.type = WordType::LSS;
-            }
-            break;
-
-        case '>':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            if (ch == '=')
-            {
-                word.val.push_back(ch);
-                ch = fgetc(fp);
-                word.type = WordType::GEQ;
-            }
-            else
-            {
-                word.type = WordType::GRE;
-            }
-            break;
-
-        case '=':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            if (ch == '=')
-            {
-                word.val.push_back(ch);
-                ch = fgetc(fp);
-                word.type = WordType::EQL;
-            }
-            else
-            {
-                word.type = WordType::ASSIGN;
-            }
-            break;
-
-        case '!':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            if (ch != '=')
-            {
+                word.type = WordType::FEOF;
                 return;
             }
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::NEQ;
-            break;
 
-        case ';':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::SEMICN;
-            break;
+            word.row = row;
 
-        case ',':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::COMMA;
-            break;
-
-        case '(':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::LPARENT;
-            break;
-
-        case ')':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::RPARENT;
-            break;
-
-        case '[':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::LBRACK;
-            break;
-
-        case ']':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::RBRACK;
-            break;
-
-        case '{':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::LBRACE;
-            break;
-
-        case '}':
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::RBRACE;
-            break;
-
-        case '0': // TODO: ERROR
-            word.val.push_back(ch);
-            ch = fgetc(fp);
-            word.type = WordType::INTCON;
-            break;
-
-        default:
-            if (isDigit(ch))
+            switch (ch)
             {
-                do
+            case '\'':
+                ch = fgetc(fp);
+                if (!(ch == '+' || ch == '-' || ch == '*' || ch == '/' || isAlpha(ch) || isDigit(ch)))
+                {
+                    word.type = WordType::CHARERR;
+                }
+                else
+                {
+                    word.type = WordType::CHARCON;
+                }
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                if (ch != '\'')
+                {
+                    word.type = WordType::NONE;
+                    return; // TODO: ERROR
+                }
+                ch = fgetc(fp);
+                break;
+
+            case '"':
+                while ((ch = fgetc(fp)) != '"')
+                {
+                    if (ch < ' ' || ch > static_cast<char>(126) || ch == static_cast<char>(EOF))
+                    {
+                        return; // TODO: ERROR
+                    }
+                    word.val.push_back(ch);
+                }
+                ch = fgetc(fp);
+                word.type = WordType::STRCON;
+                break;
+
+            case '+':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::PLUS;
+                break;
+
+            case '-':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::MINU;
+                break;
+
+            case '*':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::MULT;
+                break;
+
+            case '/':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                if (ch == '/')
+                {
+                    do
+                    {
+                        ch = fgetc(fp);
+                    } while (ch != '\n' && ch != static_cast<char>(EOF));
+                    ++row;
+                    ch = fgetc(fp);
+                    word.type = WordType::NONE;
+                    word.val.clear();
+                    continue;
+                }
+                word.type = WordType::DIV;
+                break;
+
+            case '<':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                if (ch == '=')
                 {
                     word.val.push_back(ch);
                     ch = fgetc(fp);
-                } while (isDigit(ch));
-                word.type = WordType::INTCON;
-            }
-            else if (isAlpha(ch))
-            {
-                do
+                    word.type = WordType::LEQ;
+                }
+                else
+                {
+                    word.type = WordType::LSS;
+                }
+                break;
+
+            case '>':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                if (ch == '=')
                 {
                     word.val.push_back(ch);
                     ch = fgetc(fp);
-                } while (isAlpha(ch) || isDigit(ch));
-                word.type = lexTrie.get(word.val.c_str());
+                    word.type = WordType::GEQ;
+                }
+                else
+                {
+                    word.type = WordType::GRE;
+                }
+                break;
+
+            case '=':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                if (ch == '=')
+                {
+                    word.val.push_back(ch);
+                    ch = fgetc(fp);
+                    word.type = WordType::EQL;
+                }
+                else
+                {
+                    word.type = WordType::ASSIGN;
+                }
+                break;
+
+            case '!':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                if (ch != '=')
+                {
+                    return;
+                }
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::NEQ;
+                break;
+
+            case ';':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::SEMICN;
+                break;
+
+            case ',':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::COMMA;
+                break;
+
+            case '(':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::LPARENT;
+                break;
+
+            case ')':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::RPARENT;
+                break;
+
+            case '[':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::LBRACK;
+                break;
+
+            case ']':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::RBRACK;
+                break;
+
+            case '{':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::LBRACE;
+                break;
+
+            case '}':
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                word.type = WordType::RBRACE;
+                break;
+
+            case '0': // TODO: ERROR
+                word.val.push_back(ch);
+                ch = fgetc(fp);
+                if (isDigit(ch) || isAlpha(ch))
+                {
+                    word.type = WordType::INTERR;
+                    do
+                    {
+                        ch = fgetc(fp);
+
+                    } while (isDigit(ch) || isAlpha(ch));
+                }
+                else
+                {
+                    word.type = WordType::INTCON;
+                }
+                break;
+
+            default:
+                if (isDigit(ch))
+                {
+                    do
+                    {
+                        word.val.push_back(ch);
+                        ch = fgetc(fp);
+
+                    } while (isDigit(ch));
+
+                    if (isAlpha(ch))
+                    {
+                        word.type = WordType::INTERR;
+                        do
+                        {
+                            ch = fgetc(fp);
+
+                        } while (isDigit(ch) || isAlpha(ch));
+                    }
+                    else
+                    {
+                        word.type = WordType::INTCON;
+                    }
+                }
+                else if (isAlpha(ch))
+                {
+                    do
+                    {
+                        word.val.push_back(ch);
+                        ch = fgetc(fp);
+                    } while (isAlpha(ch) || isDigit(ch));
+                    word.type = lexTrie.get(word.val.c_str());
+                }
+                else
+                {
+                    // TODO: ERROR
+                }
+                break;
             }
-            else
-            {
-                // TODO: ERROR
-            }
-            break;
+
+            return;
         }
     }
 }

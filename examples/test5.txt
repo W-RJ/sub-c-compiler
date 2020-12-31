@@ -1,0 +1,28 @@
+const char cc = 12345;
+
+int a[100];
+
+void func(char c)
+{
+}
+
+void main()
+{
+    int x;
+    a[0=0;
+    scanf(x);
+    if (x > 0
+    {
+        a['-']=x;
+    }
+    x=0;
+    do
+    {
+        x = x + 1;
+        printf(x);
+    }(x<5);
+    if ('a')
+    {
+        func(0);
+    }
+}
