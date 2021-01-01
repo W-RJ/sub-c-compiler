@@ -535,7 +535,7 @@ namespace scc
         return res;
     }
 
-    void Parser::loadElement(Var* var)
+    void Parser::loadElement(Var* var, int exp)
     {
         if (var != nullptr)
         {
@@ -547,6 +547,7 @@ namespace scc
             {
                 codes.emplace_back(0110, var->addr);
             }
+            codes.back().dependentCodes.push_back(exp);
         }
     }
 
@@ -1553,7 +1554,7 @@ namespace scc
                         nextToken();
                     }
 
-                    loadElement(var);
+                    loadElement(var, lastCode);
 
                     lastCode = codes.size() - 1;
                 }

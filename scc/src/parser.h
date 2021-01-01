@@ -174,7 +174,7 @@ namespace scc
 
         int loadVar(Var* var);
 
-        void loadElement(Var* var);
+        void loadElement(Var* var, int exp);
 
         void storeVar(Var* var, VarType type, int exp);
 
