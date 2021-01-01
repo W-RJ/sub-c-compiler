@@ -609,8 +609,8 @@ namespace scc
         for (int i = n - 1; i >= codesH; --i)
         {
             if (codes[i].id == 1
-                || (codes[i].code.f != 0010 && codes[i].code.f != 0020
-                    && codes[i].code.f != 0030 && codes[i].code.f != 0032)
+                || (codes[i].code.f != 0010 && codes[i].code.f != 0020 && codes[i].code.f != 0030
+                    && codes[i].code.f != 0032 && codes[i].code.f != 0100)
                 || (codes[i].code.f == 0100 && (codes[i].code.a < 2 || codes[i].code.a > 5)))
             {
                 codes[i].id = 1;
@@ -620,7 +620,7 @@ namespace scc
         }
         while (!q.empty())
         {
-            tmp = q.front();     
+            tmp = q.front();
 
             for (auto it : codes[tmp].dependentCodes)
             {
