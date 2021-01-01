@@ -79,6 +79,7 @@ namespace scc
     {
         sci::BPcode code;
         int id;
+        short remain;
         bool fork;
 
         int bg;
