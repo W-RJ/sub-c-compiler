@@ -4,6 +4,23 @@ Compiler for the Sub C Programing Language defined by CG.
 
 针对希冀平台定义的 Sub C 程序设计语言的编译器。
 
+## Table of Contents | 目录 <!-- omit in toc -->
+- [Build & Installation & Test | 构建、安装、自动测试方法](#build--installation--test--构建安装自动测试方法)
+  - [Linux / macOS](#linux--macos)
+  - [Windows](#windows)
+- [Project Structure | 项目结构](#project-structure--项目结构)
+  - [Sub C Compiler (SCC)](#sub-c-compiler-scc)
+  - [Sub C Interpreter (SCI)](#sub-c-interpreter-sci)
+  - [Common](#common)
+  - [IDE](#ide)
+  - [Tools](#tools)
+- [Language Definition | 语言定义](#language-definition--语言定义)
+  - [RegExp Definition | 正则表达式定义](#regexp-definition--正则表达式定义)
+  - [Lexical Definition | 词法定义](#lexical-definition--词法定义)
+  - [Grammar definition | 语法定义](#grammar-definition--语法定义)
+- [License | 许可](#license--许可)
+- [Author | 作者](#author--作者)
+
 ## Build & Installation & Test | 构建、安装、自动测试方法
 
 ### Linux / macOS
@@ -121,17 +138,17 @@ mingw32-make test
 
 ## Project Structure | 项目结构
 
-目前本项目分为5个子项目，其中在每个子项目中`src`为子项目源码目录，`build`为子项目构建生成的目标文件目录，
-`test`为子项目的自动测试目录，`Makefile`为子项目的编译脚本。
+目前本项目分为5个模块，其中在每个模块中`src`为模块源码目录，`build`为模块构建生成的目标文件目录，
+`test`为模块的自动测试目录，`Makefile`为模块的编译脚本。
 
-另外，在本项目根目录中除了5个子项目目录外还有`release`目录（构建生成的最终发布版本的可执行程序目录）、
+另外，在本项目根目录中除了5个模块目录外还有`release`目录（构建生成的最终发布版本的可执行程序目录）、
 `build`目录（构建生成的目标文件目录）、`test`目录 （整体自动测试目录）、`Makefile`（总编译脚本）。
 
 代码的编译由`Makefile`管理。
 
-各个子项目如下：
+各个模块如下：
 
-### SCC
+### Sub C Compiler (SCC)
 
 是 Sub C 程序设计语言的编译器部分。各源文件的功能如下：
 
@@ -147,7 +164,7 @@ mingw32-make test
 | define    | 包含各种编译选项的宏定义                                                              |
 | cg        | 包含对希冀系统不支持 Makefile 的问题的处理                                            |
 
-### SCI
+### Sub C Interpreter (SCI)
 
 是目标代码的解释器部分。各源文件的功能如下：
 
