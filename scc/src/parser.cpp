@@ -66,11 +66,11 @@ namespace scc
 
     // struct ExCode
 
-    ExCode::ExCode(unsigned f) : code{f}, id(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    ExCode::ExCode(unsigned f) : code{f}, id(0), remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
     {
     }
 
-    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0), remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
     {
     }
 
@@ -268,7 +268,7 @@ namespace scc
         fwrite(&codes[0].code, sizeof(codes[0].code), 1, fp);
         for (auto it = codes.begin() + 1; it != codes.end(); ++it)
         {
-            if (it->id >= static_cast<int>(optimize))
+            if (it->remain >= static_cast<int>(optimize))
             {
                 fwrite(&it->code, sizeof(it->code), 1, fp);
             }
@@ -309,7 +309,7 @@ namespace scc
         fprintf(fp, "%s %u %d\n", sci::fs[codes[0].code.f >> 3].name, codes[0].code.f & 07, codes[0].code.a);
         for (auto it = codes.begin() + 1; it != codes.end(); ++it)
         {
-            if (it->id >= static_cast<int>(optimize))
+            if (it->remain >= static_cast<int>(optimize))
             {
                 fprintf(fp, "%s %u %d\n", sci::fs[it->code.f >> 3].name, it->code.f & 07, it->code.a);
             }
@@ -481,7 +481,7 @@ namespace scc
                 ExCode& preCode = codes.back();
                 if (var->global)
                 {
-                    if (preCode.code.f == 0031 && preCode.code.a == var->addr && preCode.id >= 0 && !preCode.fork && optimize)
+                    if (preCode.code.f == 0031 && preCode.code.a == var->addr && preCode.remain >= 0 && !preCode.fork && optimize)
                     {
                         preCode.code.f |= 2u;
                     }
@@ -492,11 +492,11 @@ namespace scc
                 }
                 else
                 {
-                    if (preCode.code.f == 0030 && preCode.code.a == var->addr && preCode.id >= 0 && !preCode.fork && optimize)
+                    if (preCode.code.f == 0030 && preCode.code.a == var->addr && preCode.remain >= 0 && !preCode.fork && optimize)
                     {
                         preCode.code.f |= 2u;
                         res = codes.size() - 2;
-                        while (codes[res].code.f == 0032 && codes[res].id >= 0)
+                        while (codes[res].code.f == 0032 && codes[res].remain >= 0)
                         {
                             res--;
                         }
@@ -609,12 +609,12 @@ namespace scc
         memset(vis, false, (n - codesH) * sizeof(bool));
         for (int i = n - 1; i >= codesH; --i)
         {
-            if (codes[i].id == 1
+            if (codes[i].remain == 1
                 || (codes[i].code.f != 0010 && codes[i].code.f != 0020 && codes[i].code.f != 0030
                     && codes[i].code.f != 0032 && codes[i].code.f != 0100)
                 || (codes[i].code.f == 0100 && (codes[i].code.a < 2 || codes[i].code.a > 5)))
             {
-                codes[i].id = 1;
+                codes[i].remain = 1;
                 vis[i - codesH] = true;
                 q.push(i);
             }
@@ -627,7 +627,7 @@ namespace scc
             {
                 if (it != 0 && !vis[it - codesH])
                 {
-                    codes[it].id = 1;
+                    codes[it].remain = 1;
                     vis[it - codesH] = true;
                     q.push(it);
                 }
@@ -658,22 +658,23 @@ namespace scc
         }
         else if (codes[codesH].code.f == 0050)
         {
-            codes[codesH].id = -1;
+            codes[codesH].remain = -1;
         }
 
         n = codes.size();
         for (int i = codesH; i < n; i++)
         {
-            if (codes[i].id >= static_cast<int>(optimize))
+            codes[i].id = ip;
+            if (codes[i].remain >= static_cast<int>(optimize))
             {
-                codes[i].id = ip++;
+                ip++;
             }
             // TODO
         }
 
         for (int i = codesH; i < n; i++)
         {
-            if (codes[i].id >= static_cast<int>(optimize))
+            if (codes[i].remain >= static_cast<int>(optimize))
             {
                 switch (codes[i].code.f)
                 {
@@ -739,7 +740,7 @@ namespace scc
             // TODO: ERROR
         }
         int& id = strTrie.at(buffer[h].val.c_str());
-        if (id == 0)
+        if (id == 0 || !optimize)
         {
             strVector.emplace_back(buffer[h].val, globalSize + strSize);
             id = strVector.size();
@@ -2344,7 +2345,7 @@ namespace scc
             VarType type;
             int lastCode;
             type = expression(lastCode); // TODO: judge
-            codes[lastCode].id = 1;
+            codes[lastCode].remain = 1;
             if (i < n && type != fun.paramTypes[i])
             {
                 printErr(preToken().row, 'e', "the type of 0th parameter mismatches");
@@ -2356,7 +2357,7 @@ namespace scc
                 nextToken();
                 int lastCode;
                 type = expression(lastCode); // TODO: judge
-                codes[lastCode].id = 1;
+                codes[lastCode].remain = 1;
                 if (i < n && type != fun.paramTypes[i])
                 {
                     printErr(preToken().row, 'e', "the type of %dth parameter mismatches", i);
@@ -2552,7 +2553,7 @@ namespace scc
 
             codes.emplace_back(0030, -std::max(static_cast<int>(fun.paramTypes.size()), 1));
             codes.back().dependentCodes.push_back(lastCode);
-            codes.back().id = 1;
+            codes.back().remain = 1;
         }
         else
         {

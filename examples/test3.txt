@@ -21,8 +21,9 @@ void main()
     i3 = -2147000000;
     _i_4_ = 2147000000;
 
-    printf("Hello World");
-
+    {
+        printf("Hello World");
+    }
     printf(func(func(func(func(func(_i_4_))))));
 
     // STRCON TEST
