@@ -24,7 +24,7 @@
 #define _SCC_DEFINE_H_
 
 #if !defined(CG) && !defined(NCG)
-#define CG 1
+#define CG 4
 #endif
 
 #if !defined(DEBUG) && !defined(NDEBUG)

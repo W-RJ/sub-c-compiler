@@ -76,30 +76,30 @@ namespace scc
 
     // class Parser
 
-    bool Parser::EXPRESSION_SELECT[static_cast<unsigned>(WordType::END)] = {false};
-    bool Parser::STATEMENT_SELECT[static_cast<unsigned>(WordType::END)] = {false};
+    bool Parser::EXPRESSION_SELECT[static_cast<unsigned>(TokenType::END)] = {false};
+    bool Parser::STATEMENT_SELECT[static_cast<unsigned>(TokenType::END)] = {false};
 
     bool Parser::hasInited = false;
 
     void Parser::init()
     {
-        EXPRESSION_SELECT[static_cast<unsigned>(WordType::PLUS)] = true;
-        EXPRESSION_SELECT[static_cast<unsigned>(WordType::MINU)] = true;
-        EXPRESSION_SELECT[static_cast<unsigned>(WordType::IDENFR)] = true;
-        EXPRESSION_SELECT[static_cast<unsigned>(WordType::LPARENT)] = true;
-        EXPRESSION_SELECT[static_cast<unsigned>(WordType::INTCON)] = true;
-        EXPRESSION_SELECT[static_cast<unsigned>(WordType::CHARCON)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(TokenType::PLUS)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(TokenType::MINU)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(TokenType::IDENFR)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(TokenType::LPARENT)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(TokenType::INTCON)] = true;
+        EXPRESSION_SELECT[static_cast<unsigned>(TokenType::CHARCON)] = true;
 
-        STATEMENT_SELECT[static_cast<unsigned>(WordType::IFTK)] = true;
-        STATEMENT_SELECT[static_cast<unsigned>(WordType::WHILETK)] = true;
-        STATEMENT_SELECT[static_cast<unsigned>(WordType::DOTK)] = true;
-        STATEMENT_SELECT[static_cast<unsigned>(WordType::FORTK)] = true;
-        STATEMENT_SELECT[static_cast<unsigned>(WordType::LBRACE)] = true;
-        STATEMENT_SELECT[static_cast<unsigned>(WordType::IDENFR)] = true;
-        STATEMENT_SELECT[static_cast<unsigned>(WordType::SCANFTK)] = true;
-        STATEMENT_SELECT[static_cast<unsigned>(WordType::PRINTFTK)] = true;
-        STATEMENT_SELECT[static_cast<unsigned>(WordType::SEMICN)] = true;
-        STATEMENT_SELECT[static_cast<unsigned>(WordType::RETURNTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(TokenType::IFTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(TokenType::WHILETK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(TokenType::DOTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(TokenType::FORTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(TokenType::LBRACE)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(TokenType::IDENFR)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(TokenType::SCANFTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(TokenType::PRINTFTK)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(TokenType::SEMICN)] = true;
+        STATEMENT_SELECT[static_cast<unsigned>(TokenType::RETURNTK)] = true;
     }
 
     Parser::Parser(bool optimize) : lexer(nullptr), h(0), size(0), lexFp(nullptr),
@@ -318,7 +318,7 @@ namespace scc
         fclose(fp);
     }
 
-    void Parser::nextWord(bool accept)
+    void Parser::nextToken(bool accept)
     {
         if (accept && lexFp != nullptr)
         {
@@ -331,22 +331,22 @@ namespace scc
         }
         else
         {
-            buffer[h].type = WordType::NONE;
+            buffer[h].type = TokenType::NONE;
             buffer[h].val.clear();
-            lexer->nextWord(buffer[h]);
-            if (buffer[h].type == WordType::INTERR)
+            lexer->nextToken(buffer[h]);
+            if (buffer[h].type == TokenType::INTERR)
             {
                 printErr(buffer[h].row, 'a', "invalid integer constant '%s'", buffer[h].val.c_str());
-                buffer[h].type = WordType::INTCON;
+                buffer[h].type = TokenType::INTCON;
             }
-            else if (buffer[h].type == WordType::CHARERR)
+            else if (buffer[h].type == TokenType::CHARERR)
             {
                 printErr(buffer[h].row, 'a', "invalid character constant '%c'", buffer[h].val[0]);
-                buffer[h].type = WordType::CHARCON;
+                buffer[h].type = TokenType::CHARCON;
             }
-            else if (buffer[h].type == WordType::NONE)
+            else if (buffer[h].type == TokenType::NONE)
             {
-                printErr(buffer[h].row, 'a', "invalid word '%c'", buffer[h].val.c_str());
+                printErr(buffer[h].row, 'a', "invalid token '%c'", buffer[h].val.c_str());
             }
         }
     }
@@ -357,7 +357,7 @@ namespace scc
         size += n;
     }
 
-    Word& Parser::preWord(unsigned n)
+    Token& Parser::preToken(unsigned n)
     {
         return buffer[(h - n + CACHE_MAX) % CACHE_MAX];
     }
@@ -428,7 +428,7 @@ namespace scc
         }
     }
 
-    void Parser::verifyVar(Var*& var, const Word& word)
+    void Parser::verifyVar(Var*& var, const Token& token)
     {
         if (var != nullptr)
         {
@@ -440,13 +440,13 @@ namespace scc
         }
     }
 
-    void Parser::verifyWritableVar(Var*& var, const Word& word)
+    void Parser::verifyWritableVar(Var*& var, const Token& token)
     {
         if (var != nullptr)
         {
             if (!var->writable)
             {
-                printErr(word.row, 'j', "assignment of read-only variable '%s'", word.val.c_str());
+                printErr(token.row, 'j', "assignment of read-only variable '%s'", token.val.c_str());
                 // TODO: ERROR
                 var = nullptr;
             }
@@ -458,7 +458,7 @@ namespace scc
         }
     }
 
-    void Parser::verifyElement(Var*& var, const Word& word)
+    void Parser::verifyElement(Var*& var, const Token& token)
     {
         if (var != nullptr)
         {
@@ -733,7 +733,7 @@ namespace scc
 
     int RecursiveParser::str()
     {
-        if (buffer[h].type != WordType::STRCON)
+        if (buffer[h].type != TokenType::STRCON)
         {
             // TODO: ERROR
         }
@@ -745,7 +745,7 @@ namespace scc
             strSize += (buffer[h].val.size()) / sizeof(int) + 1;
         }
 
-        nextWord();
+        nextToken();
 
         print("<字符串>\n");
 
@@ -754,47 +754,47 @@ namespace scc
 
     void RecursiveParser::constBlock()
     {
-        if (buffer[h].type != WordType::CONSTTK)
+        if (buffer[h].type != TokenType::CONSTTK)
         {
             // TODO: ERROR
         }
         do
         {
-            nextWord();
+            nextToken();
             constDef();
-            if (buffer[h].type != WordType::SEMICN)
+            if (buffer[h].type != TokenType::SEMICN)
             {
-                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'k', "expect ';' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
 
-        } while (buffer[h].type == WordType::CONSTTK);
+        } while (buffer[h].type == TokenType::CONSTTK);
 
         print("<常量说明>\n");
     }
 
     void RecursiveParser::constDef()
     {
-        if (buffer[h].type == WordType::INTTK)
+        if (buffer[h].type == TokenType::INTTK)
         {
             do
             {
-                nextWord();
-                if (buffer[h].type != WordType::IDENFR)
+                nextToken();
+                if (buffer[h].type != TokenType::IDENFR)
                 {
                     // TODO: ERROR
                 }
                 int idH = h;
-                nextWord();
-                if (buffer[h].type != WordType::ASSIGN)
+                nextToken();
+                if (buffer[h].type != TokenType::ASSIGN)
                 {
                     // TODO: ERROR
                 }
-                nextWord();
+                nextToken();
 
                 int data;
                 try
@@ -847,31 +847,31 @@ namespace scc
                         id = localVector.size();
                     }
                 }
-            } while (buffer[h].type == WordType::COMMA);
+            } while (buffer[h].type == TokenType::COMMA);
         }
-        else if (buffer[h].type == WordType::CHARTK)
+        else if (buffer[h].type == TokenType::CHARTK)
         {
             do
             {
-                nextWord();
-                if (buffer[h].type != WordType::IDENFR)
+                nextToken();
+                if (buffer[h].type != TokenType::IDENFR)
                 {
                     // TODO: ERROR
                 }
                 int idH = h;
-                nextWord();
-                if (buffer[h].type != WordType::ASSIGN)
+                nextToken();
+                if (buffer[h].type != TokenType::ASSIGN)
                 {
                     // TODO: ERROR
                 }
-                nextWord();
-                if (buffer[h].type != WordType::CHARCON)
+                nextToken();
+                if (buffer[h].type != TokenType::CHARCON)
                 {
                     printErr(buffer[idH].row, 'o', "except character constant, not '%s'", buffer[h].val.c_str());
                     // TODO: ERROR
                 }
                 char data = buffer[h].val[0];
-                nextWord();
+                nextToken();
 
                 if (global)
                 {
@@ -914,7 +914,7 @@ namespace scc
                         id = localVector.size();
                     }
                 }
-            } while (buffer[h].type == WordType::COMMA);
+            } while (buffer[h].type == TokenType::COMMA);
         }
         else
         {
@@ -926,17 +926,17 @@ namespace scc
 
     int RecursiveParser::uinteger()
     {
-        if (buffer[h].type != WordType::INTCON)
+        if (buffer[h].type != TokenType::INTCON)
         {
             throw ParsingError("not a uinteger");
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
 
         print("<无符号整数>\n");
         try
         {
-            return std::stoi(preWord().val);
+            return std::stoi(preToken().val);
         }
         catch(const std::invalid_argument& e)
         {
@@ -949,17 +949,17 @@ namespace scc
     {
         int res = 0;
 
-        if (buffer[h].type == WordType::PLUS)
+        if (buffer[h].type == TokenType::PLUS)
         {
-            nextWord();
+            nextToken();
             res = uinteger();
         }
-        else if (buffer[h].type == WordType::MINU)
+        else if (buffer[h].type == TokenType::MINU)
         {
-            nextWord();
+            nextToken();
             res = -uinteger();
         }
-        else if (buffer[h].type == WordType::INTCON)
+        else if (buffer[h].type == TokenType::INTCON)
         {
             res = uinteger();
         }
@@ -977,11 +977,11 @@ namespace scc
     void RecursiveParser::declareHead()
     {
         VarType type = VarType::NONE;
-        if (buffer[h].type == WordType::INTTK)
+        if (buffer[h].type == TokenType::INTTK)
         {
             type = VarType::INT;
         }
-        else if (buffer[h].type == WordType::CHARTK)
+        else if (buffer[h].type == TokenType::CHARTK)
         {
             type = VarType::CHAR;
         }
@@ -990,8 +990,8 @@ namespace scc
             // TODO: ERROR
         }
 
-        nextWord();
-        if (buffer[h].type != WordType::IDENFR)
+        nextToken();
+        if (buffer[h].type != TokenType::IDENFR)
         {
             // TODO: ERROR
         }
@@ -1010,7 +1010,7 @@ namespace scc
         funVector.emplace_back(type, ip);
         id = funVector.size();
 
-        nextWord();
+        nextToken();
 
         print("<声明头部>\n");
     }
@@ -1020,27 +1020,27 @@ namespace scc
         while (true)
         {
             varDef();
-            if (buffer[h].type != WordType::SEMICN)
+            if (buffer[h].type != TokenType::SEMICN)
             {
-                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'k', "expect ';' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
-            if (buffer[h].type != WordType::INTTK && buffer[h].type != WordType::CHARTK)
+            if (buffer[h].type != TokenType::INTTK && buffer[h].type != TokenType::CHARTK)
             {
                 break;
             }
-            nextWord(false);
-            if (buffer[h].type != WordType::IDENFR)
+            nextToken(false);
+            if (buffer[h].type != TokenType::IDENFR)
             {
                 rollback(1);
                 break;
             }
-            nextWord(false);
-            if (buffer[h].type != WordType::LBRACK && buffer[h].type != WordType::COMMA && buffer[h].type != WordType::SEMICN)
+            nextToken(false);
+            if (buffer[h].type != TokenType::LBRACK && buffer[h].type != TokenType::COMMA && buffer[h].type != TokenType::SEMICN)
             {
                 rollback(2);
                 break;
@@ -1054,11 +1054,11 @@ namespace scc
     void RecursiveParser::varDef()
     {
         VarType type = VarType::NONE;
-        if (buffer[h].type == WordType::INTTK)
+        if (buffer[h].type == TokenType::INTTK)
         {
             type = VarType::INT;
         }
-        else if (buffer[h].type == WordType::CHARTK)
+        else if (buffer[h].type == TokenType::CHARTK)
         {
             type = VarType::CHAR;
         }
@@ -1068,30 +1068,30 @@ namespace scc
         }
         do
         {
-            nextWord();
-            if (buffer[h].type != WordType::IDENFR)
+            nextToken();
+            if (buffer[h].type != TokenType::IDENFR)
             {
                 // TODO: ERROR
             }
             int idH = h;
             int size = Var::SINGLE;
-            nextWord();
-            if (buffer[h].type == WordType::LBRACK)
+            nextToken();
+            if (buffer[h].type == TokenType::LBRACK)
             {
-                nextWord();
+                nextToken();
                 size = uinteger();
                 if (size == 0)
                 {
                     // TODO: ERROR
                 }
-                if (buffer[h].type != WordType::RBRACK)
+                if (buffer[h].type != TokenType::RBRACK)
                 {
-                    printErr(preWord().row, 'm', "except ']' after '%s'", preWord().val.c_str());
+                    printErr(preToken().row, 'm', "except ']' after '%s'", preToken().val.c_str());
                     // TODO: ERROR
                 }
                 else
                 {
-                    nextWord();
+                    nextToken();
                 }
             }
 
@@ -1144,7 +1144,7 @@ namespace scc
                     localVector.emplace_back(type, global, id - 1, size); // TODO
                 }
             }
-        } while (buffer[h].type == WordType::COMMA);
+        } while (buffer[h].type == TokenType::COMMA);
 
         print("<变量定义>\n");
     }
@@ -1154,26 +1154,26 @@ namespace scc
         const int codeH = codes.size();
 
         declareHead();
-        if (buffer[h].type != WordType::LPARENT)
+        if (buffer[h].type != TokenType::LPARENT)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
         param();
-        if (buffer[h].type != WordType::RPARENT)
+        if (buffer[h].type != TokenType::RPARENT)
         {
-            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+            printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
             // TODO: ERROR
         }
         else
         {
-            nextWord();
+            nextToken();
         }
-        if (buffer[h].type != WordType::LBRACE)
+        if (buffer[h].type != TokenType::LBRACE)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
 
         int retStatus = compoundSt();
         if (retStatus == RET_NONE)
@@ -1187,11 +1187,11 @@ namespace scc
             codes.emplace_back(0100, 0);
         }
 
-        if (buffer[h].type != WordType::RBRACE)
+        if (buffer[h].type != TokenType::RBRACE)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
 
         allocAddr(codeH);
 
@@ -1202,12 +1202,12 @@ namespace scc
     {
         const int codeH = codes.size();
 
-        if (buffer[h].type != WordType::VOIDTK)
+        if (buffer[h].type != TokenType::VOIDTK)
         {
             // TODO: ERROR
         }
-        nextWord();
-        if (buffer[h].type != WordType::IDENFR)
+        nextToken();
+        if (buffer[h].type != TokenType::IDENFR)
         {
             // TODO: ERROR
         }
@@ -1226,38 +1226,38 @@ namespace scc
         funVector.emplace_back(VarType::VOID, ip);
         id = funVector.size();
 
-        nextWord();
-        if (buffer[h].type != WordType::LPARENT)
+        nextToken();
+        if (buffer[h].type != TokenType::LPARENT)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
         param();
-        if (buffer[h].type != WordType::RPARENT)
+        if (buffer[h].type != TokenType::RPARENT)
         {
-            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+            printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
             // TODO: ERROR
         }
         else
         {
-            nextWord();
+            nextToken();
         }
-        if (buffer[h].type != WordType::LBRACE)
+        if (buffer[h].type != TokenType::LBRACE)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
 
         if (compoundSt() != RET_ALL)
         {
             codes.emplace_back(0100, 0);
         }
 
-        if (buffer[h].type != WordType::RBRACE)
+        if (buffer[h].type != TokenType::RBRACE)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
 
         allocAddr(codeH);
 
@@ -1268,11 +1268,11 @@ namespace scc
     {
         codes.back().fork = true;
 
-        if (buffer[h].type == WordType::CONSTTK)
+        if (buffer[h].type == TokenType::CONSTTK)
         {
             constBlock();
         }
-        if (buffer[h].type == WordType::INTTK || buffer[h].type == WordType::CHARTK)
+        if (buffer[h].type == TokenType::INTTK || buffer[h].type == TokenType::CHARTK)
         {
             varBlock();
             codes.emplace_back(0050);
@@ -1288,18 +1288,18 @@ namespace scc
     void RecursiveParser::param()
     {
         VarType type = VarType::NONE;
-        if (buffer[h].type == WordType::INTTK)
+        if (buffer[h].type == TokenType::INTTK)
         {
             type = VarType::INT;
         }
-        else if (buffer[h].type == WordType::CHARTK)
+        else if (buffer[h].type == TokenType::CHARTK)
         {
             type = VarType::CHAR;
         }
         if (type != VarType::NONE)
         {
-            nextWord();
-            if (buffer[h].type != WordType::IDENFR)
+            nextToken();
+            if (buffer[h].type != TokenType::IDENFR)
             {
                 // TODO: ERROR
             }
@@ -1312,15 +1312,15 @@ namespace scc
             fun.paramTypes.push_back(type);
             localVector.emplace_back(type);
             *id = localVector.size();
-            nextWord();
-            while (buffer[h].type == WordType::COMMA)
+            nextToken();
+            while (buffer[h].type == TokenType::COMMA)
             {
-                nextWord();
-                if (buffer[h].type == WordType::INTTK)
+                nextToken();
+                if (buffer[h].type == TokenType::INTTK)
                 {
                     type = VarType::INT;
                 }
-                else if (buffer[h].type == WordType::CHARTK)
+                else if (buffer[h].type == TokenType::CHARTK)
                 {
                     type = VarType::CHAR;
                 }
@@ -1329,8 +1329,8 @@ namespace scc
                     type = VarType::NONE;
                     // TODO: ERROR
                 }
-                nextWord();
-                if (buffer[h].type != WordType::IDENFR)
+                nextToken();
+                if (buffer[h].type != TokenType::IDENFR)
                 {
                     // TODO: ERROR
                 }
@@ -1342,7 +1342,7 @@ namespace scc
                 fun.paramTypes.push_back(type);
                 localVector.emplace_back(type);
                 *id = localVector.size();
-                nextWord();
+                nextToken();
             }
             int n = static_cast<int>(localVector.size());
             for (int i = 0; i < n; i++)
@@ -1358,49 +1358,49 @@ namespace scc
     {
         const int codeH = codes.size();
 
-        if (buffer[h].type != WordType::VOIDTK)
+        if (buffer[h].type != TokenType::VOIDTK)
         {
             // TODO: ERROR
         }
-        nextWord();
-        if (buffer[h].type != WordType::MAINTK)
+        nextToken();
+        if (buffer[h].type != TokenType::MAINTK)
         {
             // TODO: ERROR
         }
         funVector.emplace_back(VarType::VOID, ip);
         funTrie.at(buffer[h].val.c_str()) = funVector.size();
         codes[0].code.a = ip;
-        nextWord();
-        if (buffer[h].type != WordType::LPARENT)
+        nextToken();
+        if (buffer[h].type != TokenType::LPARENT)
         {
             // TODO: ERROR
         }
-        nextWord();
-        if (buffer[h].type != WordType::RPARENT)
+        nextToken();
+        if (buffer[h].type != TokenType::RPARENT)
         {
-            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+            printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
             // TODO: ERROR
         }
         else
         {
-            nextWord();
+            nextToken();
         }
-        if (buffer[h].type != WordType::LBRACE)
+        if (buffer[h].type != TokenType::LBRACE)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
 
         if (compoundSt() != RET_ALL)
         {
             codes.emplace_back(0100, 0);
         }
 
-        if (buffer[h].type != WordType::RBRACE)
+        if (buffer[h].type != TokenType::RBRACE)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
 
         allocAddr(codeH);
 
@@ -1413,16 +1413,16 @@ namespace scc
 
         int curCode;
 
-        if (buffer[h].type == WordType::PLUS)
+        if (buffer[h].type == TokenType::PLUS)
         {
-            nextWord();
+            nextToken();
             item(lastCode);
 
             type = VarType::INT;
         }
-        else if (buffer[h].type == WordType::MINU)
+        else if (buffer[h].type == TokenType::MINU)
         {
-            nextWord();
+            nextToken();
             item(lastCode);
             codes.emplace_back(0100, 1);
             codes.back().dependentCodes.push_back(lastCode);
@@ -1437,9 +1437,9 @@ namespace scc
 
         while (true)
         {
-            if (buffer[h].type == WordType::PLUS)
+            if (buffer[h].type == TokenType::PLUS)
             {
-                nextWord();
+                nextToken();
                 item(curCode);
                 codes.emplace_back(0100, 2);
                 codes.back().dependentCodes.push_back(curCode);
@@ -1447,9 +1447,9 @@ namespace scc
 
                 type = VarType::INT;
             }
-            else if (buffer[h].type == WordType::MINU)
+            else if (buffer[h].type == TokenType::MINU)
             {
-                nextWord();
+                nextToken();
                 item(curCode);
                 codes.emplace_back(0100, 3);
                 codes.back().dependentCodes.push_back(curCode);
@@ -1476,11 +1476,11 @@ namespace scc
 
         int curCode;
 
-        while (buffer[h].type == WordType::MULT || buffer[h].type == WordType::DIV)
+        while (buffer[h].type == TokenType::MULT || buffer[h].type == TokenType::DIV)
         {
-            if (buffer[h].type == WordType::MULT)
+            if (buffer[h].type == TokenType::MULT)
             {
-                nextWord();
+                nextToken();
                 factor(curCode);
                 codes.emplace_back(0100, 4);
                 codes.back().dependentCodes.push_back(curCode);
@@ -1488,9 +1488,9 @@ namespace scc
 
                 type = VarType::INT;
             }
-            else if (buffer[h].type == WordType::DIV)
+            else if (buffer[h].type == TokenType::DIV)
             {
-                nextWord();
+                nextToken();
                 factor(curCode);
                 codes.emplace_back(0100, 5);
                 codes.back().dependentCodes.push_back(curCode);
@@ -1517,9 +1517,9 @@ namespace scc
 
         switch (buffer[h].type)
         {
-        case WordType::IDENFR:
-            nextWord(false);
-            if (buffer[h].type == WordType::LPARENT)
+        case TokenType::IDENFR:
+            nextToken(false);
+            if (buffer[h].type == TokenType::LPARENT)
             {
                 rollback(1);
                 type = funCall();
@@ -1532,25 +1532,25 @@ namespace scc
                 Var* var;
                 findVar(var);
 
-                nextWord();
-                if (buffer[h].type == WordType::LBRACK)
+                nextToken();
+                if (buffer[h].type == TokenType::LBRACK)
                 {
-                    verifyElement(var, preWord());
-                    nextWord();
+                    verifyElement(var, preToken());
+                    nextToken();
 
                     if (expression(lastCode) != VarType::INT)
                     {
-                        printErr(preWord().row, 'i', "invalid type for array subscript");
+                        printErr(preToken().row, 'i', "invalid type for array subscript");
                     }
 
-                    if (buffer[h].type != WordType::RBRACK)
+                    if (buffer[h].type != TokenType::RBRACK)
                     {
-                        printErr(preWord().row, 'm', "except ']' after '%s'", preWord().val.c_str());
+                        printErr(preToken().row, 'm', "except ']' after '%s'", preToken().val.c_str());
                         // TODO: ERROR
                     }
                     else
                     {
-                        nextWord();
+                        nextToken();
                     }
 
                     loadElement(var);
@@ -1559,7 +1559,7 @@ namespace scc
                 }
                 else
                 {
-                    verifyVar(var, preWord());
+                    verifyVar(var, preToken());
                     lastCode = loadVar(var);
                 }
 
@@ -1570,31 +1570,31 @@ namespace scc
             }
             break;
 
-        case WordType::LPARENT:
-            nextWord();
+        case TokenType::LPARENT:
+            nextToken();
             expression(lastCode);
-            if (buffer[h].type != WordType::RPARENT)
+            if (buffer[h].type != TokenType::RPARENT)
             {
-                printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
             break;
 
-        case WordType::PLUS:
-        case WordType::MINU:
-        case WordType::INTCON:
+        case TokenType::PLUS:
+        case TokenType::MINU:
+        case TokenType::INTCON:
             codes.emplace_back(0010, integer());
             lastCode = codes.size() - 1;
             break;
 
-        case WordType::CHARCON:
+        case TokenType::CHARCON:
             codes.emplace_back(0010, static_cast<int>(buffer[h].val[0]));
             lastCode = codes.size() - 1;
-            nextWord();
+            nextToken();
             type = VarType::CHAR;
             break;
 
@@ -1614,29 +1614,29 @@ namespace scc
 
         switch (buffer[h].type)
         {
-        case WordType::IFTK:
+        case TokenType::IFTK:
             retStatus = conditionSt();
             break;
 
-        case WordType::WHILETK:
-        case WordType::DOTK:
-        case WordType::FORTK:
+        case TokenType::WHILETK:
+        case TokenType::DOTK:
+        case TokenType::FORTK:
             retStatus = loopSt();
             break;
 
-        case WordType::LBRACE:
-            nextWord();
+        case TokenType::LBRACE:
+            nextToken();
             retStatus = statementBlock();
-            if (buffer[h].type != WordType::RBRACE)
+            if (buffer[h].type != TokenType::RBRACE)
             {
                 // TODO: ERROR
             }
-            nextWord();
+            nextToken();
             break;
 
-        case WordType::IDENFR:
-            nextWord(false);
-            if (buffer[h].type == WordType::ASSIGN || buffer[h].type == WordType::LBRACK)
+        case TokenType::IDENFR:
+            nextToken(false);
+            if (buffer[h].type == TokenType::ASSIGN || buffer[h].type == TokenType::LBRACK)
             {
                 rollback(1);
                 assignSt();
@@ -1659,57 +1659,57 @@ namespace scc
                     funCall(false);
                 }
             }
-            if (buffer[h].type != WordType::SEMICN)
+            if (buffer[h].type != TokenType::SEMICN)
             {
-                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'k', "expect ';' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
             break;
 
-        case WordType::SCANFTK:
+        case TokenType::SCANFTK:
             readSt();
-            if (buffer[h].type != WordType::SEMICN)
+            if (buffer[h].type != TokenType::SEMICN)
             {
-                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'k', "expect ';' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
             break;
 
-        case WordType::PRINTFTK:
+        case TokenType::PRINTFTK:
             writeSt();
-            if (buffer[h].type != WordType::SEMICN)
+            if (buffer[h].type != TokenType::SEMICN)
             {
-                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'k', "expect ';' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
             break;
 
-        case WordType::SEMICN:
-            nextWord();
+        case TokenType::SEMICN:
+            nextToken();
             break;
 
-        case WordType::RETURNTK:
+        case TokenType::RETURNTK:
             returnSt();
-            if (buffer[h].type != WordType::SEMICN)
+            if (buffer[h].type != TokenType::SEMICN)
             {
-                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'k', "expect ';' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
             retStatus = RET_ALL;
             break;
@@ -1725,7 +1725,7 @@ namespace scc
 
     void RecursiveParser::assignSt()
     {
-        if (buffer[h].type != WordType::IDENFR)
+        if (buffer[h].type != TokenType::IDENFR)
         {
             // TODO: ERROR
         }
@@ -1733,44 +1733,44 @@ namespace scc
         Var* var;
         findVar(var);
 
-        nextWord();
-        if (buffer[h].type == WordType::ASSIGN)
+        nextToken();
+        if (buffer[h].type == TokenType::ASSIGN)
         {
-            verifyWritableVar(var, preWord());
+            verifyWritableVar(var, preToken());
 
-            nextWord();
+            nextToken();
 
             int lastCode;
             VarType type = expression(lastCode);
             storeVar(var, type, lastCode);
         }
-        else if (buffer[h].type == WordType::LBRACK)
+        else if (buffer[h].type == TokenType::LBRACK)
         {
-            verifyElement(var, preWord());
+            verifyElement(var, preToken());
 
-            nextWord();
+            nextToken();
 
             int exp1, exp2;
 
             if (expression(exp1) != VarType::INT)
             {
-                printErr(preWord().row, 'i', "invalid type for array subscript");
+                printErr(preToken().row, 'i', "invalid type for array subscript");
             }
 
-            if (buffer[h].type != WordType::RBRACK)
+            if (buffer[h].type != TokenType::RBRACK)
             {
-                printErr(preWord().row, 'm', "except ']' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'm', "except ']' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
-            if (buffer[h].type != WordType::ASSIGN)
+            if (buffer[h].type != TokenType::ASSIGN)
             {
                 // TODO: ERROR
             }
-            nextWord();
+            nextToken();
 
             VarType type = expression(exp2);
             storeElement(var, type, exp1, exp2);
@@ -1787,25 +1787,25 @@ namespace scc
     {
         int retStatus1, retStatus;
 
-        if (buffer[h].type != WordType::IFTK)
+        if (buffer[h].type != TokenType::IFTK)
         {
             // TODO: ERROR
         }
-        nextWord();
-        if (buffer[h].type != WordType::LPARENT)
+        nextToken();
+        if (buffer[h].type != TokenType::LPARENT)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
         int lastCode = condition();
-        if (buffer[h].type != WordType::RPARENT)
+        if (buffer[h].type != TokenType::RPARENT)
         {
-            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+            printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
             // TODO: ERROR
         }
         else
         {
-            nextWord();
+            nextToken();
         }
 
         int jpcIp = codes.size();
@@ -1825,13 +1825,13 @@ namespace scc
 
         codes.back().fork = true;
 
-        if (buffer[h].type == WordType::ELSETK)
+        if (buffer[h].type == TokenType::ELSETK)
         {
             int jmpIp = codes.size();
             codes.emplace_back(0060);
             codes[jpcIp].code.a = codes.size();
 
-            nextWord();
+            nextToken();
 
             int preLoopCode = loopCode;
             loopCode = codes.size();
@@ -1871,13 +1871,13 @@ namespace scc
 
         if (expression(lastCode) != VarType::INT)
         {
-            printErr(preWord().row, 'f', "invalid type for condition");
+            printErr(preToken().row, 'f', "invalid type for condition");
         }
 
         switch (buffer[h].type)
         {
-        case WordType::LSS:
-            nextWord();
+        case TokenType::LSS:
+            nextToken();
             type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 11 : 8);
             codes.back().dependentCodes.push_back(curCode);
@@ -1885,8 +1885,8 @@ namespace scc
             lastCode = codes.size() - 1;
             break;
 
-        case WordType::LEQ:
-            nextWord();
+        case TokenType::LEQ:
+            nextToken();
             type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 10 : 9);
             codes.back().dependentCodes.push_back(curCode);
@@ -1894,8 +1894,8 @@ namespace scc
             lastCode = codes.size() - 1;
             break;
 
-        case WordType::GRE:
-            nextWord();
+        case TokenType::GRE:
+            nextToken();
             type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 9 : 10);
             codes.back().dependentCodes.push_back(curCode);
@@ -1903,8 +1903,8 @@ namespace scc
             lastCode = codes.size() - 1;
             break;
 
-        case WordType::GEQ:
-            nextWord();
+        case TokenType::GEQ:
+            nextToken();
             type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 8 : 11);
             codes.back().dependentCodes.push_back(curCode);
@@ -1912,8 +1912,8 @@ namespace scc
             lastCode = codes.size() - 1;
             break;
 
-        case WordType::EQL:
-            nextWord();
+        case TokenType::EQL:
+            nextToken();
             type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 13 : 12);
             codes.back().dependentCodes.push_back(curCode);
@@ -1921,8 +1921,8 @@ namespace scc
             lastCode = codes.size() - 1;
             break;
 
-        case WordType::NEQ:
-            nextWord();
+        case TokenType::NEQ:
+            nextToken();
             type = expression(curCode);
             codes.emplace_back(0100, inv && optimize ? 12 : 13);
             codes.back().dependentCodes.push_back(curCode);
@@ -1951,7 +1951,7 @@ namespace scc
 
         if (type != VarType::INT)
         {
-            printErr(preWord().row, 'f', "invalid type for condition");
+            printErr(preToken().row, 'f', "invalid type for condition");
         }
 
         print("<条件>\n");
@@ -1963,16 +1963,16 @@ namespace scc
     {
         int retStatus = RET_NONE;
 
-        if (buffer[h].type == WordType::WHILETK)
+        if (buffer[h].type == TokenType::WHILETK)
         {
             codes.back().fork = true;
 
-            nextWord();
-            if (buffer[h].type != WordType::LPARENT)
+            nextToken();
+            if (buffer[h].type != TokenType::LPARENT)
             {
                 // TODO: ERROR
             }
-            nextWord();
+            nextToken();
 
             int conditionIp = codes.size();
             int preLoopCode = loopCode;
@@ -1981,14 +1981,14 @@ namespace scc
             beginLoop();
 
             int lastCode = condition();
-            if (buffer[h].type != WordType::RPARENT)
+            if (buffer[h].type != TokenType::RPARENT)
             {
-                printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
 
             int jpcIp = codes.size();
@@ -2008,7 +2008,7 @@ namespace scc
             --loopLevel;
 
         }
-        else if (buffer[h].type == WordType::DOTK)
+        else if (buffer[h].type == TokenType::DOTK)
         {
             int doIp = codes.size();
             int preLoopCode = loopCode;
@@ -2018,31 +2018,31 @@ namespace scc
 
             codes.back().fork = true;
 
-            nextWord();
+            nextToken();
             retStatus = statement();
-            if (buffer[h].type != WordType::WHILETK)
+            if (buffer[h].type != TokenType::WHILETK)
             {
                 printErr(buffer[h].row, 'n', "except 'while' before '%s'", buffer[h].val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
-            if (buffer[h].type != WordType::LPARENT)
+            if (buffer[h].type != TokenType::LPARENT)
             {
                 // TODO: ERROR
             }
-            nextWord();
+            nextToken();
             int lastCode = condition(true);
-            if (buffer[h].type != WordType::RPARENT)
+            if (buffer[h].type != TokenType::RPARENT)
             {
-                printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
 
             codes.emplace_back(0070, doIp);
@@ -2053,15 +2053,15 @@ namespace scc
             --loopLevel;
 
         }
-        else if (buffer[h].type == WordType::FORTK)
+        else if (buffer[h].type == TokenType::FORTK)
         {
-            nextWord();
-            if (buffer[h].type != WordType::LPARENT)
+            nextToken();
+            if (buffer[h].type != TokenType::LPARENT)
             {
                 // TODO: ERROR
             }
-            nextWord();
-            if (buffer[h].type != WordType::IDENFR)
+            nextToken();
+            if (buffer[h].type != TokenType::IDENFR)
             {
                 // TODO: ERROR
             }
@@ -2070,12 +2070,12 @@ namespace scc
             findVar(var);
             verifyWritableVar(var, buffer[h]);
 
-            nextWord();
-            if (buffer[h].type != WordType::ASSIGN)
+            nextToken();
+            if (buffer[h].type != TokenType::ASSIGN)
             {
                 // TODO: ERROR
             }
-            nextWord();
+            nextToken();
 
             int lastCode;
             VarType type = expression(lastCode);
@@ -2083,14 +2083,14 @@ namespace scc
 
             codes.back().fork = true;
 
-            if (buffer[h].type != WordType::SEMICN)
+            if (buffer[h].type != TokenType::SEMICN)
             {
-                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'k', "expect ';' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
 
             int conditionIp = codes.size();
@@ -2100,21 +2100,21 @@ namespace scc
             beginLoop();
 
             lastCode = condition();
-            if (buffer[h].type != WordType::SEMICN)
+            if (buffer[h].type != TokenType::SEMICN)
             {
-                printErr(preWord().row, 'k', "expect ';' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'k', "expect ';' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
 
             int jpcIp = codes.size();
             codes.emplace_back(0070);
             codes.back().dependentCodes.push_back(lastCode);
 
-            if (buffer[h].type != WordType::IDENFR)
+            if (buffer[h].type != TokenType::IDENFR)
             {
                 // TODO: ERROR
             }
@@ -2122,13 +2122,13 @@ namespace scc
             findVar(var);
             verifyWritableVar(var, buffer[h]);
 
-            nextWord();
-            if (buffer[h].type != WordType::ASSIGN)
+            nextToken();
+            if (buffer[h].type != TokenType::ASSIGN)
             {
                 // TODO: ERROR
             }
-            nextWord();
-            if (buffer[h].type != WordType::IDENFR)
+            nextToken();
+            if (buffer[h].type != TokenType::IDENFR)
             {
                 // TODO: ERROR
             }
@@ -2141,29 +2141,29 @@ namespace scc
             bool plus = true;
             int st;
 
-            nextWord();
-            if (buffer[h].type == WordType::PLUS)
+            nextToken();
+            if (buffer[h].type == TokenType::PLUS)
             {
-                nextWord();
+                nextToken();
             }
-            else if (buffer[h].type == WordType::MINU)
+            else if (buffer[h].type == TokenType::MINU)
             {
                 plus = false;
-                nextWord();
+                nextToken();
             }
             else
             {
                 // TODO: ERROR
             }
             st = step();
-            if (buffer[h].type != WordType::RPARENT)
+            if (buffer[h].type != TokenType::RPARENT)
             {
-                printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
 
             retStatus = statement() & 1;
@@ -2218,7 +2218,7 @@ namespace scc
 
     VarType RecursiveParser::funCall(bool remain)
     {
-        if (buffer[h].type != WordType::IDENFR)
+        if (buffer[h].type != TokenType::IDENFR)
         {
             // TODO: ERROR
         }
@@ -2239,21 +2239,21 @@ namespace scc
             // TODO: ERROR
         }
 
-        nextWord();
-        if (buffer[h].type != WordType::LPARENT)
+        nextToken();
+        if (buffer[h].type != TokenType::LPARENT)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
         paramVal(fun);
-        if (buffer[h].type != WordType::RPARENT)
+        if (buffer[h].type != TokenType::RPARENT)
         {
-            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+            printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
             // TODO: ERROR
         }
         else
         {
-            nextWord();
+            nextToken();
         }
 
         int&& paramCnt = fun.paramTypes.size();
@@ -2285,7 +2285,7 @@ namespace scc
 
     void RecursiveParser::voidFunCall()
     {
-        if (buffer[h].type != WordType::IDENFR)
+        if (buffer[h].type != TokenType::IDENFR)
         {
             // TODO: ERROR
         }
@@ -2306,21 +2306,21 @@ namespace scc
             // TODO: ERROR
         }
 
-        nextWord();
-        if (buffer[h].type != WordType::LPARENT)
+        nextToken();
+        if (buffer[h].type != TokenType::LPARENT)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
         paramVal(fun);
-        if (buffer[h].type != WordType::RPARENT)
+        if (buffer[h].type != TokenType::RPARENT)
         {
-            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+            printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
             // TODO: ERROR
         }
         else
         {
-            nextWord();
+            nextToken();
         }
 
         codes.emplace_back(0040, fun.addr);
@@ -2346,19 +2346,19 @@ namespace scc
             codes[lastCode].id = 1;
             if (i < n && type != fun.paramTypes[i])
             {
-                printErr(preWord().row, 'e', "the type of 0th parameter mismatches");
+                printErr(preToken().row, 'e', "the type of 0th parameter mismatches");
             }
             ++i;
 
-            while (buffer[h].type == WordType::COMMA)
+            while (buffer[h].type == TokenType::COMMA)
             {
-                nextWord();
+                nextToken();
                 int lastCode;
                 type = expression(lastCode); // TODO: judge
                 codes[lastCode].id = 1;
                 if (i < n && type != fun.paramTypes[i])
                 {
-                    printErr(preWord().row, 'e', "the type of %dth parameter mismatches", i);
+                    printErr(preToken().row, 'e', "the type of %dth parameter mismatches", i);
                 }
                 ++i;
             }
@@ -2396,19 +2396,19 @@ namespace scc
     void RecursiveParser::readSt()
     {
         Var* var;
-        if (buffer[h].type != WordType::SCANFTK)
+        if (buffer[h].type != TokenType::SCANFTK)
         {
             // TODO: ERROR
         }
-        nextWord();
-        if (buffer[h].type != WordType::LPARENT)
+        nextToken();
+        if (buffer[h].type != TokenType::LPARENT)
         {
             // TODO: ERROR
         }
         do
         {
-            nextWord();
-            if (buffer[h].type != WordType::IDENFR)
+            nextToken();
+            if (buffer[h].type != TokenType::IDENFR)
             {
                 // TODO: ERROR
             }
@@ -2430,18 +2430,18 @@ namespace scc
                 storeVar(var, var->type, codes.size() - 1);
             }
 
-            nextWord();
+            nextToken();
 
-        } while (buffer[h].type == WordType::COMMA);
+        } while (buffer[h].type == TokenType::COMMA);
 
-        if (buffer[h].type != WordType::RPARENT)
+        if (buffer[h].type != TokenType::RPARENT)
         {
-            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+            printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
             // TODO: ERROR
         }
         else
         {
-            nextWord();
+            nextToken();
         }
 
         print("<读语句>\n");
@@ -2449,27 +2449,27 @@ namespace scc
 
     void RecursiveParser::writeSt()
     {
-        if (buffer[h].type != WordType::PRINTFTK)
+        if (buffer[h].type != TokenType::PRINTFTK)
         {
             // TODO: ERROR
         }
-        nextWord();
-        if (buffer[h].type != WordType::LPARENT)
+        nextToken();
+        if (buffer[h].type != TokenType::LPARENT)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
 
         int lastCode;
 
-        if (buffer[h].type == WordType::STRCON)
+        if (buffer[h].type == TokenType::STRCON)
         {
             codes.emplace_back(0010, str());
             codes.emplace_back(0100, 18);
             codes.back().dependentCodes.push_back(codes.size() - 2);
-            if (buffer[h].type == WordType::COMMA)
+            if (buffer[h].type == TokenType::COMMA)
             {
-                nextWord();
+                nextToken();
                 if (expression(lastCode) == VarType::INT)
                 {
                     codes.emplace_back(0100, 14);
@@ -2497,14 +2497,14 @@ namespace scc
             }
             codes.back().dependentCodes.push_back(lastCode);
         }
-        if (buffer[h].type != WordType::RPARENT)
+        if (buffer[h].type != TokenType::RPARENT)
         {
-            printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+            printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
             // TODO: ERROR
         }
         else
         {
-            nextWord();
+            nextToken();
         }
 
         print("<写语句>\n");
@@ -2512,17 +2512,17 @@ namespace scc
 
     void RecursiveParser::returnSt()
     {
-        if (buffer[h].type != WordType::RETURNTK)
+        if (buffer[h].type != TokenType::RETURNTK)
         {
             // TODO: ERROR
         }
-        nextWord();
+        nextToken();
 
         const Fun& fun = funVector.back();
 
-        if (buffer[h].type == WordType::LPARENT)
+        if (buffer[h].type == TokenType::LPARENT)
         {
-            nextWord();
+            nextToken();
 
             int lastCode;
 
@@ -2537,14 +2537,14 @@ namespace scc
                     printErr(buffer[h].row, 'h', "the type of return value mismatches");
                 }
             }
-            if (buffer[h].type != WordType::RPARENT)
+            if (buffer[h].type != TokenType::RPARENT)
             {
-                printErr(preWord().row, 'l', "except ')' after '%s'", preWord().val.c_str());
+                printErr(preToken().row, 'l', "except ')' after '%s'", preToken().val.c_str());
                 // TODO: ERROR
             }
             else
             {
-                nextWord();
+                nextToken();
             }
 
             // TODO: judge
@@ -2573,24 +2573,24 @@ namespace scc
 
         global = true;
 
-        nextWord(false);
+        nextToken(false);
 
-        if (buffer[h].type == WordType::CONSTTK)
+        if (buffer[h].type == TokenType::CONSTTK)
         {
             constBlock();
         }
 
-        if (buffer[h].type == WordType::INTTK || buffer[h].type == WordType::CHARTK)
+        if (buffer[h].type == TokenType::INTTK || buffer[h].type == TokenType::CHARTK)
         {
-            nextWord(false);
-            if (buffer[h].type != WordType::IDENFR)
+            nextToken(false);
+            if (buffer[h].type != TokenType::IDENFR)
             {
                 rollback(1);
             }
             else
             {
-                nextWord(false);
-                if (buffer[h].type != WordType::LBRACK && buffer[h].type != WordType::COMMA && buffer[h].type != WordType::SEMICN)
+                nextToken(false);
+                if (buffer[h].type != TokenType::LBRACK && buffer[h].type != TokenType::COMMA && buffer[h].type != TokenType::SEMICN)
                 {
                     rollback(2);
                 }
@@ -2611,14 +2611,14 @@ namespace scc
         {
             localTrie.clear();
             localVector.clear();
-            if (buffer[h].type == WordType::INTTK || buffer[h].type == WordType::CHARTK)
+            if (buffer[h].type == TokenType::INTTK || buffer[h].type == TokenType::CHARTK)
             {
                 funDef();
             }
-            else if (buffer[h].type == WordType::VOIDTK)
+            else if (buffer[h].type == TokenType::VOIDTK)
             {
-                nextWord(false);
-                if (buffer[h].type != WordType::IDENFR)
+                nextToken(false);
+                if (buffer[h].type != TokenType::IDENFR)
                 {
                     rollback(1);
                     break;

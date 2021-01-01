@@ -30,19 +30,19 @@
 
 namespace scc
 {
-    enum class WordType
+    enum class TokenType
     {
         #include "sc.lang"
     };
 
-    extern char typeName[static_cast<unsigned>(WordType::END)][TYPE_NAME_MAX];
+    extern char typeName[static_cast<unsigned>(TokenType::END)][TYPE_NAME_MAX];
 
-    extern Trie<WordType> lexTrie;
+    extern Trie<TokenType> lexTrie;
 
-    struct Word
+    struct Token
     {
         int row;
-        WordType type = WordType::NONE;
+        TokenType type = TokenType::NONE;
         std::string val;
     };
 
@@ -87,11 +87,11 @@ namespace scc
         const char* getFileName();
 
         /**
-         * Get next word
+         * Get next token
          * 
-         * @param word: next word. type == WordType::NONE if fail
+         * @param token: next token. type == TokenType::NONE if fail
          */
-        virtual void nextWord(Word& word) = 0; // NOTE
+        virtual void nextToken(Token& token) = 0; // NOTE
 
     };
 
@@ -101,7 +101,7 @@ namespace scc
     class TrieLexer : public Lexer
     {
     public:
-        virtual void nextWord(Word& word) override;
+        virtual void nextToken(Token& token) override;
     };
 
     /**
@@ -117,7 +117,7 @@ namespace scc
 
     public:
 
-        virtual void nextWord(Word& word) override;
+        virtual void nextToken(Token& token) override;
 
     };
 }

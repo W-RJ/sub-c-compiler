@@ -27,28 +27,28 @@ build = build
 # t2str[.exe]
 ifeq ($(OS),Windows_NT)
     t2str = $(build)/t2str.exe
-    word2input = $(build)/word2input.exe
+    token2input = $(build)/token2input.exe
     CXXFLAGS += -D WINDOWS
 else
     t2str = $(build)/t2str
-    word2input = $(build)/word2input
+    token2input = $(build)/token2input
 endif
 
 ## targets
 
 .PHONY : main test all clean
 
-main: $(t2str) $(word2input)
+main: $(t2str) $(token2input)
 
 # make t2str[.exe]
 $(t2str): $(src)/t2str.cpp Makefile
 	mkdir -p $(build)
 	$(CXX) $(CXXFLAGS) -D t2str=main $(src)/t2str.cpp -o $(t2str)
 
-# make word2input[.exe]
-$(word2input): $(src)/word2input.cpp Makefile
+# make token2input[.exe]
+$(token2input): $(src)/token2input.cpp Makefile
 	mkdir -p $(build)
-	$(CXX) $(CXXFLAGS) -D word2input=main $(src)/word2input.cpp -o $(word2input)
+	$(CXX) $(CXXFLAGS) -D token2input=main $(src)/token2input.cpp -o $(token2input)
 
 ## phony targets
 
@@ -56,7 +56,7 @@ test: main
 	# TODO
 
 # clean & rebuild
-all: clean $(t2str) $(word2input)
+all: clean $(t2str) $(token2input)
 
 clean:
-	-rm $(t2str) $(word2input)
+	-rm $(t2str) $(token2input)

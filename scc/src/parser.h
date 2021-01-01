@@ -100,7 +100,7 @@ namespace scc
 
         static const int CACHE_MAX = 8;
 
-        Word buffer[CACHE_MAX];
+        Token buffer[CACHE_MAX];
 
         int h, size;
 
@@ -144,19 +144,19 @@ namespace scc
 
         std::vector<std::pair<std::string, int> > strVector;
 
-        static bool EXPRESSION_SELECT[static_cast<unsigned>(WordType::END)];
+        static bool EXPRESSION_SELECT[static_cast<unsigned>(TokenType::END)];
 
-        static bool STATEMENT_SELECT[static_cast<unsigned>(WordType::END)];
+        static bool STATEMENT_SELECT[static_cast<unsigned>(TokenType::END)];
 
         static bool hasInited;
 
         static void init();
 
-        void nextWord(bool accept = true);
+        void nextToken(bool accept = true);
 
         void rollback(unsigned n);
 
-        Word& preWord(unsigned n = 1);
+        Token& preToken(unsigned n = 1);
 
         void print(const char* name);
 
@@ -166,11 +166,11 @@ namespace scc
 
         void findVar(Var*& var);
 
-        void verifyVar(Var*& var, const Word& word);
+        void verifyVar(Var*& var, const Token& token);
 
-        void verifyWritableVar(Var*& var, const Word& word);
+        void verifyWritableVar(Var*& var, const Token& token);
 
-        void verifyElement(Var*& var, const Word& word);
+        void verifyElement(Var*& var, const Token& token);
 
         int loadVar(Var* var);
 

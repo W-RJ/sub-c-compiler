@@ -48,16 +48,16 @@ void lexerOnly(const Config& config)
         exit(1);
     }
 
-    scc::Word word;
+    scc::Token token;
     if (config.lexFileName == nullptr)
     {
         do
         {
-            word.type = scc::WordType::NONE;
-            word.val.clear();
-            lexer.nextWord(word);
+            token.type = scc::TokenType::NONE;
+            token.val.clear();
+            lexer.nextToken(token);
         }
-        while (word.type != scc::WordType::FEOF);
+        while (token.type != scc::TokenType::FEOF);
     }
     else
     {
@@ -77,13 +77,13 @@ void lexerOnly(const Config& config)
         }
 
         // Analyze
-        lexer.nextWord(word);
-        while (word.type != scc::WordType::FEOF)
+        lexer.nextToken(token);
+        while (token.type != scc::TokenType::FEOF)
         {
-            fprintf(fp, "%s %s\n", scc::typeName[static_cast<unsigned>(word.type)], word.val.c_str());
-            word.type = scc::WordType::NONE;
-            word.val.clear();
-            lexer.nextWord(word);
+            fprintf(fp, "%s %s\n", scc::typeName[static_cast<unsigned>(token.type)], token.val.c_str());
+            token.type = scc::TokenType::NONE;
+            token.val.clear();
+            lexer.nextToken(token);
         }
 
         fclose(fp);

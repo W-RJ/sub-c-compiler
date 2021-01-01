@@ -34,9 +34,9 @@
 
 namespace scc
 {
-    char typeName[static_cast<unsigned>(WordType::END)][TYPE_NAME_MAX] = {{'\0'}};
+    char typeName[static_cast<unsigned>(TokenType::END)][TYPE_NAME_MAX] = {{'\0'}};
 
-    Trie<WordType> lexTrie;
+    Trie<TokenType> lexTrie;
 
     void readLang(const char* fileName, bool buildTrie)
     {
@@ -51,10 +51,10 @@ namespace scc
         {
             throw FileError(fileName, "lang");
         }
-        RegExp<WordType> regExp(lexTrie);
+        RegExp<TokenType> regExp(lexTrie);
         const int BUFFER_MAX = 256;
         char buffer[BUFFER_MAX];
-        int n = static_cast<int>(WordType::END);
+        int n = static_cast<int>(TokenType::END);
         for (int i = 0; i < n; i++)
         {
             fscanf(fp, "%[^,],", typeName[i]);
@@ -66,7 +66,7 @@ namespace scc
                     fgets(buffer, BUFFER_MAX, fp);
                     try
                     {
-                        regExp.analyze(buffer, WordType(i));
+                        regExp.analyze(buffer, TokenType(i));
                     }
                     catch(RegExpError& e)
                     {
@@ -134,7 +134,7 @@ namespace scc
 
     // class TrieLexer
 
-    void TrieLexer::nextWord(Word& word)
+    void TrieLexer::nextToken(Token& token)
     {
         assert(fp != nullptr);
 
@@ -152,11 +152,11 @@ namespace scc
             }
             if (ch == static_cast<char>(EOF))
             {
-                word.type = WordType::FEOF;
+                token.type = TokenType::FEOF;
                 return;
             }
 
-            word.row = row;
+            token.row = row;
 
             while (true)
             {
@@ -176,13 +176,13 @@ namespace scc
                 {
                     p = lexTrie.nodes[p].son[ch - lexTrie.KEY_L];
                 }
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
             }
 
-            word.type = lexTrie.nodes[p].data;
+            token.type = lexTrie.nodes[p].data;
 
-            if (word.type == WordType::COMMENT)
+            if (token.type == TokenType::COMMENT)
             {
                 while (ch != '\n' && ch != static_cast<char>(EOF))
                 {
@@ -190,15 +190,15 @@ namespace scc
                 }
                 ++row;
                 ch = fgetc(fp);
-                word.type = WordType::NONE;
-                word.val.clear();
+                token.type = TokenType::NONE;
+                token.val.clear();
                 continue;
             }
 
-            if (word.type == WordType::CHARCON || word.type == WordType::STRCON || word.type == WordType::CHARERR)
+            if (token.type == TokenType::CHARCON || token.type == TokenType::STRCON || token.type == TokenType::CHARERR)
             {
-                word.val.pop_back();
-                word.val = word.val.substr(1);
+                token.val.pop_back();
+                token.val = token.val.substr(1);
             }
 
             return;
@@ -217,7 +217,7 @@ namespace scc
         return ch >= '0' && ch <= '9';
     }
 
-    void DFALexer::nextWord(Word& word)
+    void DFALexer::nextToken(Token& token)
     {
         assert(fp != nullptr);
 
@@ -233,11 +233,11 @@ namespace scc
             }
             if (ch == static_cast<char>(EOF))
             {
-                word.type = WordType::FEOF;
+                token.type = TokenType::FEOF;
                 return;
             }
 
-            word.row = row;
+            token.row = row;
 
             switch (ch)
             {
@@ -245,17 +245,17 @@ namespace scc
                 ch = fgetc(fp);
                 if (!(ch == '+' || ch == '-' || ch == '*' || ch == '/' || isAlpha(ch) || isDigit(ch)))
                 {
-                    word.type = WordType::CHARERR;
+                    token.type = TokenType::CHARERR;
                 }
                 else
                 {
-                    word.type = WordType::CHARCON;
+                    token.type = TokenType::CHARCON;
                 }
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
                 if (ch != '\'')
                 {
-                    word.type = WordType::NONE;
+                    token.type = TokenType::NONE;
                     return; // TODO: ERROR
                 }
                 ch = fgetc(fp);
@@ -268,32 +268,32 @@ namespace scc
                     {
                         return; // TODO: ERROR
                     }
-                    word.val.push_back(ch);
+                    token.val.push_back(ch);
                 }
                 ch = fgetc(fp);
-                word.type = WordType::STRCON;
+                token.type = TokenType::STRCON;
                 break;
 
             case '+':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::PLUS;
+                token.type = TokenType::PLUS;
                 break;
 
             case '-':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::MINU;
+                token.type = TokenType::MINU;
                 break;
 
             case '*':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::MULT;
+                token.type = TokenType::MULT;
                 break;
 
             case '/':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
                 if (ch == '/')
                 {
@@ -303,124 +303,124 @@ namespace scc
                     } while (ch != '\n' && ch != static_cast<char>(EOF));
                     ++row;
                     ch = fgetc(fp);
-                    word.type = WordType::NONE;
-                    word.val.clear();
+                    token.type = TokenType::NONE;
+                    token.val.clear();
                     continue;
                 }
-                word.type = WordType::DIV;
+                token.type = TokenType::DIV;
                 break;
 
             case '<':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
                 if (ch == '=')
                 {
-                    word.val.push_back(ch);
+                    token.val.push_back(ch);
                     ch = fgetc(fp);
-                    word.type = WordType::LEQ;
+                    token.type = TokenType::LEQ;
                 }
                 else
                 {
-                    word.type = WordType::LSS;
+                    token.type = TokenType::LSS;
                 }
                 break;
 
             case '>':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
                 if (ch == '=')
                 {
-                    word.val.push_back(ch);
+                    token.val.push_back(ch);
                     ch = fgetc(fp);
-                    word.type = WordType::GEQ;
+                    token.type = TokenType::GEQ;
                 }
                 else
                 {
-                    word.type = WordType::GRE;
+                    token.type = TokenType::GRE;
                 }
                 break;
 
             case '=':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
                 if (ch == '=')
                 {
-                    word.val.push_back(ch);
+                    token.val.push_back(ch);
                     ch = fgetc(fp);
-                    word.type = WordType::EQL;
+                    token.type = TokenType::EQL;
                 }
                 else
                 {
-                    word.type = WordType::ASSIGN;
+                    token.type = TokenType::ASSIGN;
                 }
                 break;
 
             case '!':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
                 if (ch != '=')
                 {
                     return;
                 }
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::NEQ;
+                token.type = TokenType::NEQ;
                 break;
 
             case ';':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::SEMICN;
+                token.type = TokenType::SEMICN;
                 break;
 
             case ',':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::COMMA;
+                token.type = TokenType::COMMA;
                 break;
 
             case '(':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::LPARENT;
+                token.type = TokenType::LPARENT;
                 break;
 
             case ')':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::RPARENT;
+                token.type = TokenType::RPARENT;
                 break;
 
             case '[':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::LBRACK;
+                token.type = TokenType::LBRACK;
                 break;
 
             case ']':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::RBRACK;
+                token.type = TokenType::RBRACK;
                 break;
 
             case '{':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::LBRACE;
+                token.type = TokenType::LBRACE;
                 break;
 
             case '}':
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
-                word.type = WordType::RBRACE;
+                token.type = TokenType::RBRACE;
                 break;
 
             case '0': // TODO: ERROR
-                word.val.push_back(ch);
+                token.val.push_back(ch);
                 ch = fgetc(fp);
                 if (isDigit(ch) || isAlpha(ch))
                 {
-                    word.type = WordType::INTERR;
+                    token.type = TokenType::INTERR;
                     do
                     {
                         ch = fgetc(fp);
@@ -429,7 +429,7 @@ namespace scc
                 }
                 else
                 {
-                    word.type = WordType::INTCON;
+                    token.type = TokenType::INTCON;
                 }
                 break;
 
@@ -438,14 +438,14 @@ namespace scc
                 {
                     do
                     {
-                        word.val.push_back(ch);
+                        token.val.push_back(ch);
                         ch = fgetc(fp);
 
                     } while (isDigit(ch));
 
                     if (isAlpha(ch))
                     {
-                        word.type = WordType::INTERR;
+                        token.type = TokenType::INTERR;
                         do
                         {
                             ch = fgetc(fp);
@@ -454,17 +454,17 @@ namespace scc
                     }
                     else
                     {
-                        word.type = WordType::INTCON;
+                        token.type = TokenType::INTCON;
                     }
                 }
                 else if (isAlpha(ch))
                 {
                     do
                     {
-                        word.val.push_back(ch);
+                        token.val.push_back(ch);
                         ch = fgetc(fp);
                     } while (isAlpha(ch) || isDigit(ch));
-                    word.type = lexTrie.get(word.val.c_str());
+                    token.type = lexTrie.get(token.val.c_str());
                 }
                 else
                 {

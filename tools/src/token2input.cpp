@@ -1,5 +1,5 @@
 /*
-    Tool for converting word to source code.
+    Tool for converting token to source code.
     Copyright (C) 2020-2021 Renjian Wang
 
     This file is part of SCC.
@@ -23,11 +23,11 @@
 #include <cstring>
 #include <cerrno>
 
-#define CMD_NAME "word2input: "
+#define CMD_NAME "token2input: "
 #define ERROR_PREFIX CMD_NAME "error: "
 #define FATAL_ERROR_PREFIX CMD_NAME "fatal error: "
 
-int word2input(int argc, char** argv)
+int token2input(int argc, char** argv)
 {
     FILE *ifp = stdin, *ofp = stdout;
     if (argc == 3)
