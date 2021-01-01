@@ -271,6 +271,10 @@ Sub C 程序设计语言的EBNF语法定义如下：
       <returnSt> -> RETURNTK [LPARENT <expression> RPARENT]
 ```
 
+## License | 许可
+
+[GPL-3.0 License](LICENSE)
+
 ## Author | 作者
 
 编译成功组。
