@@ -257,7 +257,7 @@ namespace scc
 
         int zero = 0;
 
-        for (auto it : strVector)
+        for (auto& it : strVector)
         {
             fwrite(it.first.c_str(), it.first.size(), 1, fp);
             fwrite(&zero, sizeof(int) - (it.first.size()) % sizeof(int), 1, fp);
@@ -265,12 +265,11 @@ namespace scc
 
         fwrite(&ip, sizeof(int), 1, fp);
 
-        fwrite(&codes[0].code, sizeof(codes[0].code), 1, fp);
-        for (auto it = codes.begin() + 1; it != codes.end(); ++it)
+        for (auto& it : codes)
         {
-            if (it->remain >= static_cast<int>(optimize))
+            if (it.remain >= static_cast<int>(optimize))
             {
-                fwrite(&it->code, sizeof(it->code), 1, fp);
+                fwrite(&it.code, sizeof(it.code), 1, fp);
             }
         }
 
@@ -299,19 +298,18 @@ namespace scc
 
         fprintf(fp, "%s 0 %d\n", sci::fs[005].name, globalSize);
 
-        for (auto it : strVector)
+        for (auto& it : strVector)
         {
             fprintf(fp, "%s 0 %d %s\n", sci::fs[013].name, static_cast<int>(it.first.size() / sizeof(int)) + 1, it.first.c_str());
         }
 
         fprintf(fp, "%s\n", sci::TPCODE_CODE);
 
-        fprintf(fp, "%s %u %d\n", sci::fs[codes[0].code.f >> 3].name, codes[0].code.f & 07, codes[0].code.a);
-        for (auto it = codes.begin() + 1; it != codes.end(); ++it)
+        for (auto& it : codes)
         {
-            if (it->remain >= static_cast<int>(optimize))
+            if (it.remain >= static_cast<int>(optimize))
             {
-                fprintf(fp, "%s %u %d\n", sci::fs[it->code.f >> 3].name, it->code.f & 07, it->code.a);
+                fprintf(fp, "%s %u %d\n", sci::fs[it.code.f >> 3].name, it.code.f & 07, it.code.a);
             }
         }
 
@@ -2607,6 +2605,7 @@ namespace scc
         global = false;
 
         codes.emplace_back(0040);
+        codes.back().remain = 1;
         ++ip;
 
         while (true)
