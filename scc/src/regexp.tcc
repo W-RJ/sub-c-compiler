@@ -23,12 +23,12 @@
 #ifndef _SCC_REGEXP_TCC_
 #define _SCC_REGEXP_TCC_
 
-#include <cstring>
-
 #include "regexp"
 #include "trie"
 
 #include "../../common/src/exception.h"
+
+#include <cstring>
 
 namespace scc
 {

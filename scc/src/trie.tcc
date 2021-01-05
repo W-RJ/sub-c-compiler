@@ -23,10 +23,10 @@
 #ifndef _SCC_TRIE_TCC_
 #define _SCC_TRIE_TCC_
 
-#include <cstdio>
-
 #include "trie.h"
 #include "../../common/src/exception.h"
+
+#include <cstdio>
 
 namespace scc
 {

@@ -18,11 +18,11 @@
     along with SCC.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "exception.h"
+
 #include <stdexcept>
 #include <cstring>
 #include <cerrno>
-
-#include "exception.h"
 
 // class RuntimeError
 

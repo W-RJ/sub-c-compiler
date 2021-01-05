@@ -18,11 +18,6 @@
     along with SCC.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <clocale>
-
 #include "lexer.h"
 #include "parser.h"
 
@@ -30,6 +25,11 @@
 #include "config.h"
 
 #include "../../common/src/exception.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <clocale>
 
 #if defined(CG) && CG == 4
 void runBin(const char* fileName);

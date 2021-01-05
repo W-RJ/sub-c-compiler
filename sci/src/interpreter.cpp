@@ -21,9 +21,10 @@
 #include <cstdio>
 #include <cstring>
 
+#include "interpreter.h"
+
 #include "../../common/src/pcode.h"
 #include "../../common/src/exception.h"
-#include "interpreter.h"
 
 namespace sci
 {

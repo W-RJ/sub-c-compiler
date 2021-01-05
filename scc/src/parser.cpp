@@ -18,6 +18,14 @@
     along with SCC.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "lexer.h"
+#include "parser.h"
+#include "trie"
+#include "define.h"
+
+#include "../../common/src/pcode.h"
+#include "../../common/src/exception.h"
+
 #include <cstdio>
 #include <climits>
 #include <cstdarg>
@@ -27,14 +35,6 @@
 #include <vector>
 #include <string>
 #include <queue>
-
-#include "lexer.h"
-#include "parser.h"
-#include "trie"
-#include "define.h"
-
-#include "../../common/src/pcode.h"
-#include "../../common/src/exception.h"
 
 namespace scc
 {

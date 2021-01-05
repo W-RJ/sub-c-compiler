@@ -18,15 +18,16 @@
     along with SCC.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <cstdio>
-#include <cstring>
-#include <cassert>
-
 #include "lexer.h"
 #include "regexp"
 #include "trie"
 #include "define.h"
+
 #include "../../common/src/exception.h"
+
+#include <cstdio>
+#include <cstring>
+#include <cassert>
 
 #ifdef CG
 #include "cg.h"

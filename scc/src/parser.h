@@ -23,6 +23,11 @@
 #ifndef _SCC_PARSER_H_
 #define _SCC_PARSER_H_
 
+#include "lexer.h"
+#include "trie"
+
+#include "../../common/src/pcode.h"
+
 #include <cstdio>
 #include <cstdarg>
 
@@ -30,10 +35,6 @@
 #include <vector>
 #include <list>
 #include <utility>
-
-#include "lexer.h"
-#include "trie"
-#include "../../common/src/pcode.h"
 
 namespace scc
 {
