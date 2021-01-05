@@ -370,19 +370,22 @@ namespace sci
         if (memcmp(buffer, TPCODE_DATA, sizeof(TPCODE_DATA) / sizeof(char)) == 0)
         {
             int size;
+            char *strBase;
             while (true)
             {
                 fscanf(fp, "%8s", buffer);
 
                 if (memcmp(buffer, fs[013].name, 4) == 0)
                 {
-                    if (fscanf(fp, " %*d %d", &size) != 1)
+                    if (fscanf(fp, " %*d %d ", &size) != 1)
                     {
                         fclose(fp);
                         throw InvalidFormatError(fileName, "text pcode");
                     }
-                    st.resize(top + size + 1);
-                    fscanf(fp, " %[^\n]", reinterpret_cast<char*>(st.data() + top + 1));
+                    st.resize(top + size + 2);
+                    strBase = reinterpret_cast<char *>(st.data() + top + 1);
+                    fgets(strBase, size * sizeof(int) + 1, fp);
+                    strBase[strlen(strBase) - 1] = '\0';
                     top += size;
                 }
                 else if (memcmp(buffer, fs[005].name, 4) == 0)
@@ -400,7 +403,7 @@ namespace sci
                 }
             }
 
-            st.resize(top + 1);
+            st.resize(top + 2);
         }
 
         if (memcmp(buffer, TPCODE_CODE, sizeof(TPCODE_CODE) / sizeof(char)) != 0)

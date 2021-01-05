@@ -744,7 +744,7 @@ namespace scc
         {
             strVector.emplace_back(buffer[h].val, globalSize + strSize);
             id = strVector.size();
-            strSize += (buffer[h].val.size()) / sizeof(int) + 1;
+            strSize += static_cast<int>(buffer[h].val.size() / sizeof(int)) + 1;
         }
 
         nextToken();
