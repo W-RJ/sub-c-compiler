@@ -2433,7 +2433,7 @@ namespace scc
 
     void RecursiveParser::writeSt()
     {
-        assert(buffer[h].type != TokenType::PRINTFTK);
+        assert(buffer[h].type == TokenType::PRINTFTK);
 
         nextToken();
         if (buffer[h].type != TokenType::LPARENT)
