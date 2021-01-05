@@ -204,7 +204,7 @@ namespace scc
 
         bool hasErr();
 
-        void write(const char* fileName);
+        void writeBin(const char* fileName);
 
         void writeText(const char* fileName);
     };

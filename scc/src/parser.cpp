@@ -242,7 +242,7 @@ namespace scc
         return hasError;
     }
 
-    void Parser::write(const char* fileName)
+    void Parser::writeBin(const char* fileName)
     {
         assert(fileName != nullptr);
 
@@ -260,20 +260,39 @@ namespace scc
             throw FileError(fileName, "object");
         }
 
+        sci::BPcodeBlockType type;
+        int tmpInt;
+
         fwrite(&sci::BPCODE_PREFIX, sizeof(sci::BPCODE_PREFIX), 1, fp);
+
+        fwrite(&sci::BPCODE_MIN_VERSION, sizeof(int), 1, fp);
+
+        fwrite(&sci::BPCODE_VERSION, sizeof(int), 1, fp);
+
+        // general
+        type = sci::BPcodeBlockType::GENERAL;
+        tmpInt = 1;
+        fwrite(&type, sizeof(sci::BPcodeBlockType), 1, fp);
+        fwrite(&tmpInt, sizeof(int), 1, fp);
 
         fwrite(&globalSize, sizeof(int), 1, fp);
 
+        // str
+        type = sci::BPcodeBlockType::STR;
+        fwrite(&type, sizeof(sci::BPcodeBlockType), 1, fp);
         fwrite(&strSize, sizeof(int), 1, fp);
 
-        int zero = 0;
+        tmpInt = 0;
 
         for (const auto& it : strVector)
         {
             fwrite(it.first.c_str(), it.first.size(), 1, fp);
-            fwrite(&zero, sizeof(int) - (it.first.size()) % sizeof(int), 1, fp);
+            fwrite(&tmpInt, sizeof(int) - (it.first.size()) % sizeof(int), 1, fp);
         }
 
+        // code
+        type = sci::BPcodeBlockType::CODE;
+        fwrite(&type, sizeof(sci::BPcodeBlockType), 1, fp);
         fwrite(&ip, sizeof(int), 1, fp);
 
         for (const auto& it : codes)
@@ -605,7 +624,7 @@ namespace scc
     {
         Fun& fun = funVector.back();
         int n = codes.size();
-        int tmp;
+        int cur;
         std::queue<int> q;
         bool* vis = new bool[n - codesH];
         memset(vis, false, (n - codesH) * sizeof(bool));
@@ -623,9 +642,10 @@ namespace scc
         }
         while (!q.empty())
         {
-            tmp = q.front();
+            cur = q.front();
+            q.pop();
 
-            for (auto it : codes[tmp].dependentCodes)
+            for (auto it : codes[cur].dependentCodes)
             {
                 if (it != 0 && !vis[it - codesH])
                 {
@@ -634,7 +654,6 @@ namespace scc
                     q.push(it);
                 }
             }
-            q.pop();
         }
         delete[] vis;
         int addr = 2;

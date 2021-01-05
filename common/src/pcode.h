@@ -47,7 +47,18 @@ namespace sci
         int a;
     };
 
-    const char BPCODE_PREFIX[] = "\200BPCODE";
+    enum class BPcodeBlockType
+    {
+        GENERAL,
+        STR,
+        CODE,
+    };
+
+    const char BPCODE_PREFIX[] = "\200\200BPCODE\a\127-\122\112\200\200";
+
+    const unsigned BPCODE_MIN_VERSION = 0x000100;
+
+    const unsigned BPCODE_VERSION = 0x000100;
 
     const char TPCODE_DATA[] = ".data";
 

@@ -107,7 +107,7 @@ bool compile(const Config& config)
     {
         if (config.bin)
         {
-            parser->write(config.objectFileName);
+            parser->writeBin(config.objectFileName);
         }
         else
         {
