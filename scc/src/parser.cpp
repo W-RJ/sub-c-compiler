@@ -74,6 +74,17 @@ namespace scc
     {
     }
 
+    ExCode::ExCode(unsigned f, int a, int depCode) : code{f, a}, id(0), remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    {
+        dependentCodes.push_back(depCode);
+    }
+
+    ExCode::ExCode(unsigned f, int a, int depCode1, int depCode2) : code{f, a}, id(0), remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    {
+        dependentCodes.push_back(depCode1);
+        dependentCodes.push_back(depCode2);
+    }
+
     // class Parser
 
     bool Parser::EXPRESSION_SELECT[static_cast<unsigned>(TokenType::END)] = {false};
@@ -257,7 +268,7 @@ namespace scc
 
         int zero = 0;
 
-        for (auto& it : strVector)
+        for (const auto& it : strVector)
         {
             fwrite(it.first.c_str(), it.first.size(), 1, fp);
             fwrite(&zero, sizeof(int) - (it.first.size()) % sizeof(int), 1, fp);
@@ -265,7 +276,7 @@ namespace scc
 
         fwrite(&ip, sizeof(int), 1, fp);
 
-        for (auto& it : codes)
+        for (const auto& it : codes)
         {
             if (it.remain >= static_cast<int>(optimize))
             {
@@ -298,14 +309,14 @@ namespace scc
 
         fprintf(fp, "%s 0 %d\n", sci::fs[005].name, globalSize);
 
-        for (auto& it : strVector)
+        for (const auto& it : strVector)
         {
             fprintf(fp, "%s 0 %d %s\n", sci::fs[013].name, static_cast<int>(it.first.size() / sizeof(int)) + 1, it.first.c_str());
         }
 
         fprintf(fp, "%s\n", sci::TPCODE_CODE);
 
-        for (auto& it : codes)
+        for (const auto& it : codes)
         {
             if (it.remain >= static_cast<int>(optimize))
             {
@@ -533,23 +544,22 @@ namespace scc
         return res;
     }
 
-    void Parser::loadElement(Var* var, int exp)
+    void Parser::loadElement(Var* var, int depCode)
     {
         if (var != nullptr)
         {
             if (var->global)
             {
-                codes.emplace_back(0111, var->addr);
+                codes.emplace_back(0111, var->addr, depCode);
             }
             else
             {
-                codes.emplace_back(0110, var->addr);
+                codes.emplace_back(0110, var->addr, depCode);
             }
-            codes.back().dependentCodes.push_back(exp);
         }
     }
 
-    void Parser::storeVar(Var* var, VarType type, int exp)
+    void Parser::storeVar(Var* var, VarType type, int depCode)
     {
         if (var != nullptr)
         {
@@ -559,8 +569,7 @@ namespace scc
             }
             if (var->global)
             {
-                codes.emplace_back(0031, var->addr);
-                codes.back().dependentCodes.push_back(exp);
+                codes.emplace_back(0031, var->addr, depCode);
             }
             else
             {
@@ -568,13 +577,12 @@ namespace scc
                 var->preAssign.emplace_back();
                 var->preAssign.back().push_back(codes.size());
                 var->isPreAssign.back() = true;
-                codes.emplace_back(0030, var->addr);
-                codes.back().dependentCodes.push_back(exp);
+                codes.emplace_back(0030, var->addr, depCode);
             }
         }
     }
 
-    void Parser::storeElement(Var* var, VarType type, int exp1, int exp2)
+    void Parser::storeElement(Var* var, VarType type, int depCode1, int depCode2)
     {
         if (var != nullptr)
         {
@@ -584,15 +592,11 @@ namespace scc
             }
             if (var->global)
             {
-                codes.emplace_back(0121, var->addr);
-                codes.back().dependentCodes.push_back(exp1);
-                codes.back().dependentCodes.push_back(exp2);
+                codes.emplace_back(0121, var->addr, depCode1, depCode2);
             }
             else
             {
-                codes.emplace_back(0120, var->addr);
-                codes.back().dependentCodes.push_back(exp1);
-                codes.back().dependentCodes.push_back(exp2);
+                codes.emplace_back(0120, var->addr, depCode1, depCode2);
             }
         }
     }
@@ -1420,8 +1424,7 @@ namespace scc
         {
             nextToken();
             item(lastCode);
-            codes.emplace_back(0100, 1);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, 1, lastCode);
             lastCode = codes.size() - 1;
 
             type = VarType::INT;
@@ -1437,9 +1440,7 @@ namespace scc
             {
                 nextToken();
                 item(curCode);
-                codes.emplace_back(0100, 2);
-                codes.back().dependentCodes.push_back(curCode);
-                codes.back().dependentCodes.push_back(lastCode);
+                codes.emplace_back(0100, 2, curCode, lastCode);
 
                 type = VarType::INT;
             }
@@ -1447,9 +1448,7 @@ namespace scc
             {
                 nextToken();
                 item(curCode);
-                codes.emplace_back(0100, 3);
-                codes.back().dependentCodes.push_back(curCode);
-                codes.back().dependentCodes.push_back(lastCode);
+                codes.emplace_back(0100, 3, curCode, lastCode);
 
                 type = VarType::INT;
             }
@@ -1478,9 +1477,7 @@ namespace scc
             {
                 nextToken();
                 factor(curCode);
-                codes.emplace_back(0100, 4);
-                codes.back().dependentCodes.push_back(curCode);
-                codes.back().dependentCodes.push_back(lastCode);
+                codes.emplace_back(0100, 4, curCode, lastCode);
 
                 type = VarType::INT;
             }
@@ -1488,9 +1485,7 @@ namespace scc
             {
                 nextToken();
                 factor(curCode);
-                codes.emplace_back(0100, 5);
-                codes.back().dependentCodes.push_back(curCode);
-                codes.back().dependentCodes.push_back(lastCode);
+                codes.emplace_back(0100, 5, curCode, lastCode);
 
                 type = VarType::INT;
             }
@@ -1744,9 +1739,9 @@ namespace scc
 
             nextToken();
 
-            int exp1, exp2;
+            int depCode1, depCode2;
 
-            if (expression(exp1) != VarType::INT)
+            if (expression(depCode1) != VarType::INT)
             {
                 printErr(preToken().row, 'i', "invalid type for array subscript");
             }
@@ -1766,8 +1761,8 @@ namespace scc
             }
             nextToken();
 
-            VarType type = expression(exp2);
-            storeElement(var, type, exp1, exp2);
+            VarType type = expression(depCode2);
+            storeElement(var, type, depCode1, depCode2);
         }
         else
         {
@@ -1801,8 +1796,7 @@ namespace scc
         }
 
         int jpcIp = codes.size();
-        codes.emplace_back(0070);
-        codes.back().dependentCodes.push_back(lastCode);
+        codes.emplace_back(0070, lastCode);
 
         int preLoopCode = loopCode;
         loopCode = codes.size();
@@ -1871,62 +1865,49 @@ namespace scc
         case TokenType::LSS:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 11 : 8);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 11 : 8, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         case TokenType::LEQ:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 10 : 9);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 10 : 9, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         case TokenType::GRE:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 9 : 10);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 9 : 10, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         case TokenType::GEQ:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 8 : 11);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 8 : 11, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         case TokenType::EQL:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 13 : 12);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 13 : 12, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         case TokenType::NEQ:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 12 : 13);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 12 : 13, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         default:
             if (inv && optimize)
             {
-                codes.emplace_back(0100, 7);
-                codes.back().dependentCodes.push_back(lastCode);
+                codes.emplace_back(0100, 7, lastCode);
                 lastCode = codes.size() - 1;
             }
             break;
@@ -1935,9 +1916,7 @@ namespace scc
         if (!optimize && inv)
         {
             codes.emplace_back(0010, 0);
-            codes.emplace_back(0100, 12);
-            codes.back().dependentCodes.push_back(codes.size() - 2);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, 12, codes.size() - 1, lastCode);
             lastCode = codes.size() - 1;
         }
 
@@ -1984,8 +1963,7 @@ namespace scc
             }
 
             int jpcIp = codes.size();
-            codes.emplace_back(0070);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0070, lastCode);
 
             retStatus = statement() & 1;
 
@@ -2037,8 +2015,7 @@ namespace scc
                 nextToken();
             }
 
-            codes.emplace_back(0070, doIp);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0070, doIp, lastCode);
 
             endLoop();
             loopCode = preLoopCode;
@@ -2103,8 +2080,7 @@ namespace scc
             }
 
             int jpcIp = codes.size();
-            codes.emplace_back(0070);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0070, lastCode);
 
             if (buffer[h].type != TokenType::IDENFR)
             {
@@ -2166,15 +2142,11 @@ namespace scc
 
             if (plus)
             {
-                codes.emplace_back(0100, 2);
-                codes.back().dependentCodes.push_back(lastCode);
-                codes.back().dependentCodes.push_back(codes.size() - 2);
+                codes.emplace_back(0100, 2, codes.size() - 1, lastCode);
             }
             else
             {
-                codes.emplace_back(0100, 3);
-                codes.back().dependentCodes.push_back(lastCode);
-                codes.back().dependentCodes.push_back(codes.size() - 2);
+                codes.emplace_back(0100, 3, codes.size() - 1, lastCode);
             }
 
             storeVar(var, VarType::INT, codes.size() - 1);
@@ -2447,20 +2419,18 @@ namespace scc
         if (buffer[h].type == TokenType::STRCON)
         {
             codes.emplace_back(0010, str());
-            codes.emplace_back(0100, 18);
-            codes.back().dependentCodes.push_back(codes.size() - 2);
+            codes.emplace_back(0100, 18, codes.size() - 1);
             if (buffer[h].type == TokenType::COMMA)
             {
                 nextToken();
                 if (expression(lastCode) == VarType::INT)
                 {
-                    codes.emplace_back(0100, 14);
+                    codes.emplace_back(0100, 14, lastCode);
                 }
                 else
                 {
-                    codes.emplace_back(0100, 19);
+                    codes.emplace_back(0100, 19, lastCode);
                 }
-                codes.back().dependentCodes.push_back(lastCode);
             }
             else
             {
@@ -2471,13 +2441,12 @@ namespace scc
         {
             if (expression(lastCode) == VarType::INT)
             {
-                codes.emplace_back(0100, 14);
+                codes.emplace_back(0100, 14, lastCode);
             }
             else
             {
-                codes.emplace_back(0100, 19);
+                codes.emplace_back(0100, 19, lastCode);
             }
-            codes.back().dependentCodes.push_back(lastCode);
         }
         if (buffer[h].type != TokenType::RPARENT)
         {
@@ -2529,8 +2498,7 @@ namespace scc
 
             // TODO: judge
 
-            codes.emplace_back(0030, -std::max(static_cast<int>(fun.paramTypes.size()), 1));
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0030, -std::max(static_cast<int>(fun.paramTypes.size()), 1), lastCode);
             codes.back().remain = 1;
         }
         else
