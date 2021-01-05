@@ -91,7 +91,7 @@ void lexerOnly(const Config& config)
     lexer.close();
 }
 
-void compile(const Config& config)
+bool compile(const Config& config)
 {
     scc::Lexer* lexer = new scc::TrieLexer;
     lexer->open(config.inputFileName);
@@ -101,9 +101,9 @@ void compile(const Config& config)
 
     parser->open(config.lexFileName, config.parserFileName, config.errFileName);
 
-    parser->parse();
+    bool success = parser->parse();
 
-    if (config.objectFileName != nullptr)
+    if (success && config.objectFileName != nullptr)
     {
         if (config.bin)
         {
@@ -119,6 +119,8 @@ void compile(const Config& config)
     delete parser;
     lexer->close();
     delete lexer;
+
+    return success;
 }
 
 int main(int argc, char **argv)
@@ -163,7 +165,12 @@ int main(int argc, char **argv)
     {
         try
         {
-            compile(config);
+            if (!compile(config))
+            {
+#ifndef CG
+                exit(1);
+#endif
+            }
         }
         catch (const FileError& e)
         {

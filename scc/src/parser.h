@@ -200,7 +200,7 @@ namespace scc
 
         void close();
 
-        virtual void parse() = 0;
+        virtual bool parse() = 0;
 
         bool hasErr();
 
@@ -285,7 +285,7 @@ namespace scc
 
         using Parser::Parser;
 
-        virtual void parse() override;
+        virtual bool parse() override;
 
     };
 }

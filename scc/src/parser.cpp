@@ -2515,7 +2515,7 @@ namespace scc
         print("<返回语句>\n");
     }
 
-    void RecursiveParser::parse()
+    bool RecursiveParser::parse()
     {
         assert(lexer != nullptr);
 
@@ -2588,5 +2588,7 @@ namespace scc
         print("<程序>\n");
 
         // TODO
+
+        return !hasError;
     }
 }
