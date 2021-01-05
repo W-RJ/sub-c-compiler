@@ -733,10 +733,8 @@ namespace scc
 
     int RecursiveParser::str()
     {
-        if (buffer[h].type != TokenType::STRCON)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::STRCON);
+
         int& id = strTrie.at(buffer[h].val.c_str());
         if (id == 0 || !optimize)
         {
@@ -1064,7 +1062,7 @@ namespace scc
         }
         else
         {
-            // TODO: ERROR
+            throw ParsingError("invalid type of var");
         }
         do
         {
@@ -1202,10 +1200,8 @@ namespace scc
     {
         const int codeH = codes.size();
 
-        if (buffer[h].type != TokenType::VOIDTK)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::VOIDTK);
+
         nextToken();
         if (buffer[h].type != TokenType::IDENFR)
         {
@@ -1715,6 +1711,7 @@ namespace scc
             break;
 
         default:
+            // TODO: ERROR
             break;
         }
 
@@ -1725,10 +1722,7 @@ namespace scc
 
     void RecursiveParser::assignSt()
     {
-        if (buffer[h].type != TokenType::IDENFR)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::IDENFR);
 
         Var* var;
         findVar(var);
@@ -1777,7 +1771,7 @@ namespace scc
         }
         else
         {
-            // TODO: ERROR
+            throw ParsingError("expect '=' or '['");
         }
 
         print("<赋值语句>\n");
@@ -1787,10 +1781,8 @@ namespace scc
     {
         int retStatus1, retStatus;
 
-        if (buffer[h].type != TokenType::IFTK)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::IFTK);
+
         nextToken();
         if (buffer[h].type != TokenType::LPARENT)
         {
@@ -2199,7 +2191,7 @@ namespace scc
         }
         else
         {
-            // TODO: ERROR
+            throw ParsingError("not a loop statement");
         }
 
         print("<循环语句>\n");
@@ -2218,10 +2210,7 @@ namespace scc
 
     VarType RecursiveParser::funCall(bool remain)
     {
-        if (buffer[h].type != TokenType::IDENFR)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::IDENFR);
 
         int id = funTrie.find(buffer[h].val.c_str());
         if (id == 0)
@@ -2285,10 +2274,7 @@ namespace scc
 
     void RecursiveParser::voidFunCall()
     {
-        if (buffer[h].type != TokenType::IDENFR)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::IDENFR);
 
         int id = funTrie.find(buffer[h].val.c_str());
         if (id == 0)
@@ -2396,10 +2382,8 @@ namespace scc
     void RecursiveParser::readSt()
     {
         Var* var;
-        if (buffer[h].type != TokenType::SCANFTK)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::SCANFTK);
+
         nextToken();
         if (buffer[h].type != TokenType::LPARENT)
         {
@@ -2449,10 +2433,8 @@ namespace scc
 
     void RecursiveParser::writeSt()
     {
-        if (buffer[h].type != TokenType::PRINTFTK)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type != TokenType::PRINTFTK);
+
         nextToken();
         if (buffer[h].type != TokenType::LPARENT)
         {
@@ -2512,10 +2494,8 @@ namespace scc
 
     void RecursiveParser::returnSt()
     {
-        if (buffer[h].type != TokenType::RETURNTK)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::RETURNTK);
+
         nextToken();
 
         const Fun& fun = funVector.back();
