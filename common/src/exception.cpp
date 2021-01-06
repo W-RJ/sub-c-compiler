@@ -57,7 +57,8 @@ void FileError::print(FILE* fp) const noexcept
 
 // class InvalidArgumentError
 
-InvalidArgumentError::InvalidArgumentError(const char* what_arg, const char* arg, const char* help) : RuntimeError(what_arg), arg(arg), help(help)
+InvalidArgumentError::InvalidArgumentError(const char* what_arg, const char* arg, const char* help) :
+        RuntimeError(what_arg), arg(arg), help(help)
 {
 }
 
@@ -79,22 +80,26 @@ void InvalidArgumentError::print(FILE* fp) const noexcept
 
 // class RegExpError
 
-RegExpError::RegExpError(const char *what_arg, char ch) : RuntimeError(what_arg), typeName(nullptr), ch(ch)
+RegExpError::RegExpError(const char *what_arg, char ch) :
+        RuntimeError(what_arg), typeName(nullptr), ch(ch)
 {
 }
 
 void RegExpError::print(FILE* fp) const noexcept
 {
-    fprintf(fp, "%s%s In the definition of '%s': %s (near %c)\n", CMD_NAME, ERROR_PREFIX, typeName, what(), ch);
+    fprintf(fp, "%s%s In the definition of '%s': %s (near %c)\n",
+            CMD_NAME, ERROR_PREFIX, typeName, what(), ch);
 }
 
 // class InstructionError
 
-InstructionError::InstructionError(const char *what_arg, unsigned fbin) : RuntimeError(what_arg), fbin(fbin), ftext(nullptr)
+InstructionError::InstructionError(const char *what_arg, unsigned fbin) :
+        RuntimeError(what_arg), fbin(fbin), ftext(nullptr)
 {
 }
 
-InstructionError::InstructionError(const char *what_arg, const char* ftext) : RuntimeError(what_arg), ftext(ftext)
+InstructionError::InstructionError(const char *what_arg, const char* ftext) :
+        RuntimeError(what_arg), ftext(ftext)
 {
 }
 
@@ -113,7 +118,8 @@ void InstructionError::print(FILE* fp) const noexcept
 
 // class InvalidFormatError
 
-InvalidFormatError::InvalidFormatError(const char* fileName, const char* fileType) : RuntimeError(fileType), fileName(fileName), fileType(fileType)
+InvalidFormatError::InvalidFormatError(const char* fileName, const char* fileType) :
+        RuntimeError(fileType), fileName(fileName), fileType(fileType)
 {
 }
 

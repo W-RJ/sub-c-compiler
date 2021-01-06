@@ -56,7 +56,7 @@ namespace scc
 
         T& get(const char* key);
 
-        const T& find(const char* key);
+        const T& cfind(const char* key);
 
         void clear();
 

@@ -84,7 +84,7 @@ namespace scc
     }
 
     template<class T, char KEY_L, char KEY_R>
-    const T& Trie<T, KEY_L, KEY_R>::find(const char* key)
+    const T& Trie<T, KEY_L, KEY_R>::cfind(const char* key)
     {
         int p = 0;
         while (*key != '\0')

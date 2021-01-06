@@ -196,7 +196,8 @@ namespace scc
                 continue;
             }
 
-            if (token.type == TokenType::CHARCON || token.type == TokenType::STRCON || token.type == TokenType::CHARERR)
+            if (token.type == TokenType::CHARCON || token.type == TokenType::STRCON
+                    || token.type == TokenType::CHARERR)
             {
                 token.val.pop_back();
                 token.val = token.val.substr(1);

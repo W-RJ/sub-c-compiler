@@ -90,7 +90,8 @@ $(build)/parser.o: $(src)/parser.cpp $(src)/parser.h $(src)/lexer.h $(src)/trie 
         $(root)/common/$(src)/pcode.h $(src)/sc.lang Makefile $(precmd)
 	$(call compile,parser)
 
-$(build)/config.o: $(src)/config.cpp $(src)/config.h $(root)/common/$(src)/exception.h $(src)/define.h Makefile $(precmd)
+$(build)/config.o: $(src)/config.cpp $(src)/config.h $(root)/common/$(src)/exception.h \
+        $(src)/define.h Makefile $(precmd)
 	$(call compile,config)
 
 $(build)/cg.o: $(src)/cg.cpp $(src)/cg.h Makefile $(precmd)

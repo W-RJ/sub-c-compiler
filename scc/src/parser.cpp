@@ -46,13 +46,15 @@ namespace scc
         isPreAssign.push_back(false);
     }
 
-    Var::Var(VarType type, bool global, int addr, bool writable) : type(type), global(global), writable(writable), addr(addr), size(SINGLE)
+    Var::Var(VarType type, bool global, int addr, bool writable) :
+            type(type), global(global), writable(writable), addr(addr), size(SINGLE)
     {
         preAssign.emplace_back();
         isPreAssign.push_back(false);
     }
 
-    Var::Var(VarType type, bool global, int addr, int size) : type(type), global(global), writable(true), addr(addr), size(size)
+    Var::Var(VarType type, bool global, int addr, int size) :
+            type(type), global(global), writable(true), addr(addr), size(size)
     {
         preAssign.emplace_back();
         isPreAssign.push_back(false);
@@ -66,20 +68,24 @@ namespace scc
 
     // struct ExCode
 
-    ExCode::ExCode(unsigned f) : code{f}, id(0), remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    ExCode::ExCode(unsigned f) : code{f}, id(0), remain(0),
+            fork(false), bg(INT_MAX >> 1), dependentVar(0)
     {
     }
 
-    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0), remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0), remain(0),
+            fork(false), bg(INT_MAX >> 1), dependentVar(0)
     {
     }
 
-    ExCode::ExCode(unsigned f, int a, int depCode) : code{f, a}, id(0), remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    ExCode::ExCode(unsigned f, int a, int depCode) : code{f, a}, id(0), remain(0),
+            fork(false), bg(INT_MAX >> 1), dependentVar(0)
     {
         dependentCodes.push_back(depCode);
     }
 
-    ExCode::ExCode(unsigned f, int a, int depCode1, int depCode2) : code{f, a}, id(0), remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    ExCode::ExCode(unsigned f, int a, int depCode1, int depCode2) : code{f, a}, id(0),
+            remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
     {
         dependentCodes.push_back(depCode1);
         dependentCodes.push_back(depCode2);
@@ -114,8 +120,8 @@ namespace scc
     }
 
     Parser::Parser(bool optimize) : lexer(nullptr), h(0), size(0), lexFp(nullptr),
-            parserFp(nullptr), errorFp(nullptr), ip(0), loopCode(0), loopLevel(0), optimize(optimize),
-            hasError(false), global(true), globalSize(0), strSize(0)
+            parserFp(nullptr), errorFp(nullptr), ip(0), loopCode(0), loopLevel(0),
+            optimize(optimize), hasError(false), global(true), globalSize(0), strSize(0)
     {
         if (!hasInited)
         {
@@ -330,7 +336,8 @@ namespace scc
 
         for (const auto& it : strVector)
         {
-            fprintf(fp, "%s 0 %d %s\n", sci::fs[013].name, static_cast<int>(it.first.size() / sizeof(int)) + 1, it.first.c_str());
+            fprintf(fp, "%s 0 %d %s\n", sci::fs[013].name,
+                    static_cast<int>(it.first.size() / sizeof(int)) + 1, it.first.c_str());
         }
 
         fprintf(fp, "%s\n", sci::TPCODE_CODE);
@@ -350,7 +357,8 @@ namespace scc
     {
         if (accept && lexFp != nullptr)
         {
-            fprintf(lexFp, "%s %s\n", scc::typeName[static_cast<unsigned>(buffer[h].type)], buffer[h].val.c_str());
+            fprintf(lexFp, "%s %s\n", scc::typeName[static_cast<unsigned>(buffer[h].type)],
+                    buffer[h].val.c_str());
         }
         ++h %= CACHE_MAX;
         if (size > 0)
@@ -435,21 +443,22 @@ namespace scc
 
     void Parser::findVar(Var*& var)
     {
-        int id = localTrie.find(buffer[h].val.c_str());
+        int id = localTrie.cfind(buffer[h].val.c_str());
         if (id != 0)
         {
             var = localVector.data() + id - 1;
         }
         else
         {
-            id = globalTrie.find(buffer[h].val.c_str());
+            id = globalTrie.cfind(buffer[h].val.c_str());
             if (id != 0)
             {
                 var = globalVector.data() + id - 1;
             }
             else
             {
-                printErr(buffer[h].row, 'c', "'%s' was not declared in this scope", buffer[h].val.c_str());
+                printErr(buffer[h].row, 'c', "'%s' was not declared in this scope",
+                        buffer[h].val.c_str());
                 // TODO: ERROR
                 var = nullptr;
             }
@@ -509,7 +518,8 @@ namespace scc
                 ExCode& preCode = codes.back();
                 if (var->global)
                 {
-                    if (preCode.code.f == 0031 && preCode.code.a == var->addr && preCode.remain >= 0 && !preCode.fork && optimize)
+                    if (preCode.code.f == 0031 && preCode.code.a == var->addr
+                            && preCode.remain >= 0 && !preCode.fork && optimize)
                     {
                         preCode.code.f |= 2u;
                     }
@@ -520,7 +530,8 @@ namespace scc
                 }
                 else
                 {
-                    if (preCode.code.f == 0030 && preCode.code.a == var->addr && preCode.remain >= 0 && !preCode.fork && optimize)
+                    if (preCode.code.f == 0030 && preCode.code.a == var->addr
+                            && preCode.remain >= 0 && !preCode.fork && optimize)
                     {
                         preCode.code.f |= 2u;
                         res = codes.size() - 2;
@@ -546,7 +557,8 @@ namespace scc
                         codes.back().bg = bg; // TODO: FIXME
                         while (bg <= loopLevel)
                         {
-                            codes.back().dependentCodes.insert(codes.back().dependentCodes.end(), var->preAssign[bg].begin(), var->preAssign[bg].end());
+                            codes.back().dependentCodes.insert(codes.back().dependentCodes.end(),
+                                    var->preAssign[bg].begin(), var->preAssign[bg].end());
                             bg++;
                         }
                         codes.back().dependentVar = var - localVector.data();
@@ -748,7 +760,8 @@ namespace scc
         }
         for (auto& it : localVector)
         {
-            it.preAssign[loopLevel - 1].splice(it.preAssign[loopLevel - 1].begin(), std::move(it.preAssign[loopLevel]));
+            it.preAssign[loopLevel - 1].splice(it.preAssign[loopLevel - 1].begin(),
+                    std::move(it.preAssign[loopLevel]));
             it.preAssign.resize(loopLevel);
             it.isPreAssign.resize(loopLevel);
         }
@@ -824,14 +837,16 @@ namespace scc
                 }
                 catch (const ParsingError& e)
                 {
-                    printErr(buffer[idH].row, 'o', "except numeric constant, not '%s'", buffer[h].val.c_str());
+                    printErr(buffer[idH].row, 'o', "except numeric constant, not '%s'",
+                            buffer[h].val.c_str());
                 }
 
                 if (global)
                 {
-                    if (funTrie.find(buffer[idH].val.c_str()) != 0)
+                    if (funTrie.cfind(buffer[idH].val.c_str()) != 0)
                     {
-                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -840,7 +855,8 @@ namespace scc
                         int& id = globalTrie.at(buffer[idH].val.c_str()); // TODO
                         if (id != 0) // TODO
                         {
-                            printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                            printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                    buffer[idH].val.c_str());
                             // TODO: ERROR
                             continue;
                         }
@@ -858,7 +874,8 @@ namespace scc
                     int& id = localTrie.at(buffer[idH].val.c_str()); // TODO
                     if (id != 0)
                     {
-                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -888,7 +905,8 @@ namespace scc
                 nextToken();
                 if (buffer[h].type != TokenType::CHARCON)
                 {
-                    printErr(buffer[idH].row, 'o', "except character constant, not '%s'", buffer[h].val.c_str());
+                    printErr(buffer[idH].row, 'o', "except character constant, not '%s'",
+                            buffer[h].val.c_str());
                     // TODO: ERROR
                 }
                 char data = buffer[h].val[0];
@@ -896,9 +914,10 @@ namespace scc
 
                 if (global)
                 {
-                    if (funTrie.find(buffer[idH].val.c_str()) != 0)
+                    if (funTrie.cfind(buffer[idH].val.c_str()) != 0)
                     {
-                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -907,7 +926,8 @@ namespace scc
                         int& id = globalTrie.at(buffer[idH].val.c_str()); // TODO
                         if (id != 0) // TODO
                         {
-                            printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                            printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                    buffer[idH].val.c_str());
                             // TODO: ERROR
                             continue;
                         }
@@ -925,7 +945,8 @@ namespace scc
                     int& id = localTrie.at(buffer[idH].val.c_str()); // TODO
                     if (id != 0)
                     {
-                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -1017,7 +1038,7 @@ namespace scc
             // TODO: ERROR
         }
 
-        if (globalTrie.find(buffer[h].val.c_str()) != 0)
+        if (globalTrie.cfind(buffer[h].val.c_str()) != 0)
         {
             printErr(buffer[h].row, 'b', "redeclaration of '%s'", buffer[h].val.c_str());
             // TODO: ERROR
@@ -1061,7 +1082,8 @@ namespace scc
                 break;
             }
             nextToken(false);
-            if (buffer[h].type != TokenType::LBRACK && buffer[h].type != TokenType::COMMA && buffer[h].type != TokenType::SEMICN)
+            if (buffer[h].type != TokenType::LBRACK && buffer[h].type != TokenType::COMMA
+                    && buffer[h].type != TokenType::SEMICN)
             {
                 rollback(2);
                 break;
@@ -1118,7 +1140,7 @@ namespace scc
 
             if (global)
             {
-                if (funTrie.find(buffer[idH].val.c_str()) != 0)
+                if (funTrie.cfind(buffer[idH].val.c_str()) != 0)
                 {
                     printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                     // TODO: ERROR
@@ -1231,7 +1253,7 @@ namespace scc
             // TODO: ERROR
         }
 
-        if (globalTrie.find(buffer[h].val.c_str()) != 0)
+        if (globalTrie.cfind(buffer[h].val.c_str()) != 0)
         {
             printErr(buffer[h].row, 'b', "redeclaration of '%s'", buffer[h].val.c_str());
             // TODO: ERROR
@@ -1654,7 +1676,7 @@ namespace scc
             else
             {
                 rollback(1);
-                int id = funTrie.find(buffer[h].val.c_str());
+                int id = funTrie.cfind(buffer[h].val.c_str());
                 if (id == 0)
                 {
                     // TODO: ERROR
@@ -2203,7 +2225,7 @@ namespace scc
     {
         assert(buffer[h].type == TokenType::IDENFR);
 
-        int id = funTrie.find(buffer[h].val.c_str());
+        int id = funTrie.cfind(buffer[h].val.c_str());
         if (id == 0)
         {
             printErr(buffer[h].row, 'c', "'%s' was not declared in this scope", buffer[h].val.c_str());
@@ -2267,7 +2289,7 @@ namespace scc
     {
         assert(buffer[h].type == TokenType::IDENFR);
 
-        int id = funTrie.find(buffer[h].val.c_str());
+        int id = funTrie.cfind(buffer[h].val.c_str());
         if (id == 0)
         {
             printErr(buffer[h].row, 'c', "'%s' was not declared in this scope", buffer[h].val.c_str());
@@ -2498,7 +2520,8 @@ namespace scc
             {
                 if (fun.returnType == VarType::VOID)
                 {
-                    printErr(buffer[h].row, 'g', "return-statement with a value, in function returning 'void'");
+                    printErr(buffer[h].row, 'g',
+                            "return-statement with a value, in function returning 'void'");
                 }
                 else
                 {
@@ -2557,7 +2580,8 @@ namespace scc
             else
             {
                 nextToken(false);
-                if (buffer[h].type != TokenType::LBRACK && buffer[h].type != TokenType::COMMA && buffer[h].type != TokenType::SEMICN)
+                if (buffer[h].type != TokenType::LBRACK && buffer[h].type != TokenType::COMMA
+                        && buffer[h].type != TokenType::SEMICN)
                 {
                     rollback(2);
                 }
