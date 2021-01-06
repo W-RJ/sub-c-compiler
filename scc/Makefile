@@ -98,8 +98,8 @@ $(build)/cg.o: $(src)/cg.cpp $(src)/cg.h Makefile $(precmd)
 	$(call compile,cg)
 
 ifeq ($(t2str),$(wildcard $(t2str)))
-$(src)/cg.cpp: $(t2str) $(src)/sc.lang $(src)/cg.tl Makefile
-	cp $(src)/cg.tl $(src)/cg.cpp
+$(src)/cg.cpp: $(t2str) $(src)/sc.lang $(src)/cg.tdl Makefile
+	cp $(src)/cg.tdl $(src)/cg.cpp
 	$(t2str) < $(src)/sc.lang >> $(src)/cg.cpp
 	echo "\";" >> $(src)/cg.cpp
 	echo "}" >> $(src)/cg.cpp
