@@ -42,8 +42,8 @@ __pycache__
 /release/
 /build/
 /common/build/
-/scc/build/
-/sci/build/
+/compiler/build/
+/interpreter/build/
 /tools/build/
 /*.zip
 

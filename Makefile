@@ -25,14 +25,14 @@ release = release
 range = 1 2 3
 
 ifeq ($(OS),Windows_NT)
-    targets = "scc/$(build)/scc.exe" "scc/$(build)/sc.lang"
+    targets = "compiler/$(build)/scc.exe" "compiler/$(build)/sc.lang"
     ifneq ($(CG),4)
-        targets += "sci/$(build)/sci.exe"
+        targets += "interpreter/$(build)/sci.exe"
     endif
 else
-    targets = "scc/$(build)/scc" "scc/$(build)/sc.lang"
+    targets = "compiler/$(build)/scc" "compiler/$(build)/sc.lang"
     ifneq ($(CG),4)
-        targets += "sci/$(build)/sci"
+        targets += "interpreter/$(build)/sci"
     endif
 endif
 
@@ -43,16 +43,16 @@ endif
 main:
 	"$(MAKE)" -C tools
 	"$(MAKE)" -C common
-	"$(MAKE)" -C sci
-	"$(MAKE)" -C scc
+	"$(MAKE)" -C interpreter
+	"$(MAKE)" -C compiler
 	mkdir -p "$(build)"
 	cp $(targets) "$(build)" #TODO: Windows
 
 release:
 	"$(MAKE)" release=true -C tools
 	"$(MAKE)" release=true -C common
-	"$(MAKE)" release=true -C sci
-	"$(MAKE)" release=true -C scc
+	"$(MAKE)" release=true -C interpreter
+	"$(MAKE)" release=true -C compiler
 	mkdir -p "$(build)" "$(release)"
 	cp $(targets) "$(build)"
 	cp $(targets) "$(release)"
@@ -66,7 +66,7 @@ uninstall:
 
 zip: release
 	-rm scc.zip
-	zip -r scc.zip common scc sci -x \*.pyc
+	zip -r scc.zip common compiler interpreter -x \*.pyc
 
 test: module_test main
 	export SCC='$(targets)'; \
@@ -83,10 +83,10 @@ test: module_test main
 module_test:
 	"$(MAKE)" test -C tools
 	"$(MAKE)" test -C common
-	"$(MAKE)" unit_test -C scc
-	$(foreach i, $(range), "$(MAKE)" module_test CG=$(i) -C scc &&) true
-	# $(MAKE) module_test CG= -C scc
-	"$(MAKE)" test -C sci
+	"$(MAKE)" unit_test -C compiler
+	$(foreach i, $(range), "$(MAKE)" module_test CG=$(i) -C compiler &&) true
+	# $(MAKE) module_test CG= -C compiler
+	"$(MAKE)" test -C interpreter
 
 # clean & rebuild
 all: clean main
@@ -94,7 +94,7 @@ all: clean main
 clean:
 	"$(MAKE)" clean -C tools
 	"$(MAKE)" clean -C common
-	"$(MAKE)" clean -C sci
-	"$(MAKE)" clean -C scc
+	"$(MAKE)" clean -C interpreter
+	"$(MAKE)" clean -C compiler
 	-rm "$(build)/scc" "$(build)/sc.lang" "$(build)/sci"
 	-rm scc.zip

@@ -39,7 +39,7 @@ endif
 objects = $(build)/main.o $(build)/lexer.o $(build)/parser.o $(build)/config.o
 externs = $(root)/common/build/exception.o
 ifeq ($(CG),4)
-    externs += $(root)/sci/build/imain.o $(root)/sci/build/interpreter.o
+    externs += $(root)/interpreter/build/imain.o $(root)/interpreter/build/interpreter.o
 endif
 
 # scc[.exe]
