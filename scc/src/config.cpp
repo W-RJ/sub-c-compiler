@@ -39,7 +39,7 @@ void pclose(const void*)
 
 const char* Config::cmdName = "scc";
 
-const char* const Config::VERSION = "1.0";
+const char* const Config::VERSION = "0.1.0";
 
 const char *const Config::HELP =
     "Usage: scc <input file> [options]\n"
