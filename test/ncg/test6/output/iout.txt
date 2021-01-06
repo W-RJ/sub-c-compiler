@@ -1,0 +1,67 @@
+input n
+input a0
+input a1
+input a2
+input a3
+input a4
+input a5
+input a6
+input a7
+input a8
+input a9
+input a10
+input a11
+input a12
+input a13
+input a14
+input a15
+input a16
+input a17
+input a18
+input a19
+input a20
+input a21
+input a22
+input a23
+input a24
+input a25
+input a26
+input a27
+input a28
+input a29
+input a30
+input a31
+sorted array:
+0
+1
+2
+2
+3
+3
+3
+3
+5
+7
+7
+8
+9
+9
+9
+10
+10
+10
+11
+11
+11
+12
+12
+12
+14
+14
+14
+14
+14
+14
+15
+15
+10

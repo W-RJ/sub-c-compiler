@@ -1,0 +1,51 @@
+int a[1024];
+
+void sort(int n)
+{
+    int i, j;
+    int tmp;
+    for (i = 0; i < n; i=i+1)
+    {
+        for (j=n-1; j>i; j=j-1)
+        {
+            if (a[j-1] > a[j])
+            {
+                tmp = a[j];
+                a[j] = a[j-1];
+                a[j-1] = tmp;
+            }
+        }
+    }
+}
+
+void main7()
+{
+    int x, y, z;
+    y = 0;
+    do
+    {
+        x = x + 1;
+        y = y + 1;
+    } while (y < 10);
+    printf(y);
+}
+
+void main()
+{
+    int n, x, i;
+    printf("input n");
+    scanf(n);
+    for (i=0; i<n; i=i+1)
+    {
+        printf("input a", i);
+        scanf(x);
+        a[i] = x;
+    }
+    sort(n);
+    printf("sorted array:");
+    for (i=0; i<n; i=i+1)
+    {
+        printf(a[i]);
+    }
+    main7();
+}
