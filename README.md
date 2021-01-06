@@ -4,6 +4,8 @@ Compiler for the Sub C Programing Language defined by CG.
 
 针对希冀平台定义的 Sub C 程序设计语言的编译器。
 
+[![CI](https://github.com/W-RJ/sub-c-compiler/workflows/CI/badge.svg)](https://github.com/W-RJ/sub-c-compiler/actions)
+
 ## Table of Contents | 目录 <!-- omit in toc -->
 - [Build & Installation & Test | 构建、安装、自动测试方法](#build--installation--test--构建安装自动测试方法)
   - [Linux / macOS](#linux--macos)
