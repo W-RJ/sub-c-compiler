@@ -39,8 +39,8 @@ class TestClass:
         os.system("cp " + scc + ' "' + str(tmpdir.join(input_dir)) + '"')
         os.chdir(tmpdir.join(input_dir))
         os.rename("sc.lang", "sc2.lang")
-        assert os.system("timeout 1 ./scc test.sc -G sc2.lang -e result.txt -p @ -t > cout.txt 2> cerr.txt") == 0
-        assert os.system("timeout 1 ./sci -t test.tpc < iin.txt > iout.txt 2> ierr.txt") == 0
+        assert os.system("timeout 1 ./scc test.sc -G sc2.lang -e result.txt -p @ -P -t > cout.txt 2> cerr.txt") == 0
+        assert os.system("timeout 5 ./sci -t test.tpc < iin.txt > iout.txt 2> ierr.txt") == 0
         os.system("rm scc sci sc2.lang test.sc test.tpc iin.txt")
         assert os.system('diff "' + str(os.path.join(os.path.dirname(__file__), output_dir)) + '" "' + str(tmpdir.join(input_dir)) + '"') == 0
 
@@ -50,8 +50,8 @@ class TestClass:
         shutil.copytree(os.path.join(os.path.dirname(__file__), input_dir), tmpdir.join(input_dir))
         os.system("cp " + scc + ' "' + str(tmpdir.join(input_dir)) + '"')
         os.chdir(tmpdir.join(input_dir))
-        assert os.system("timeout 1 ./scc - -e - -p - -P -o test.bpc < test.sc > result.txt 2> cerr.txt") == 0
-        assert os.system("timeout 1 ./sci test.bpc < iin.txt > iout.txt 2> ierr.txt") == 0
+        assert os.system("timeout 1 ./scc - -e result.txt -p @ -o - < test.sc > test.bpc 2> cerr.txt") == 0
+        assert os.system("timeout 5 ./sci test.bpc < iin.txt > iout.txt 2> ierr.txt") == 0
         os.system("touch cout.txt")
         os.system("rm scc sci sc.lang test.sc test.bpc iin.txt")
         assert os.system('diff "' + str(os.path.join(os.path.dirname(__file__), output_dir)) + '" "' + str(tmpdir.join(input_dir)) + '"') == 0
