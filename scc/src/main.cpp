@@ -18,11 +18,6 @@
     along with SCC.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <clocale>
-
 #include "lexer.h"
 #include "parser.h"
 
@@ -30,6 +25,11 @@
 #include "config.h"
 
 #include "../../common/src/exception.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <clocale>
 
 #if defined(CG) && CG == 4
 void runBin(const char* fileName);
@@ -91,7 +91,7 @@ void lexerOnly(const Config& config)
     lexer.close();
 }
 
-void compile(const Config& config)
+bool compile(const Config& config)
 {
     scc::Lexer* lexer = new scc::TrieLexer;
     lexer->open(config.inputFileName);
@@ -101,13 +101,13 @@ void compile(const Config& config)
 
     parser->open(config.lexFileName, config.parserFileName, config.errFileName);
 
-    parser->parse();
+    bool success = parser->parse();
 
-    if (config.objectFileName != nullptr)
+    if (success && config.objectFileName != nullptr)
     {
         if (config.bin)
         {
-            parser->write(config.objectFileName);
+            parser->writeBin(config.objectFileName);
         }
         else
         {
@@ -119,6 +119,8 @@ void compile(const Config& config)
     delete parser;
     lexer->close();
     delete lexer;
+
+    return success;
 }
 
 int main(int argc, char **argv)
@@ -163,7 +165,12 @@ int main(int argc, char **argv)
     {
         try
         {
-            compile(config);
+            if (!compile(config))
+            {
+#ifndef CG
+                exit(1);
+#endif
+            }
         }
         catch (const FileError& e)
         {

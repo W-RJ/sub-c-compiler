@@ -60,6 +60,8 @@ namespace sci
 
         bool del;
 
+        int nextBlock(FILE *fp, BPcodeBlockType type);
+
     public:
 
         BInterpreter();

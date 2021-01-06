@@ -24,9 +24,16 @@ release = release
 
 range = 1 2 3
 
-targets = "scc/$(build)/scc" "scc/$(build)/sc.lang"
-ifneq ($(CG),4)
-    targets += "sci/$(build)/sci"
+ifeq ($(OS),Windows_NT)
+    targets = "scc/$(build)/scc.exe" "scc/$(build)/sc.lang"
+    ifneq ($(CG),4)
+        targets += "sci/$(build)/sci.exe"
+    endif
+else
+    targets = "scc/$(build)/scc" "scc/$(build)/sc.lang"
+    ifneq ($(CG),4)
+        targets += "sci/$(build)/sci"
+    endif
 endif
 
 ## phony targets
@@ -62,6 +69,15 @@ zip: release
 	zip -r scc.zip common scc sci -x \*.pyc
 
 test: module_test main
+	export SCC='$(targets)'; \
+	mkdir -p test/ncg; \
+	pytest test/ncg; \
+	RET=$$?; \
+	if [ "$$RET" != "0" ] && [ "$$RET" != "5" ]; then \
+		exit $$RET; \
+	else \
+		exit 0; \
+	fi
 	# TODO
 
 module_test:

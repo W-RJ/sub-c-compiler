@@ -20,8 +20,8 @@
 
 #include <cstdio>
 
-#include "../../common/src/exception.h"
 #include "interpreter.h"
+#include "../../common/src/exception.h"
 
 void runBin(const char* fileName)
 {

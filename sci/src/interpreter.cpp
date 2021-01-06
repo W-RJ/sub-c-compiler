@@ -21,9 +21,10 @@
 #include <cstdio>
 #include <cstring>
 
+#include "interpreter.h"
+
 #include "../../common/src/pcode.h"
 #include "../../common/src/exception.h"
-#include "interpreter.h"
 
 namespace sci
 {
@@ -37,6 +38,23 @@ namespace sci
 
     BInterpreter::BInterpreter() : codes(nullptr), del(false)
     {
+    }
+
+    int BInterpreter::nextBlock(FILE *fp, BPcodeBlockType type)
+    {
+        BPcodeBlockType curType;
+        int size;
+        while (true)
+        {
+            size = -1;
+            fread(&curType, sizeof(BPcodeBlockType), 1, fp);
+            fread(&size, sizeof(int), 1, fp);
+            if (curType == type || size < 0)
+            {
+                return size;
+            }
+            fseek(fp, size * sizeof(int), SEEK_CUR);
+        }
     }
 
     void BInterpreter::set(BPcode* codes)
@@ -69,20 +87,52 @@ namespace sci
             throw InvalidFormatError(fileName, "binary pcode");
         }
 
+        // version
+        unsigned version;
+        fread(&version, sizeof(unsigned), 1, fp);
+        if (version > BPCODE_VERSION)
+        {
+            fclose(fp);
+            throw InvalidFormatError(fileName, "binary pcode"); // TODO
+        }
+
+        fread(&version, sizeof(unsigned), 1, fp);
+
         // TODO: verify
 
-        int globalSize, strSize;
+        int size, globalSize;
+
+        // general
+        if ((size = nextBlock(fp, BPcodeBlockType::GENERAL)) < 0)
+        {
+            fclose(fp);
+            throw InvalidFormatError(fileName, "binary pcode"); // TODO
+        }
         fread(&globalSize, sizeof(int), 1, fp);
-        fread(&strSize, sizeof(int), 1, fp);
-        top = globalSize + strSize - 1;
+        fseek(fp, (size - 1) * sizeof(int), SEEK_CUR);
+
+        // str
+        size = nextBlock(fp, BPcodeBlockType::STR);
+        if (globalSize < 0 || size < 0)
+        {
+            fclose(fp);
+            throw InvalidFormatError(fileName, "binary pcode"); // TODO
+        }
+        top = globalSize + size - 1;
         st.resize(top + 1);
-        fread(st.data() + globalSize, sizeof(int), strSize, fp);
 
-        int codeSize;
-        fread(&codeSize, sizeof(int), 1, fp);
-        codes = new BPcode[codeSize];
+        fread(st.data() + globalSize, sizeof(int), size, fp);
 
-        if (static_cast<int>(fread(codes, sizeof(BPcode), codeSize, fp)) != codeSize)
+        // code
+        if ((size = nextBlock(fp, BPcodeBlockType::CODE)) < 0)
+        {
+            fclose(fp);
+            throw InvalidFormatError(fileName, "binary pcode"); // TODO
+        }
+
+        codes = new BPcode[size];
+
+        if (static_cast<int>(fread(codes, sizeof(BPcode), size, fp)) != size)
         {
             fclose(fp);
             throw InvalidFormatError(fileName, "binary pcode");
@@ -369,19 +419,22 @@ namespace sci
         if (memcmp(buffer, TPCODE_DATA, sizeof(TPCODE_DATA) / sizeof(char)) == 0)
         {
             int size;
+            char *strBase;
             while (true)
             {
                 fscanf(fp, "%8s", buffer);
 
                 if (memcmp(buffer, fs[013].name, 4) == 0)
                 {
-                    if (fscanf(fp, " %*d %d", &size) != 1)
+                    if (fscanf(fp, " %*d %d ", &size) != 1)
                     {
                         fclose(fp);
                         throw InvalidFormatError(fileName, "text pcode");
                     }
-                    st.resize(top + size + 1);
-                    fscanf(fp, " %[^\n]", reinterpret_cast<char*>(st.data() + top + 1));
+                    st.resize(top + size + 2);
+                    strBase = reinterpret_cast<char *>(st.data() + top + 1);
+                    fgets(strBase, size * sizeof(int) + 1, fp);
+                    strBase[strlen(strBase) - 1] = '\0';
                     top += size;
                 }
                 else if (memcmp(buffer, fs[005].name, 4) == 0)
@@ -399,7 +452,7 @@ namespace sci
                 }
             }
 
-            st.resize(top + 1);
+            st.resize(top + 2);
         }
 
         if (memcmp(buffer, TPCODE_CODE, sizeof(TPCODE_CODE) / sizeof(char)) != 0)
@@ -412,12 +465,6 @@ namespace sci
         while (fscanf(fp, "%3s %d %d", code.f.name, &code.l, &code.a) >= 0)
         {
             codes.push_back(code);
-        }
-
-        if (!feof(fp))
-        {
-            fclose(fp);
-            throw InvalidFormatError(fileName, "text pcode");
         }
 
         // TODO

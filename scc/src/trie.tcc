@@ -23,10 +23,10 @@
 #ifndef _SCC_TRIE_TCC_
 #define _SCC_TRIE_TCC_
 
-#include <cstdio>
-
 #include "trie.h"
 #include "../../common/src/exception.h"
+
+#include <cstdio>
 
 namespace scc
 {
@@ -84,7 +84,7 @@ namespace scc
     }
 
     template<class T, char KEY_L, char KEY_R>
-    const T& Trie<T, KEY_L, KEY_R>::find(const char* key)
+    const T& Trie<T, KEY_L, KEY_R>::cfind(const char* key)
     {
         int p = 0;
         while (*key != '\0')

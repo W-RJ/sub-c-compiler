@@ -18,12 +18,13 @@
     along with SCC.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "config.h"
+#include "define.h"
+
+#include "../../common/src/exception.h"
+
 #include <cstdio>
 #include <cstring>
-
-#include "config.h"
-#include "../../common/src/exception.h"
-#include "define.h"
 
 FILE* popen(const void*, const void*)
 {

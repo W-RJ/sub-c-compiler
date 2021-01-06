@@ -18,6 +18,14 @@
     along with SCC.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "lexer.h"
+#include "parser.h"
+#include "trie"
+#include "define.h"
+
+#include "../../common/src/pcode.h"
+#include "../../common/src/exception.h"
+
 #include <cstdio>
 #include <climits>
 #include <cstdarg>
@@ -27,14 +35,6 @@
 #include <vector>
 #include <string>
 #include <queue>
-
-#include "lexer.h"
-#include "parser.h"
-#include "trie"
-#include "define.h"
-
-#include "../../common/src/pcode.h"
-#include "../../common/src/exception.h"
 
 namespace scc
 {
@@ -46,13 +46,15 @@ namespace scc
         isPreAssign.push_back(false);
     }
 
-    Var::Var(VarType type, bool global, int addr, bool writable) : type(type), global(global), writable(writable), addr(addr), size(SINGLE)
+    Var::Var(VarType type, bool global, int addr, bool writable) :
+            type(type), global(global), writable(writable), addr(addr), size(SINGLE)
     {
         preAssign.emplace_back();
         isPreAssign.push_back(false);
     }
 
-    Var::Var(VarType type, bool global, int addr, int size) : type(type), global(global), writable(true), addr(addr), size(size)
+    Var::Var(VarType type, bool global, int addr, int size) :
+            type(type), global(global), writable(true), addr(addr), size(size)
     {
         preAssign.emplace_back();
         isPreAssign.push_back(false);
@@ -66,12 +68,27 @@ namespace scc
 
     // struct ExCode
 
-    ExCode::ExCode(unsigned f) : code{f}, id(0), remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    ExCode::ExCode(unsigned f) : code{f}, id(0), remain(0),
+            fork(false), bg(INT_MAX >> 1), dependentVar(0)
     {
     }
 
-    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0), remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    ExCode::ExCode(unsigned f, int a) : code{f, a}, id(0), remain(0),
+            fork(false), bg(INT_MAX >> 1), dependentVar(0)
     {
+    }
+
+    ExCode::ExCode(unsigned f, int a, int depCode) : code{f, a}, id(0), remain(0),
+            fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    {
+        dependentCodes.push_back(depCode);
+    }
+
+    ExCode::ExCode(unsigned f, int a, int depCode1, int depCode2) : code{f, a}, id(0),
+            remain(0), fork(false), bg(INT_MAX >> 1), dependentVar(0)
+    {
+        dependentCodes.push_back(depCode1);
+        dependentCodes.push_back(depCode2);
     }
 
     // class Parser
@@ -103,8 +120,8 @@ namespace scc
     }
 
     Parser::Parser(bool optimize) : lexer(nullptr), h(0), size(0), lexFp(nullptr),
-            parserFp(nullptr), errorFp(nullptr), ip(0), loopCode(0), loopLevel(0), optimize(optimize),
-            hasError(false), global(true), globalSize(0), strSize(0)
+            parserFp(nullptr), errorFp(nullptr), ip(0), loopCode(0), loopLevel(0),
+            optimize(optimize), hasError(false), global(true), globalSize(0), strSize(0)
     {
         if (!hasInited)
         {
@@ -231,7 +248,7 @@ namespace scc
         return hasError;
     }
 
-    void Parser::write(const char* fileName)
+    void Parser::writeBin(const char* fileName)
     {
         assert(fileName != nullptr);
 
@@ -249,23 +266,42 @@ namespace scc
             throw FileError(fileName, "object");
         }
 
+        sci::BPcodeBlockType type;
+        int tmpInt;
+
         fwrite(&sci::BPCODE_PREFIX, sizeof(sci::BPCODE_PREFIX), 1, fp);
+
+        fwrite(&sci::BPCODE_MIN_VERSION, sizeof(int), 1, fp);
+
+        fwrite(&sci::BPCODE_VERSION, sizeof(int), 1, fp);
+
+        // general
+        type = sci::BPcodeBlockType::GENERAL;
+        tmpInt = 1;
+        fwrite(&type, sizeof(sci::BPcodeBlockType), 1, fp);
+        fwrite(&tmpInt, sizeof(int), 1, fp);
 
         fwrite(&globalSize, sizeof(int), 1, fp);
 
+        // str
+        type = sci::BPcodeBlockType::STR;
+        fwrite(&type, sizeof(sci::BPcodeBlockType), 1, fp);
         fwrite(&strSize, sizeof(int), 1, fp);
 
-        int zero = 0;
+        tmpInt = 0;
 
-        for (auto& it : strVector)
+        for (const auto& it : strVector)
         {
             fwrite(it.first.c_str(), it.first.size(), 1, fp);
-            fwrite(&zero, sizeof(int) - (it.first.size()) % sizeof(int), 1, fp);
+            fwrite(&tmpInt, sizeof(int) - (it.first.size()) % sizeof(int), 1, fp);
         }
 
+        // code
+        type = sci::BPcodeBlockType::CODE;
+        fwrite(&type, sizeof(sci::BPcodeBlockType), 1, fp);
         fwrite(&ip, sizeof(int), 1, fp);
 
-        for (auto& it : codes)
+        for (const auto& it : codes)
         {
             if (it.remain >= static_cast<int>(optimize))
             {
@@ -298,14 +334,15 @@ namespace scc
 
         fprintf(fp, "%s 0 %d\n", sci::fs[005].name, globalSize);
 
-        for (auto& it : strVector)
+        for (const auto& it : strVector)
         {
-            fprintf(fp, "%s 0 %d %s\n", sci::fs[013].name, static_cast<int>(it.first.size() / sizeof(int)) + 1, it.first.c_str());
+            fprintf(fp, "%s 0 %d %s\n", sci::fs[013].name,
+                    static_cast<int>(it.first.size() / sizeof(int)) + 1, it.first.c_str());
         }
 
         fprintf(fp, "%s\n", sci::TPCODE_CODE);
 
-        for (auto& it : codes)
+        for (const auto& it : codes)
         {
             if (it.remain >= static_cast<int>(optimize))
             {
@@ -320,7 +357,8 @@ namespace scc
     {
         if (accept && lexFp != nullptr)
         {
-            fprintf(lexFp, "%s %s\n", scc::typeName[static_cast<unsigned>(buffer[h].type)], buffer[h].val.c_str());
+            fprintf(lexFp, "%s %s\n", scc::typeName[static_cast<unsigned>(buffer[h].type)],
+                    buffer[h].val.c_str());
         }
         ++h %= CACHE_MAX;
         if (size > 0)
@@ -405,21 +443,22 @@ namespace scc
 
     void Parser::findVar(Var*& var)
     {
-        int id = localTrie.find(buffer[h].val.c_str());
+        int id = localTrie.cfind(buffer[h].val.c_str());
         if (id != 0)
         {
             var = localVector.data() + id - 1;
         }
         else
         {
-            id = globalTrie.find(buffer[h].val.c_str());
+            id = globalTrie.cfind(buffer[h].val.c_str());
             if (id != 0)
             {
                 var = globalVector.data() + id - 1;
             }
             else
             {
-                printErr(buffer[h].row, 'c', "'%s' was not declared in this scope", buffer[h].val.c_str());
+                printErr(buffer[h].row, 'c', "'%s' was not declared in this scope",
+                        buffer[h].val.c_str());
                 // TODO: ERROR
                 var = nullptr;
             }
@@ -479,7 +518,8 @@ namespace scc
                 ExCode& preCode = codes.back();
                 if (var->global)
                 {
-                    if (preCode.code.f == 0031 && preCode.code.a == var->addr && preCode.remain >= 0 && !preCode.fork && optimize)
+                    if (preCode.code.f == 0031 && preCode.code.a == var->addr
+                            && preCode.remain >= 0 && !preCode.fork && optimize)
                     {
                         preCode.code.f |= 2u;
                     }
@@ -490,7 +530,8 @@ namespace scc
                 }
                 else
                 {
-                    if (preCode.code.f == 0030 && preCode.code.a == var->addr && preCode.remain >= 0 && !preCode.fork && optimize)
+                    if (preCode.code.f == 0030 && preCode.code.a == var->addr
+                            && preCode.remain >= 0 && !preCode.fork && optimize)
                     {
                         preCode.code.f |= 2u;
                         res = codes.size() - 2;
@@ -516,7 +557,8 @@ namespace scc
                         codes.back().bg = bg; // TODO: FIXME
                         while (bg <= loopLevel)
                         {
-                            codes.back().dependentCodes.insert(codes.back().dependentCodes.end(), var->preAssign[bg].begin(), var->preAssign[bg].end());
+                            codes.back().dependentCodes.insert(codes.back().dependentCodes.end(),
+                                    var->preAssign[bg].begin(), var->preAssign[bg].end());
                             bg++;
                         }
                         codes.back().dependentVar = var - localVector.data();
@@ -533,23 +575,22 @@ namespace scc
         return res;
     }
 
-    void Parser::loadElement(Var* var, int exp)
+    void Parser::loadElement(Var* var, int depCode)
     {
         if (var != nullptr)
         {
             if (var->global)
             {
-                codes.emplace_back(0111, var->addr);
+                codes.emplace_back(0111, var->addr, depCode);
             }
             else
             {
-                codes.emplace_back(0110, var->addr);
+                codes.emplace_back(0110, var->addr, depCode);
             }
-            codes.back().dependentCodes.push_back(exp);
         }
     }
 
-    void Parser::storeVar(Var* var, VarType type, int exp)
+    void Parser::storeVar(Var* var, VarType type, int depCode)
     {
         if (var != nullptr)
         {
@@ -559,8 +600,7 @@ namespace scc
             }
             if (var->global)
             {
-                codes.emplace_back(0031, var->addr);
-                codes.back().dependentCodes.push_back(exp);
+                codes.emplace_back(0031, var->addr, depCode);
             }
             else
             {
@@ -568,13 +608,12 @@ namespace scc
                 var->preAssign.emplace_back();
                 var->preAssign.back().push_back(codes.size());
                 var->isPreAssign.back() = true;
-                codes.emplace_back(0030, var->addr);
-                codes.back().dependentCodes.push_back(exp);
+                codes.emplace_back(0030, var->addr, depCode);
             }
         }
     }
 
-    void Parser::storeElement(Var* var, VarType type, int exp1, int exp2)
+    void Parser::storeElement(Var* var, VarType type, int depCode1, int depCode2)
     {
         if (var != nullptr)
         {
@@ -584,15 +623,11 @@ namespace scc
             }
             if (var->global)
             {
-                codes.emplace_back(0121, var->addr);
-                codes.back().dependentCodes.push_back(exp1);
-                codes.back().dependentCodes.push_back(exp2);
+                codes.emplace_back(0121, var->addr, depCode1, depCode2);
             }
             else
             {
-                codes.emplace_back(0120, var->addr);
-                codes.back().dependentCodes.push_back(exp1);
-                codes.back().dependentCodes.push_back(exp2);
+                codes.emplace_back(0120, var->addr, depCode1, depCode2);
             }
         }
     }
@@ -601,7 +636,7 @@ namespace scc
     {
         Fun& fun = funVector.back();
         int n = codes.size();
-        int tmp;
+        int cur;
         std::queue<int> q;
         bool* vis = new bool[n - codesH];
         memset(vis, false, (n - codesH) * sizeof(bool));
@@ -619,9 +654,10 @@ namespace scc
         }
         while (!q.empty())
         {
-            tmp = q.front();
+            cur = q.front();
+            q.pop();
 
-            for (auto it : codes[tmp].dependentCodes)
+            for (auto it : codes[cur].dependentCodes)
             {
                 if (it != 0 && !vis[it - codesH])
                 {
@@ -630,7 +666,6 @@ namespace scc
                     q.push(it);
                 }
             }
-            q.pop();
         }
         delete[] vis;
         int addr = 2;
@@ -725,7 +760,8 @@ namespace scc
         }
         for (auto& it : localVector)
         {
-            it.preAssign[loopLevel - 1].splice(it.preAssign[loopLevel - 1].begin(), std::move(it.preAssign[loopLevel]));
+            it.preAssign[loopLevel - 1].splice(it.preAssign[loopLevel - 1].begin(),
+                    std::move(it.preAssign[loopLevel]));
             it.preAssign.resize(loopLevel);
             it.isPreAssign.resize(loopLevel);
         }
@@ -733,16 +769,14 @@ namespace scc
 
     int RecursiveParser::str()
     {
-        if (buffer[h].type != TokenType::STRCON)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::STRCON);
+
         int& id = strTrie.at(buffer[h].val.c_str());
         if (id == 0 || !optimize)
         {
             strVector.emplace_back(buffer[h].val, globalSize + strSize);
             id = strVector.size();
-            strSize += (buffer[h].val.size()) / sizeof(int) + 1;
+            strSize += static_cast<int>(buffer[h].val.size() / sizeof(int)) + 1;
         }
 
         nextToken();
@@ -803,14 +837,16 @@ namespace scc
                 }
                 catch (const ParsingError& e)
                 {
-                    printErr(buffer[idH].row, 'o', "except numeric constant, not '%s'", buffer[h].val.c_str());
+                    printErr(buffer[idH].row, 'o', "except numeric constant, not '%s'",
+                            buffer[h].val.c_str());
                 }
 
                 if (global)
                 {
-                    if (funTrie.find(buffer[idH].val.c_str()) != 0)
+                    if (funTrie.cfind(buffer[idH].val.c_str()) != 0)
                     {
-                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -819,7 +855,8 @@ namespace scc
                         int& id = globalTrie.at(buffer[idH].val.c_str()); // TODO
                         if (id != 0) // TODO
                         {
-                            printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                            printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                    buffer[idH].val.c_str());
                             // TODO: ERROR
                             continue;
                         }
@@ -837,7 +874,8 @@ namespace scc
                     int& id = localTrie.at(buffer[idH].val.c_str()); // TODO
                     if (id != 0)
                     {
-                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -867,7 +905,8 @@ namespace scc
                 nextToken();
                 if (buffer[h].type != TokenType::CHARCON)
                 {
-                    printErr(buffer[idH].row, 'o', "except character constant, not '%s'", buffer[h].val.c_str());
+                    printErr(buffer[idH].row, 'o', "except character constant, not '%s'",
+                            buffer[h].val.c_str());
                     // TODO: ERROR
                 }
                 char data = buffer[h].val[0];
@@ -875,9 +914,10 @@ namespace scc
 
                 if (global)
                 {
-                    if (funTrie.find(buffer[idH].val.c_str()) != 0)
+                    if (funTrie.cfind(buffer[idH].val.c_str()) != 0)
                     {
-                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -886,7 +926,8 @@ namespace scc
                         int& id = globalTrie.at(buffer[idH].val.c_str()); // TODO
                         if (id != 0) // TODO
                         {
-                            printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                            printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                    buffer[idH].val.c_str());
                             // TODO: ERROR
                             continue;
                         }
@@ -904,7 +945,8 @@ namespace scc
                     int& id = localTrie.at(buffer[idH].val.c_str()); // TODO
                     if (id != 0)
                     {
-                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
+                        printErr(buffer[idH].row, 'b', "redeclaration of '%s'",
+                                buffer[idH].val.c_str());
                         // TODO: ERROR
                         continue;
                     }
@@ -996,7 +1038,7 @@ namespace scc
             // TODO: ERROR
         }
 
-        if (globalTrie.find(buffer[h].val.c_str()) != 0)
+        if (globalTrie.cfind(buffer[h].val.c_str()) != 0)
         {
             printErr(buffer[h].row, 'b', "redeclaration of '%s'", buffer[h].val.c_str());
             // TODO: ERROR
@@ -1040,7 +1082,8 @@ namespace scc
                 break;
             }
             nextToken(false);
-            if (buffer[h].type != TokenType::LBRACK && buffer[h].type != TokenType::COMMA && buffer[h].type != TokenType::SEMICN)
+            if (buffer[h].type != TokenType::LBRACK && buffer[h].type != TokenType::COMMA
+                    && buffer[h].type != TokenType::SEMICN)
             {
                 rollback(2);
                 break;
@@ -1064,7 +1107,7 @@ namespace scc
         }
         else
         {
-            // TODO: ERROR
+            throw ParsingError("invalid type of var");
         }
         do
         {
@@ -1097,7 +1140,7 @@ namespace scc
 
             if (global)
             {
-                if (funTrie.find(buffer[idH].val.c_str()) != 0)
+                if (funTrie.cfind(buffer[idH].val.c_str()) != 0)
                 {
                     printErr(buffer[idH].row, 'b', "redeclaration of '%s'", buffer[idH].val.c_str());
                     // TODO: ERROR
@@ -1202,17 +1245,15 @@ namespace scc
     {
         const int codeH = codes.size();
 
-        if (buffer[h].type != TokenType::VOIDTK)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::VOIDTK);
+
         nextToken();
         if (buffer[h].type != TokenType::IDENFR)
         {
             // TODO: ERROR
         }
 
-        if (globalTrie.find(buffer[h].val.c_str()) != 0)
+        if (globalTrie.cfind(buffer[h].val.c_str()) != 0)
         {
             printErr(buffer[h].row, 'b', "redeclaration of '%s'", buffer[h].val.c_str());
             // TODO: ERROR
@@ -1424,8 +1465,7 @@ namespace scc
         {
             nextToken();
             item(lastCode);
-            codes.emplace_back(0100, 1);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, 1, lastCode);
             lastCode = codes.size() - 1;
 
             type = VarType::INT;
@@ -1441,9 +1481,7 @@ namespace scc
             {
                 nextToken();
                 item(curCode);
-                codes.emplace_back(0100, 2);
-                codes.back().dependentCodes.push_back(curCode);
-                codes.back().dependentCodes.push_back(lastCode);
+                codes.emplace_back(0100, 2, curCode, lastCode);
 
                 type = VarType::INT;
             }
@@ -1451,9 +1489,7 @@ namespace scc
             {
                 nextToken();
                 item(curCode);
-                codes.emplace_back(0100, 3);
-                codes.back().dependentCodes.push_back(curCode);
-                codes.back().dependentCodes.push_back(lastCode);
+                codes.emplace_back(0100, 3, curCode, lastCode);
 
                 type = VarType::INT;
             }
@@ -1482,9 +1518,7 @@ namespace scc
             {
                 nextToken();
                 factor(curCode);
-                codes.emplace_back(0100, 4);
-                codes.back().dependentCodes.push_back(curCode);
-                codes.back().dependentCodes.push_back(lastCode);
+                codes.emplace_back(0100, 4, curCode, lastCode);
 
                 type = VarType::INT;
             }
@@ -1492,9 +1526,7 @@ namespace scc
             {
                 nextToken();
                 factor(curCode);
-                codes.emplace_back(0100, 5);
-                codes.back().dependentCodes.push_back(curCode);
-                codes.back().dependentCodes.push_back(lastCode);
+                codes.emplace_back(0100, 5, curCode, lastCode);
 
                 type = VarType::INT;
             }
@@ -1644,7 +1676,7 @@ namespace scc
             else
             {
                 rollback(1);
-                int id = funTrie.find(buffer[h].val.c_str());
+                int id = funTrie.cfind(buffer[h].val.c_str());
                 if (id == 0)
                 {
                     // TODO: ERROR
@@ -1715,6 +1747,7 @@ namespace scc
             break;
 
         default:
+            // TODO: ERROR
             break;
         }
 
@@ -1725,10 +1758,7 @@ namespace scc
 
     void RecursiveParser::assignSt()
     {
-        if (buffer[h].type != TokenType::IDENFR)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::IDENFR);
 
         Var* var;
         findVar(var);
@@ -1750,9 +1780,9 @@ namespace scc
 
             nextToken();
 
-            int exp1, exp2;
+            int depCode1, depCode2;
 
-            if (expression(exp1) != VarType::INT)
+            if (expression(depCode1) != VarType::INT)
             {
                 printErr(preToken().row, 'i', "invalid type for array subscript");
             }
@@ -1772,12 +1802,12 @@ namespace scc
             }
             nextToken();
 
-            VarType type = expression(exp2);
-            storeElement(var, type, exp1, exp2);
+            VarType type = expression(depCode2);
+            storeElement(var, type, depCode1, depCode2);
         }
         else
         {
-            // TODO: ERROR
+            throw ParsingError("expect '=' or '['");
         }
 
         print("<赋值语句>\n");
@@ -1787,10 +1817,8 @@ namespace scc
     {
         int retStatus1, retStatus;
 
-        if (buffer[h].type != TokenType::IFTK)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::IFTK);
+
         nextToken();
         if (buffer[h].type != TokenType::LPARENT)
         {
@@ -1809,8 +1837,7 @@ namespace scc
         }
 
         int jpcIp = codes.size();
-        codes.emplace_back(0070);
-        codes.back().dependentCodes.push_back(lastCode);
+        codes.emplace_back(0070, lastCode);
 
         int preLoopCode = loopCode;
         loopCode = codes.size();
@@ -1879,62 +1906,49 @@ namespace scc
         case TokenType::LSS:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 11 : 8);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 11 : 8, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         case TokenType::LEQ:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 10 : 9);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 10 : 9, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         case TokenType::GRE:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 9 : 10);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 9 : 10, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         case TokenType::GEQ:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 8 : 11);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 8 : 11, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         case TokenType::EQL:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 13 : 12);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 13 : 12, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         case TokenType::NEQ:
             nextToken();
             type = expression(curCode);
-            codes.emplace_back(0100, inv && optimize ? 12 : 13);
-            codes.back().dependentCodes.push_back(curCode);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, inv && optimize ? 12 : 13, curCode, lastCode);
             lastCode = codes.size() - 1;
             break;
 
         default:
             if (inv && optimize)
             {
-                codes.emplace_back(0100, 7);
-                codes.back().dependentCodes.push_back(lastCode);
+                codes.emplace_back(0100, 7, lastCode);
                 lastCode = codes.size() - 1;
             }
             break;
@@ -1943,9 +1957,7 @@ namespace scc
         if (!optimize && inv)
         {
             codes.emplace_back(0010, 0);
-            codes.emplace_back(0100, 12);
-            codes.back().dependentCodes.push_back(codes.size() - 2);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0100, 12, codes.size() - 1, lastCode);
             lastCode = codes.size() - 1;
         }
 
@@ -1992,8 +2004,7 @@ namespace scc
             }
 
             int jpcIp = codes.size();
-            codes.emplace_back(0070);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0070, lastCode);
 
             retStatus = statement() & 1;
 
@@ -2045,8 +2056,7 @@ namespace scc
                 nextToken();
             }
 
-            codes.emplace_back(0070, doIp);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0070, doIp, lastCode);
 
             endLoop();
             loopCode = preLoopCode;
@@ -2111,8 +2121,7 @@ namespace scc
             }
 
             int jpcIp = codes.size();
-            codes.emplace_back(0070);
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0070, lastCode);
 
             if (buffer[h].type != TokenType::IDENFR)
             {
@@ -2174,15 +2183,11 @@ namespace scc
 
             if (plus)
             {
-                codes.emplace_back(0100, 2);
-                codes.back().dependentCodes.push_back(lastCode);
-                codes.back().dependentCodes.push_back(codes.size() - 2);
+                codes.emplace_back(0100, 2, codes.size() - 1, lastCode);
             }
             else
             {
-                codes.emplace_back(0100, 3);
-                codes.back().dependentCodes.push_back(lastCode);
-                codes.back().dependentCodes.push_back(codes.size() - 2);
+                codes.emplace_back(0100, 3, codes.size() - 1, lastCode);
             }
 
             storeVar(var, VarType::INT, codes.size() - 1);
@@ -2199,7 +2204,7 @@ namespace scc
         }
         else
         {
-            // TODO: ERROR
+            throw ParsingError("not a loop statement");
         }
 
         print("<循环语句>\n");
@@ -2218,12 +2223,9 @@ namespace scc
 
     VarType RecursiveParser::funCall(bool remain)
     {
-        if (buffer[h].type != TokenType::IDENFR)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::IDENFR);
 
-        int id = funTrie.find(buffer[h].val.c_str());
+        int id = funTrie.cfind(buffer[h].val.c_str());
         if (id == 0)
         {
             printErr(buffer[h].row, 'c', "'%s' was not declared in this scope", buffer[h].val.c_str());
@@ -2285,12 +2287,9 @@ namespace scc
 
     void RecursiveParser::voidFunCall()
     {
-        if (buffer[h].type != TokenType::IDENFR)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::IDENFR);
 
-        int id = funTrie.find(buffer[h].val.c_str());
+        int id = funTrie.cfind(buffer[h].val.c_str());
         if (id == 0)
         {
             printErr(buffer[h].row, 'c', "'%s' was not declared in this scope", buffer[h].val.c_str());
@@ -2396,10 +2395,8 @@ namespace scc
     void RecursiveParser::readSt()
     {
         Var* var;
-        if (buffer[h].type != TokenType::SCANFTK)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::SCANFTK);
+
         nextToken();
         if (buffer[h].type != TokenType::LPARENT)
         {
@@ -2449,10 +2446,8 @@ namespace scc
 
     void RecursiveParser::writeSt()
     {
-        if (buffer[h].type != TokenType::PRINTFTK)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::PRINTFTK);
+
         nextToken();
         if (buffer[h].type != TokenType::LPARENT)
         {
@@ -2465,20 +2460,18 @@ namespace scc
         if (buffer[h].type == TokenType::STRCON)
         {
             codes.emplace_back(0010, str());
-            codes.emplace_back(0100, 18);
-            codes.back().dependentCodes.push_back(codes.size() - 2);
+            codes.emplace_back(0100, 18, codes.size() - 1);
             if (buffer[h].type == TokenType::COMMA)
             {
                 nextToken();
                 if (expression(lastCode) == VarType::INT)
                 {
-                    codes.emplace_back(0100, 14);
+                    codes.emplace_back(0100, 14, lastCode);
                 }
                 else
                 {
-                    codes.emplace_back(0100, 19);
+                    codes.emplace_back(0100, 19, lastCode);
                 }
-                codes.back().dependentCodes.push_back(lastCode);
             }
             else
             {
@@ -2489,13 +2482,12 @@ namespace scc
         {
             if (expression(lastCode) == VarType::INT)
             {
-                codes.emplace_back(0100, 14);
+                codes.emplace_back(0100, 14, lastCode);
             }
             else
             {
-                codes.emplace_back(0100, 19);
+                codes.emplace_back(0100, 19, lastCode);
             }
-            codes.back().dependentCodes.push_back(lastCode);
         }
         if (buffer[h].type != TokenType::RPARENT)
         {
@@ -2512,10 +2504,8 @@ namespace scc
 
     void RecursiveParser::returnSt()
     {
-        if (buffer[h].type != TokenType::RETURNTK)
-        {
-            // TODO: ERROR
-        }
+        assert(buffer[h].type == TokenType::RETURNTK);
+
         nextToken();
 
         const Fun& fun = funVector.back();
@@ -2530,7 +2520,8 @@ namespace scc
             {
                 if (fun.returnType == VarType::VOID)
                 {
-                    printErr(buffer[h].row, 'g', "return-statement with a value, in function returning 'void'");
+                    printErr(buffer[h].row, 'g',
+                            "return-statement with a value, in function returning 'void'");
                 }
                 else
                 {
@@ -2549,8 +2540,7 @@ namespace scc
 
             // TODO: judge
 
-            codes.emplace_back(0030, -std::max(static_cast<int>(fun.paramTypes.size()), 1));
-            codes.back().dependentCodes.push_back(lastCode);
+            codes.emplace_back(0030, -std::max(static_cast<int>(fun.paramTypes.size()), 1), lastCode);
             codes.back().remain = 1;
         }
         else
@@ -2567,7 +2557,7 @@ namespace scc
         print("<返回语句>\n");
     }
 
-    void RecursiveParser::parse()
+    bool RecursiveParser::parse()
     {
         assert(lexer != nullptr);
 
@@ -2590,7 +2580,8 @@ namespace scc
             else
             {
                 nextToken(false);
-                if (buffer[h].type != TokenType::LBRACK && buffer[h].type != TokenType::COMMA && buffer[h].type != TokenType::SEMICN)
+                if (buffer[h].type != TokenType::LBRACK && buffer[h].type != TokenType::COMMA
+                        && buffer[h].type != TokenType::SEMICN)
                 {
                     rollback(2);
                 }
@@ -2640,5 +2631,7 @@ namespace scc
         print("<程序>\n");
 
         // TODO
+
+        return !hasError;
     }
 }

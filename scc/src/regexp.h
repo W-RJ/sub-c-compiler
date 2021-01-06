@@ -23,11 +23,11 @@
 #ifndef _SCC_REGEXP_H_
 #define _SCC_REGEXP_H_
 
+#include "trie"
+
 #include <cstdio>
 #include <vector>
 #include <utility>
-
-#include "trie"
 
 namespace scc
 {

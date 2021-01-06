@@ -23,6 +23,11 @@
 #ifndef _SCC_PARSER_H_
 #define _SCC_PARSER_H_
 
+#include "lexer.h"
+#include "trie"
+
+#include "../../common/src/pcode.h"
+
 #include <cstdio>
 #include <cstdarg>
 
@@ -30,10 +35,6 @@
 #include <vector>
 #include <list>
 #include <utility>
-
-#include "lexer.h"
-#include "trie"
-#include "../../common/src/pcode.h"
 
 namespace scc
 {
@@ -91,6 +92,10 @@ namespace scc
         explicit ExCode(unsigned f);
 
         ExCode(unsigned f, int a);
+
+        ExCode(unsigned f, int a, int depCode);
+
+        ExCode(unsigned f, int a, int depCode1, int depCode2);
     };
 
     class Parser
@@ -175,11 +180,11 @@ namespace scc
 
         int loadVar(Var* var);
 
-        void loadElement(Var* var, int exp);
+        void loadElement(Var* var, int depCode);
 
-        void storeVar(Var* var, VarType type, int exp);
+        void storeVar(Var* var, VarType type, int depCode);
 
-        void storeElement(Var* var, VarType typer, int exp1, int exp2);
+        void storeElement(Var* var, VarType typer, int depCode1, int depCode2);
 
         void allocAddr(int codesH);
 
@@ -195,11 +200,11 @@ namespace scc
 
         void close();
 
-        virtual void parse() = 0;
+        virtual bool parse() = 0;
 
         bool hasErr();
 
-        void write(const char* fileName);
+        void writeBin(const char* fileName);
 
         void writeText(const char* fileName);
     };
@@ -280,7 +285,7 @@ namespace scc
 
         using Parser::Parser;
 
-        virtual void parse() override;
+        virtual bool parse() override;
 
     };
 }
