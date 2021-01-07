@@ -2628,6 +2628,11 @@ namespace scc
 
         mainFun();
 
+        if (buffer[h].type != TokenType::FEOF)
+        {
+            printErr(buffer[h].row, '\0', "expect end of file before '%s'", buffer[h].val.c_str());
+        }
+
         print("<程序>\n");
 
         // TODO
